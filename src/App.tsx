@@ -3,28 +3,52 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // components
 import RootLayout from "./layouts/RootLayout";
 
+// context
+import { AuthProvider, useAuth } from "./context/AuthContext";
+
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
+import ProtectedRoutes from "./routes/ProtectedRoutes";
+import PublicRoutes from "./routes/PublicRoutes";
 
 function App() {
+  const { logOut } = useAuth();
   const router = createBrowserRouter([
     {
-      path: "/",
-      element: <RootLayout />,
+      element: <PublicRoutes />,
       children: [
         {
-          index: true,
-          element: <DashboardPage />,
+          path: "/login",
+          element: <LoginPage />,
         },
       ],
     },
     {
-      path: "/login",
-      element: <LoginPage />,
+      element: <ProtectedRoutes />,
+      children: [
+        {
+          index: "/",
+          element: <RootLayout />,
+          children: [
+            {
+              index: true,
+              element: <DashboardPage />,
+            },
+          ],
+        },
+        {
+          path: "/logout",
+          action: () => logOut(),
+        },
+      ],
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />;
+    </AuthProvider>
+  );
 }
 
 export default App;
