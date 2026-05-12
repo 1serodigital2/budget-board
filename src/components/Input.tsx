@@ -5,6 +5,7 @@ const Input = ({
   label,
   handleInputChange,
   required = false,
+  type = "text",
 }: InputProps) => {
   return (
     <div className="flex flex-col">

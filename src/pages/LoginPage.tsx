@@ -40,7 +40,7 @@ const Login = () => {
   return (
     <div className="flex min-h-screen items-center justify-center flex-col">
       <h1 className="mb-2 text-center text-3xl font-bold">Budget Board</h1>
-      <div className="bg-[#7c3aed] p-5 rounded-3xl w-125">
+      <div className="bg-(--color-primary) p-5 rounded-3xl w-125">
         <form onSubmit={handleFormSubmit} action="">
           <div className="mb-2.5">
             <Input

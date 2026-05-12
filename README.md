@@ -72,7 +72,7 @@ export default defineConfig([
 ]);
 ```
 
-Project architecture
+# Project architecture
 src/
 ├── components/
 ├── context/
@@ -87,7 +87,7 @@ src/
 ├── layouts/
 ├── lib/
 ├── pages/
-├── routes/
+├── routes/ś
 │ └── ProtectedRoute.tsx
 │
 ├── services/
@@ -99,3 +99,51 @@ src/
 ├── utils/
 ├── App.tsx
 └── main.tsx
+
+# Firestore Database Structure
+users/
+│
+└── {uid}/
+    │
+    ├── profile/
+    │   ├── name: string
+    │   ├── email: string
+    │   ├── photoURL: string
+    │   └── createdAt: timestamp
+    │
+    ├── expenses/
+    │   │
+    │   └── {expenseId}/
+    │       ├── title: string
+    │       ├── amount: number
+    │       ├── categoryId: string
+    │       ├── note: string
+    │       ├── budgetId: string
+    │       ├── paymentMethod: string
+    │       ├── createdAt: timestamp
+    │       └── updatedAt: timestamp
+    │
+    ├── categories/
+    │   │
+    │   └── {categoryId}/
+    │       ├── name: string
+    │       ├── color: string
+    │       ├── icon: string
+    │       ├── createdAt: timestamp
+    │       └── updatedAt: timestamp
+    │
+    ├── budgets/
+    │   │
+    │   └── {budgetId}/
+    │       ├── categoryId: string
+    │       ├── limit: number
+    │       ├── spent: number
+    │       ├── month: string
+    │       ├── year: number
+    │       ├── createdAt: timestamp
+    │       └── updatedAt: timestamp
+    │
+    └── settings/
+        ├── currency: "INR"
+        ├── theme: "light"
+        └── notifications: true

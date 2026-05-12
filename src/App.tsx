@@ -6,10 +6,13 @@ import RootLayout from "./layouts/RootLayout";
 // context
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
+// pages
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
 import PublicRoutes from "./routes/PublicRoutes";
+import AddExpensePage from "./pages/AddExpensePage";
+import ExpensesPage from "./pages/ExpensesPage";
 
 function App() {
   const { logOut } = useAuth();
@@ -34,11 +37,15 @@ function App() {
               index: true,
               element: <DashboardPage />,
             },
+            {
+              path: "/expenses",
+              element: <ExpensesPage />,
+            },
+            {
+              path: "/expenses/add",
+              element: <AddExpensePage />,
+            },
           ],
-        },
-        {
-          path: "/logout",
-          action: () => logOut(),
         },
       ],
     },

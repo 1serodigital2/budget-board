@@ -6,9 +6,11 @@ const RootLayout = () => {
   return (
     <div className="flex">
       <SideBarNavigation />
-      <main>
+      <main className="w-full">
         <Header />
-        <Outlet />
+        <div className="px-10 py-5">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
