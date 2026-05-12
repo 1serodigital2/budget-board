@@ -1,6 +1,7 @@
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { auth } from "./firebase";
 
@@ -10,12 +11,10 @@ export const createUser = (email, password) => {
 };
 
 export const loginUser = (email, password) => {
-  setLoading(true);
-  console.log("login response ", response);
+  console.log("login response ");
   return signInWithEmailAndPassword(auth, email, password);
 };
 
-export const logOut = () => {
-  setLoading(true);
+export const logOutUser = () => {
   return signOut(auth);
 };

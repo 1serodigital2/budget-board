@@ -3,9 +3,14 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../services/firebase";
 
 // auth
+import { loginUser, logOutUser } from "../services/auth";
 
 const AuthContext = createContext({
   toggleLoading: () => {},
+  user: null,
+  logOut: () => {},
+  login: () => {},
+  loading: true,
 });
 
 export const AuthProvider = ({ children }) => {
@@ -17,19 +22,23 @@ export const AuthProvider = ({ children }) => {
   //   return createUserWithEmailAndPassword(auth, email, password);
   // };
 
-  // const loginUser = (email, password) => {
-  //   setLoading(true);
-  //   console.log("login response ", response);
-  //   return signInWithEmailAndPassword(auth, email, password);
-  // };
+  const login = async (email, password) => {
+    try {
+      setLoading(true);
+      await loginUser(email, password);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // const logOut = () => {
-  //   setLoading(true);
-  //   return signOut(auth);
-  // };
-
-  const toggleLoading = () => {
-    setLoading(true);
+  const logOut = async () => {
+    try {
+      setLoading(true);
+      await logOutUser();
+    } finally {
+      console.log("user logged out");
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -46,10 +55,9 @@ export const AuthProvider = ({ children }) => {
   const authValue = {
     // createUser,
     user,
-    // loginUser,
-    // logOut,
-    // loading,
-    toggleLoading,
+    login,
+    logOut,
+    loading,
   };
 
   return (

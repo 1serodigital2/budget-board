@@ -27,7 +27,7 @@ function App() {
       element: <ProtectedRoutes />,
       children: [
         {
-          index: "/",
+          path: "/",
           element: <RootLayout />,
           children: [
             {

@@ -11,7 +11,7 @@ const initialValues = {
 };
 
 const Login = () => {
-  const { user, loginUser } = useAuth();
+  const { user, login, loading } = useAuth();
   const navigate = useNavigate();
   if (user) {
     navigate("/");
@@ -20,11 +20,12 @@ const Login = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (!loginData.email || !loginData.password) {
+    const email = loginData.email || "";
+    const password = loginData.password || "";
+    if (!email || !password) {
       console.log("Please fill up the form properly");
     }
-    const response = await loginUser(loginData);
-    console.log("login response ", response);
+    await login(email, password);
   };
 
   const handleInputChange = (name, value) => {
@@ -58,7 +59,7 @@ const Login = () => {
             />
           </div>
           <button className="bg-[#1e3a8a] p-3 text-white rounded-xl cursor-pointer">
-            Login
+            {loading ? "Submitting" : "Login"}
           </button>
         </form>
       </div>
