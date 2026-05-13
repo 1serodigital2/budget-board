@@ -6,6 +6,7 @@ const Input = ({
   handleInputChange,
   required = false,
   type = "text",
+  inputValues
 }: InputProps) => {
   return (
     <div className="flex flex-col">
@@ -16,11 +17,12 @@ const Input = ({
         {label}
       </label>
       <input
-        type="text"
+        type={type}
         id={name}
         required={required}
         className="block mb-2.5 text-sm font-medium text-heading p-3 border rounded-xl text-white"
         onChange={(e) => handleInputChange(name, e.target.value)}
+        value={inputValues}
       />
     </div>
   );
