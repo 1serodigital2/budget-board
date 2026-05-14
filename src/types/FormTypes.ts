@@ -4,7 +4,7 @@ export interface InputProps {
   handleInputChange: (name: string, value: string | number) => void;
   required?: boolean;
   type?: string;
-  inputValues?: string | number | undefined
+  inputValues?: string | number | undefined;
 }
 
 export interface LoginProps {
@@ -16,4 +16,16 @@ export interface ExpenseProps {
   amount: number;
   category: string;
   note?: string;
+}
+export interface AlertProps {
+  type?: "success" | "error" | "warning" | "info" | "loading";
+  message: string;
+}
+
+export interface ExpenseFormProps {
+  handleFormSubmit: () => void;
+  handleInputChange: () => void;
+  inputValues: ExpenseProps;
+  isPending: boolean;
+  submitMessage: AlertProps;
 }

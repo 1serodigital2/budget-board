@@ -10,6 +10,9 @@ import Input from "../components/Input";
 // types
 import { ExpenseProps } from "../types/FormTypes";
 import { createExpense, queryClient } from "../api/expenses";
+import ExpenseForm from "../components/form/Expense";
+import Alert, { AlertProps } from "../components/ui/Alert";
+import { error } from "console";
 
 const initialValues: ExpenseProps = {
   amount: 0,
@@ -19,20 +22,35 @@ const initialValues: ExpenseProps = {
 
 const AddExpense = () => {
   const [inputValues, setInputValues] = useState(initialValues);
+  const [submitMessage, setSubmitMessage] = useState<AlertProps>({
+    message: "",
+  });
+
   const { user } = useAuth();
 
   const { mutate, isPending } = useMutation({
     mutationFn: createExpense,
     onSuccess: () => {
       setInputValues(initialValues);
+      setSubmitMessage({ message: "Expense added successfully" });
       queryClient.invalidateQueries({
         queryKey: ["users"],
         refetchType: "none",
       });
+
+      setTimeout(() => {
+        setSubmitMessage({ message: "" });
+      }, 3000);
     },
 
     onError: () => {
       console.error("Unable to add expense");
+
+      setSubmitMessage({ type: "error", message: "Unable to add expense" });
+
+      setTimeout(() => {
+        setSubmitMessage({ message: "" });
+      }, 3000);
     },
   });
 
@@ -74,44 +92,17 @@ const AddExpense = () => {
     }
   };
 
+
   return (
     <>
       <h1 className="text-2xl font-medium mb-4">Add Expense</h1>
-      <form
-        onSubmit={handleFormSubmit}
-        className="bg-(--color-primary) p-8 rounded-3xl max-w-3xl"
-      >
-        <div className="mb-2 5">
-          <Input
-            type="number"
-            name="amount"
-            label="Amount"
-            required
-            handleInputChange={handleInputChange}
-            inputValues={inputValues.amount || ""}
-          />
-        </div>
-        <div className="mb-2 5">
-          <Input
-            name="category"
-            label="Category"
-            required
-            handleInputChange={handleInputChange}
-            inputValues={inputValues.category || ""}
-          />
-        </div>
-        <div className="mb-2 5">
-          <Input
-            name="note"
-            label="Short note"
-            handleInputChange={handleInputChange}
-            inputValues={inputValues.note || ""}
-          />
-        </div>
-        <button className="bg-[#1e3a8a] p-3 text-white rounded-xl cursor-pointer">
-          {isPending ? "Submitting" : "Submit"}
-        </button>
-      </form>
+      <ExpenseForm
+        handleFormSubmit={handleFormSubmit}
+        handleInputChange={handleInputChange}
+        inputValues={inputValues}
+        isPending={isPending}
+        submitMessage={submitMessage}
+      />
     </>
   );
 };
