@@ -29,3 +29,8 @@ export interface ExpenseFormProps {
   isPending: boolean;
   submitMessage: AlertProps;
 }
+
+export interface LoginTypes {
+  email: string;
+  password: string;
+}

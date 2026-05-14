@@ -11,8 +11,7 @@ import Input from "../components/Input";
 import { ExpenseProps } from "../types/FormTypes";
 import { createExpense, queryClient } from "../api/expenses";
 import ExpenseForm from "../components/form/Expense";
-import Alert, { AlertProps } from "../components/ui/Alert";
-import { error } from "console";
+import { AlertProps } from "../types/FormTypes";
 
 const initialValues: ExpenseProps = {
   amount: 0,
@@ -91,7 +90,6 @@ const AddExpense = () => {
       console.error("Unable to add", error);
     }
   };
-
 
   return (
     <>

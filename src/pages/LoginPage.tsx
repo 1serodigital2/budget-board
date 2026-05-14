@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 import Input from "../components/Input";
+import { LoginProps, LoginTypes } from "../types/FormTypes";
 
-const initialValues = {
+const initialValues: LoginProps = {
   email: "",
   password: "",
 };
@@ -16,19 +17,19 @@ const Login = () => {
   if (user) {
     navigate("/");
   }
-  const [loginData, setLoginData] = useState<InputProps>(initialValues);
+  const [loginData, setLoginData] = useState<LoginProps>(initialValues);
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const email = loginData.email || "";
     const password = loginData.password || "";
     if (!email || !password) {
       console.log("Please fill up the form properly");
     }
-    await login(email, password);
+    await login({ email, password });
   };
 
-  const handleInputChange = (name, value) => {
+  const handleInputChange = (name: string, value: string | number) => {
     setLoginData((prevState) => {
       return {
         ...prevState,
@@ -58,7 +59,10 @@ const Login = () => {
               required
             />
           </div>
-          <button className="bg-[#1e3a8a] p-3 text-white rounded-xl cursor-pointer">
+          <button
+            className="bg-[#1e3a8a] p-3 text-white rounded-xl cursor-pointer"
+            disabled={loading === true}
+          >
             {loading ? "Submitting" : "Login"}
           </button>
         </form>

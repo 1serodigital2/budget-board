@@ -1,28 +1,39 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../services/firebase";
 
 // auth
 import { loginUser, logOutUser } from "../services/auth";
+import { LoginProps } from "../types/FormTypes";
 
-const AuthContext = createContext({
-  toggleLoading: () => {},
+interface AuthContextType {
+  user: User | null;
+  logOut: () => Promise<void>;
+  login: ({ email, password }: LoginProps) => Promise<void>;
+  loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType>({
   user: null,
-  logOut: () => {},
-  login: () => {},
+  logOut: async () => {},
+  login: async () => {},
   loading: true,
 });
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+interface AuthProviderProps {
+  children: ReactNode;
+}
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // const createUser = (email, password) => {
-  //   setLoading(true);
-  //   return createUserWithEmailAndPassword(auth, email, password);
-  // };
-
-  const login = async (email, password) => {
+  const login = async ({ email, password }: LoginProps) => {
     try {
       setLoading(true);
       await loginUser(email, password);

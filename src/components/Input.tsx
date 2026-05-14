@@ -6,13 +6,13 @@ const Input = ({
   handleInputChange,
   required = false,
   type = "text",
-  inputValues
+  inputValues,
 }: InputProps) => {
   return (
     <div className="flex flex-col">
       <label
         htmlFor={name}
-        className="block mb-2.5 text-md text-white font-medium text-heading "
+        className="block mb-2.5 text-md text-white font-medium text-heading"
       >
         {label}
       </label>
