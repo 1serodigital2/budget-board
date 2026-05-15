@@ -16,6 +16,8 @@ import ProtectedRoutes from "./routes/ProtectedRoutes";
 import PublicRoutes from "./routes/PublicRoutes";
 import AddExpensePage from "./pages/AddExpensePage";
 import ExpensesPage from "./pages/ExpensesPage";
+import ExpensePage, {loader as ExpenseLoader} from "./pages/ExpensePage";
+import EditExpensePage from "./pages/EditExpensePage";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +48,16 @@ const router = createBrowserRouter([
             path: "/expenses/add",
             element: <AddExpensePage />,
           },
+          {
+            path: "/expenses/:id",
+            element: <ExpensePage />,
+            // loader: ExpenseLoader
+          },
+          {
+            path: "/expenses/:id/edit",
+            element: <EditExpensePage />,
+            // loader: ExpenseLoader
+          }
         ],
       },
     ],

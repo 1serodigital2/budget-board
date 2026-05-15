@@ -68,11 +68,38 @@ interface deleteExpenseType {
   uid: string;
 }
 export const deleteExpense = async ({ id, uid }: deleteExpenseType) => {
+  console.log("deleteExpense request expense id", id);
+  console.log("deleteExpense request user id", uid);
+
   try {
     const response = await deleteDoc(doc(db, `users/${uid}/expenses`, id));
     console.log("delete expense resposne", response);
   } catch (error: any) {
     console.error("Unablet to delete expense", error);
     throw new Error("Unable to delete expense", error);
+  }
+};
+
+export const getExpenseById = async ({ uid, id }) => {
+  console.log("getExpense uid", uid);
+  console.log("getExpense id", id);
+  try {
+    const docSnap = await getDoc(doc(db, `users/${uid}/expenses`, id));
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const expenseData = {
+        id,
+        amount: data.amount,
+        category: data.category,
+        note: data.note,
+        createdAt: data.createdAt || "",
+      };
+
+      console.log("expenseData", expenseData);
+      return expenseData;
+    }
+  } catch (error) {
+    console.error("Unable to get expense detail", error);
+    throw new Error("Unable to get expense detail", error);
   }
 };

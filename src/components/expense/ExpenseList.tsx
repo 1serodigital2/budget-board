@@ -7,7 +7,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteExpense, getExpenses, queryClient } from "../../api/expenses";
 import { useAuth } from "../../context/AuthContext";
 import Alert from "../ui/Alert";
-import { AlertProps } from "../../types/FormTypes";
 
 const ExpenseList = () => {
   const [deleteMessage, setDeleteMessage] = useState<AlertProps>({
@@ -36,18 +35,17 @@ const ExpenseList = () => {
       });
       queryClient.invalidateQueries({
         queryKey: ["expenses"],
-        // refetchType: "none",
       });
 
       setTimeout(() => {
         setDeleteMessage({ message: "" });
-      });
+      }, 3000);
     },
     onError: () => {
       setDeleteMessage({ type: "error", message: "Unable to delete expense" });
       setTimeout(() => {
         setDeleteMessage({ message: "" });
-      });
+      }, 3000);
     },
   });
 
@@ -121,7 +119,7 @@ const ExpenseList = () => {
 
                   <button
                     disabled={isPending}
-                    onClick={() => handleDelete(event.id)}
+                    onClick={() => handleDelete(expense.id)}
                     className="cursor-pointer text-red-900 disabled:opacity-50"
                   >
                     {isPending ? "Deleting..." : "Delete"}
