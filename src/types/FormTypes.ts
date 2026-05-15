@@ -16,6 +16,7 @@ export interface ExpenseProps {
   amount: number;
   category: string;
   note?: string;
+  createdAt?: string;
 }
 export interface AlertProps {
   type?: "success" | "error" | "warning" | "info" | "loading";

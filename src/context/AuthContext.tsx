@@ -12,6 +12,8 @@ import { auth } from "../services/firebase";
 import { loginUser, logOutUser } from "../services/auth";
 import { LoginProps } from "../types/FormTypes";
 
+import { setUserIdCookie } from "../utils/helpers";
+
 interface AuthContextType {
   user: User | null;
   logOut: () => Promise<void>;
@@ -56,6 +58,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      setUserIdCookie(currentUser.uid, 365);
     });
 
     return () => {

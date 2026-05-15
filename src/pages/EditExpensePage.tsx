@@ -1,6 +1,6 @@
 // react hooks
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLoaderData } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 // tanstack
@@ -23,11 +23,13 @@ const EditExpensePage = () => {
   const { user } = useAuth();
   const params = useParams();
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["expenses", params.id],
-    queryFn: () => getExpenseById({ uid: user.uid, id: params.id }),
-    enabled: !!user.uid && !!params.id
-  });
+  const expData = useLoaderData();
+
+  // const { data, isLoading, isError, error } = useQuery({
+  //   queryKey: ["expenses", params.id],
+  //   queryFn: () => getExpenseById({ uid: user.uid, id: params.id }),
+  //   enabled: !!user.uid && !!params.id,
+  // });
 
   const { mutate, isPending } = useMutation({
     mutationFn: createExpense,
@@ -56,10 +58,10 @@ const EditExpensePage = () => {
   });
 
   const expenseData: ExpenseProps = {
-    amount: data.amount,
-    category: data.category,
-    note: data.note,
-    createdAt: data.createdAt,
+    amount: expData.amount || "",
+    category: expData.category || "",
+    note: expData.note || "",
+    createdAt: expData.createdAt || "",
   };
 
   const [inputValues, setInputValues] = useState<ExpenseProps>(expenseData);
@@ -132,3 +134,14 @@ const EditExpensePage = () => {
 };
 
 export default EditExpensePage;
+
+export const loader = async ({ request, params }) => {
+  console.log("loader triggered");
+  try {
+    const { user } = useAuth();
+    const response = await getExpenseById({ uid: user.id, id: request.id });
+    return response;
+  } catch (error: any) {
+    throw new Error("error while loading expense", error);
+  }
+};

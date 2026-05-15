@@ -80,7 +80,12 @@ export const deleteExpense = async ({ id, uid }: deleteExpenseType) => {
   }
 };
 
-export const getExpenseById = async ({ uid, id }) => {
+interface GetExpenseByIdType {
+  uid: string;
+  id: string;
+}
+
+export const getExpenseById = async ({ uid, id }: GetExpenseByIdType) => {
   console.log("getExpense uid", uid);
   console.log("getExpense id", id);
   try {
@@ -98,7 +103,7 @@ export const getExpenseById = async ({ uid, id }) => {
       console.log("expenseData", expenseData);
       return expenseData;
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Unable to get expense detail", error);
     throw new Error("Unable to get expense detail", error);
   }
