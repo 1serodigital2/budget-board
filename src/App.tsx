@@ -17,47 +17,55 @@ import PublicRoutes from "./routes/PublicRoutes";
 import AddExpensePage from "./pages/AddExpensePage";
 import ExpensesPage from "./pages/ExpensesPage";
 
-function App() {
-  const { logOut } = useAuth();
-  const router = createBrowserRouter([
-    {
-      element: <PublicRoutes />,
-      children: [
-        {
-          path: "/login",
-          element: <LoginPage />,
-        },
-      ],
-    },
-    {
-      element: <ProtectedRoutes />,
-      children: [
-        {
-          path: "/",
-          element: <RootLayout />,
-          children: [
-            {
-              index: true,
-              element: <DashboardPage />,
-            },
-            {
-              path: "/expenses",
-              element: <ExpensesPage />,
-            },
-            {
-              path: "/expenses/add",
-              element: <AddExpensePage />,
-            },
-          ],
-        },
-      ],
-    },
-  ]);
+const router = createBrowserRouter([
+  {
+    element: <PublicRoutes />,
+    children: [
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
+    ],
+  },
+  {
+    element: <ProtectedRoutes />,
+    children: [
+      {
+        path: "/",
+        element: <RootLayout />,
+        children: [
+          {
+            index: true,
+            element: <DashboardPage />,
+          },
+          {
+            path: "/expenses",
+            element: <ExpensesPage />,
+          },
+          {
+            path: "/expenses/add",
+            element: <AddExpensePage />,
+          },
+        ],
+      },
+    ],
+  },
+]);
 
+function AppRoute() {
+  const { loading } = useAuth();
+  if (loading) {
+    return <p>Please wait ....</p>;
+  }
+
+  return <RouterProvider router={router} />;
+}
+
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <RouterProvider router={router} />;
+        <AppRoute />
       </AuthProvider>
     </QueryClientProvider>
   );
