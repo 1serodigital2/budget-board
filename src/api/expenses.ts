@@ -1,5 +1,13 @@
 import { QueryClient } from "@tanstack/react-query";
-import { addDoc, doc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  doc,
+  collection,
+  serverTimestamp,
+  getDoc,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
 import { db } from "../services/firebase";
 import { ExpenseProps } from "../types/FormTypes";
 
@@ -14,7 +22,6 @@ export const createExpense = async ({
   expenseDetail,
 }: CreateExpenseProp) => {
   try {
-    console.log("user id", uid);
     if (!uid) {
       throw new Error("Uid is missing");
     }
@@ -23,7 +30,49 @@ export const createExpense = async ({
       createdAt: serverTimestamp(),
     });
     console.log("doc refid", docRef.id);
-  } catch (error) {
+  } catch (error: any) {
     throw new Error("Unable to add expense", error);
+  }
+};
+
+export const getExpenses = async (uid: string) => {
+  console.log("getting expenses for user", uid);
+
+  try {
+    const querySnapshot = await getDocs(
+      collection(db, `users/${uid}/expenses`),
+    );
+
+    const expenses = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      return {
+        id: doc.id,
+        amount: data.amount,
+        category: data.category,
+        note: data.note,
+        createdAt: data.createdAt || "",
+      };
+    });
+
+    return expenses;
+  } catch (error: any) {
+    console.error("Unable to get expenses", error);
+
+    throw new Error("Unable to get expenses");
+  }
+};
+
+interface deleteExpenseType {
+  id: string;
+  uid: string;
+}
+export const deleteExpense = async ({ id, uid }: deleteExpenseType) => {
+  try {
+    const response = await deleteDoc(doc(db, `users/${uid}/expenses`, id));
+    console.log("delete expense resposne", response);
+  } catch (error: any) {
+    console.error("Unablet to delete expense", error);
+    throw new Error("Unable to delete expense", error);
   }
 };

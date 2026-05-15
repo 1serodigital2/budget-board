@@ -1,8 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 
 const Dashboard = () => {
-  const { currentUser } = useAuth();
-  console.log("auth", currentUser);
+  const { user } = useAuth();
 
   return <h1>Dashboard</h1>;
 };
