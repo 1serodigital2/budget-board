@@ -7,6 +7,7 @@ import {
   getDoc,
   getDocs,
   deleteDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { ExpenseProps } from "../types/FormTypes";
@@ -106,5 +107,33 @@ export const getExpenseById = async ({ uid, id }: GetExpenseByIdType) => {
   } catch (error: any) {
     console.error("Unable to get expense detail", error);
     throw new Error("Unable to get expense detail", error);
+  }
+};
+
+interface UpdateExpenseData {
+  expId: string;
+  expenseDetail: ExpenseProps;
+  uid: string;
+}
+export const updateExpense = async ({
+  uid,
+  expId,
+  expenseDetail,
+}: UpdateExpenseData) => {
+  try {
+    console.log("updateExpense uid", uid);
+    console.log("updateExpense id", expId);
+    console.log("updateExpense expenseDetail", expenseDetail);
+    const eventRef = doc(db, `users/${uid}/expenses`, expId);
+
+    await updateDoc(eventRef, {
+      ...expenseDetail,
+      createdAt: serverTimestamp(),
+    });
+
+    return true;
+  } catch (error) {
+    console.error("unable to update expense", error);
+    throw new Error("Error while updating expense");
   }
 };

@@ -17,9 +17,7 @@ import PublicRoutes from "./routes/PublicRoutes";
 import AddExpensePage from "./pages/AddExpensePage";
 import ExpensesPage from "./pages/ExpensesPage";
 import ExpensePage from "./pages/ExpensePage";
-import EditExpensePage, {
-  loader as ExpenseLoader,
-} from "./pages/EditExpensePage";
+import EditExpensePage from "./pages/EditExpensePage";
 
 const router = createBrowserRouter([
   {
@@ -58,7 +56,7 @@ const router = createBrowserRouter([
           {
             path: "/expenses/:id/edit",
             element: <EditExpensePage />,
-            loader: ExpenseLoader,
+            // loader: ExpenseLoader,
           },
         ],
       },

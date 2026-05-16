@@ -1,5 +1,5 @@
 // react hooks
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useLoaderData } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -8,7 +8,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 // types
 import { ExpenseProps } from "../types/FormTypes";
-import { createExpense, getExpenseById, queryClient } from "../api/expenses";
+import {
+  createExpense,
+  getExpenseById,
+  queryClient,
+  updateExpense,
+} from "../api/expenses";
 import ExpenseForm from "../components/form/Expense";
 import { AlertProps } from "../types/FormTypes";
 import Alert from "../components/ui/Alert";
@@ -21,24 +26,35 @@ const initialValues: ExpenseProps = {
 
 const EditExpensePage = () => {
   const { user } = useAuth();
-  const params = useParams();
+  const { id } = useParams();
+  const [inputValues, setInputValues] = useState<ExpenseProps>(initialValues);
+  const [submitMessage, setSubmitMessage] = useState<AlertProps>({
+    message: "",
+  });
 
-  const expData = useLoaderData();
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["expenses", id],
+    queryFn: () => getExpenseById({ uid: user.uid, id }),
+    enabled: !!user.uid && !!id,
+  });
 
-  // const { data, isLoading, isError, error } = useQuery({
-  //   queryKey: ["expenses", params.id],
-  //   queryFn: () => getExpenseById({ uid: user.uid, id: params.id }),
-  //   enabled: !!user.uid && !!params.id,
-  // });
+  useEffect(() => {
+    if (data) {
+      setInputValues({
+        amount: data.amount || "",
+        category: data.category || "",
+        note: data.note || "",
+        createdAt: data.createdAt || "",
+      });
+    }
+  }, [data]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: createExpense,
+    mutationFn: updateExpense,
     onSuccess: () => {
-      setInputValues(initialValues);
-      setSubmitMessage({ message: "Expense added successfully" });
+      setSubmitMessage({ message: "Expense updated successfully" });
       queryClient.invalidateQueries({
-        queryKey: ["users"],
-        refetchType: "none",
+        queryKey: ["users", user.uid],
       });
 
       setTimeout(() => {
@@ -47,9 +63,9 @@ const EditExpensePage = () => {
     },
 
     onError: () => {
-      console.error("Unable to add expense");
+      console.error("Unable to update expense");
 
-      setSubmitMessage({ type: "error", message: "Unable to add expense" });
+      setSubmitMessage({ type: "error", message: "Unable to update expense" });
 
       setTimeout(() => {
         setSubmitMessage({ message: "" });
@@ -57,21 +73,19 @@ const EditExpensePage = () => {
     },
   });
 
-  const expenseData: ExpenseProps = {
-    amount: expData.amount || "",
-    category: expData.category || "",
-    note: expData.note || "",
-    createdAt: expData.createdAt || "",
-  };
-
-  const [inputValues, setInputValues] = useState<ExpenseProps>(expenseData);
-  const [submitMessage, setSubmitMessage] = useState<AlertProps>({
-    message: "",
-  });
+  if (isLoading) {
+    return <Alert message="Loading expense" />;
+  }
+  if (isError) {
+    return (
+      <Alert
+        type="error"
+        message={error.message || "Unable to get expense detail"}
+      />
+    );
+  }
 
   const handleInputChange = (name: string, inputValue: string | number) => {
-    console.log("name ", name);
-    console.log("inputValue ", inputValue);
     if (!name || !inputValue) {
       console.error("Please fill up the form properly");
     }
@@ -101,23 +115,11 @@ const EditExpensePage = () => {
         note,
       };
 
-      mutate({ uid: user.uid, expenseDetail });
+      mutate({ expId: id, expenseDetail, uid: user.uid });
     } catch (error) {
       console.error("Unable to add", error);
     }
   };
-
-  if (isLoading) {
-    return <Alert message="Loading expense" />;
-  }
-  if (isError) {
-    return (
-      <Alert
-        type="error"
-        message={error.message || "Unable to get expense detail"}
-      />
-    );
-  }
 
   return (
     <>
@@ -135,13 +137,13 @@ const EditExpensePage = () => {
 
 export default EditExpensePage;
 
-export const loader = async ({ request, params }) => {
-  console.log("loader triggered");
-  try {
-    const { user } = useAuth();
-    const response = await getExpenseById({ uid: user.id, id: request.id });
-    return response;
-  } catch (error: any) {
-    throw new Error("error while loading expense", error);
-  }
-};
+// export const loader = async ({ request, params }) => {
+//   console.log("loader triggered");
+//   try {
+//     const { user } = useAuth();
+//     const response = await getExpenseById({ uid: user.id, id: request.id });
+//     return response;
+//   } catch (error: any) {
+//     throw new Error("error while loading expense", error);
+//   }
+// };
