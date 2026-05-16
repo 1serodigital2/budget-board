@@ -121,9 +121,6 @@ export const updateExpense = async ({
   expenseDetail,
 }: UpdateExpenseData) => {
   try {
-    console.log("updateExpense uid", uid);
-    console.log("updateExpense id", expId);
-    console.log("updateExpense expenseDetail", expenseDetail);
     const eventRef = doc(db, `users/${uid}/expenses`, expId);
 
     await updateDoc(eventRef, {

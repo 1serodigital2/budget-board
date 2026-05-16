@@ -18,6 +18,8 @@ import AddExpensePage from "./pages/AddExpensePage";
 import ExpensesPage from "./pages/ExpensesPage";
 import ExpensePage from "./pages/ExpensePage";
 import EditExpensePage from "./pages/EditExpensePage";
+import CategoriesPage from "./pages/categories/Categories";
+import AddCategoryPage from "./pages/categories/AddCategoryPage";
 
 const router = createBrowserRouter([
   {
@@ -41,22 +43,28 @@ const router = createBrowserRouter([
             element: <DashboardPage />,
           },
           {
-            path: "/expenses",
+            path: "expenses",
             element: <ExpensesPage />,
           },
           {
-            path: "/expenses/add",
+            path: "expenses/add",
             element: <AddExpensePage />,
           },
           {
-            path: "/expenses/:id",
+            path: "expenses/:id",
             element: <ExpensePage />,
-            // loader: ExpenseLoader
           },
           {
-            path: "/expenses/:id/edit",
+            path: "expenses/:id/edit",
             element: <EditExpensePage />,
-            // loader: ExpenseLoader,
+          },
+          {
+            path: "categories",
+            element: <CategoriesPage />,
+          },
+          {
+            path: "categories/add",
+            element: <AddCategoryPage />,
           },
         ],
       },
