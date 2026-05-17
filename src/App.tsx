@@ -14,10 +14,10 @@ import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
 import PublicRoutes from "./routes/PublicRoutes";
-import AddExpensePage from "./pages/AddExpensePage";
-import ExpensesPage from "./pages/ExpensesPage";
-import ExpensePage from "./pages/ExpensePage";
-import EditExpensePage from "./pages/EditExpensePage";
+import AddExpensePage from "./pages/expenses/AddExpensePage";
+import ExpensesPage from "./pages/expenses/ExpensesPage";
+import ExpensePage from "./pages/expenses/ExpensePage";
+import EditExpensePage from "./pages/expenses/EditExpensePage";
 import CategoriesPage from "./pages/categories/Categories";
 import AddCategoryPage from "./pages/categories/AddCategoryPage";
 

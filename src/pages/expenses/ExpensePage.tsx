@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 
 import { useQuery } from "@tanstack/react-query";
-import { getExpenseById } from "../api/expenses";
-import { useAuth } from "../context/AuthContext";
-import Alert from "../components/ui/Alert";
+import { getExpenseById } from "../../api/expenses";
+import { useAuth } from "../../context/AuthContext";
+import Alert from "../../components/ui/Alert";
 
 const ExpensePage = () => {
   const { user } = useAuth();

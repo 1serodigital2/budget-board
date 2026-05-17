@@ -5,6 +5,7 @@ export interface InputProps {
   required?: boolean;
   type?: string;
   inputValues?: string | number | undefined;
+  sx?: object;
 }
 
 export interface LoginProps {
@@ -24,8 +25,8 @@ export interface AlertProps {
 }
 
 export interface ExpenseFormProps {
-  handleFormSubmit: () => void;
-  handleInputChange: () => void;
+  handleFormSubmit: (e: React.SubmitEvent) => void;
+  handleInputChange: (name: string, inputValue: string | number) => void;
   inputValues: ExpenseProps;
   isPending: boolean;
   submitMessage: AlertProps;

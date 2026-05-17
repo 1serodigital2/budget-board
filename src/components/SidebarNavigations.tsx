@@ -21,7 +21,7 @@ const SideBarNavigation = () => {
             <NavLink to="/expenses">All Expense</NavLink>
           </li>
         </ul>
-        <li className="text-white">
+        <li className="text-white mt-3">
           <NavLink to="/categories">Categories</NavLink>
         </li>
         <ul className="pl-4 pt-2">

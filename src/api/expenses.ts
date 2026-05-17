@@ -82,7 +82,7 @@ export const deleteExpense = async ({ id, uid }: deleteExpenseType) => {
 };
 
 interface GetExpenseByIdType {
-  uid: string;
+  uid?: string;
   id: string;
 }
 
