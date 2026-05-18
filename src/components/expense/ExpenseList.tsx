@@ -7,13 +7,16 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteExpense, getExpenses, queryClient } from "../../api/expenses";
 import { useAuth } from "../../context/AuthContext";
 import Alert from "../ui/Alert";
+import Table from "../ui/Table";
+import TableBodyData from "../ui/TableBodyData";
+import { AlertProps } from "../../types/FormTypes";
 
 const ExpenseList = () => {
   const [deleteMessage, setDeleteMessage] = useState<AlertProps>({
     message: "",
   });
   const { user } = useAuth();
-  const userId = user.uid;
+  const userId = user?.uid;
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["expenses"],
@@ -62,7 +65,7 @@ const ExpenseList = () => {
     );
   }
 
-  const handleDelete = (expenseId) => {
+  const handleDelete = (expenseId: string) => {
     if (confirm("Are you sure to delete this event") === true) {
       mutate({ uid: userId, id: expenseId });
     }
@@ -73,7 +76,51 @@ const ExpenseList = () => {
       {deleteMessage && deleteMessage.message !== "" && (
         <Alert type={deleteMessage.type} message={deleteMessage.message} />
       )}
-      <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default rounded">
+
+      <Table
+        columnNames={["SL No", "Category", "Amount", "Note", "Date", "Action"]}
+        data={data}
+      >
+        {data?.map((expense, i) => (
+          <tr
+            key={expense.id}
+            className="bg-neutral-primary border-b border-default"
+          >
+            <TableBodyData item={i + 1} />
+            <TableBodyData item={expense.category} />
+            <TableBodyData item={expense.amount} />
+            <TableBodyData item={expense.note} />
+            <TableBodyData item={expense.createdAt?.toDate
+                    ? expense.createdAt.toDate().toLocaleDateString()
+                    : "No date"} />
+            <TableBodyData >
+              <NavLink
+                to={expense.id}
+                className="cursor-pointer btn-primary mr-4 text-green-700"
+              >
+                View
+              </NavLink>
+
+              <NavLink
+                to={`${expense.id}/edit`}
+                className="cursor-pointer btn-primary mr-4 text-blue-600"
+              >
+                Edit
+              </NavLink>
+
+              <button
+                disabled={isPending}
+                onClick={() => handleDelete(expense.id)}
+                className="cursor-pointer text-red-900 disabled:opacity-50"
+              >
+                {isPending ? "Deleting..." : "Delete"}
+              </button>
+            </TableBodyData>
+          </tr>
+        ))}
+      </Table>
+
+      {/* <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default rounded">
         <table className="w-full text-sm text-left rtl:text-right text-body">
           <thead className="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default rounded">
             <tr>
@@ -129,7 +176,7 @@ const ExpenseList = () => {
             ))}
           </tbody>
         </table>
-      </div>
+      </div> */}
     </>
   );
 };
