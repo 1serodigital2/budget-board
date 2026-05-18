@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createExpense, queryClient } from "../../api/expenses";
 import ExpenseForm from "../../components/form/Expense";
 import useExpenseForm from "../../hooks/useExpenseForm";
+import H1 from "../../components/ui/Heading";
 
 const AddExpense = () => {
   const {
@@ -62,7 +63,7 @@ const AddExpense = () => {
 
   return (
     <>
-      <h1 className="text-2xl font-medium mb-4">Add Expense</h1>
+      <H1>Add Expense</H1>
       <ExpenseForm
         handleFormSubmit={handleFormSubmit}
         handleInputChange={handleInputChange}
