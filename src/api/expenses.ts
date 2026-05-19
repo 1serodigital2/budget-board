@@ -40,6 +40,9 @@ export const getExpenses = async (uid: string) => {
   console.log("getting expenses for user", uid);
 
   try {
+    if (!uid) {
+      throw new Error("Unauthorized access");
+    }
     const querySnapshot = await getDocs(
       collection(db, `users/${uid}/expenses`),
     );

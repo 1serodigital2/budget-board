@@ -1,10 +1,12 @@
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
   getDocs,
   serverTimestamp,
 } from "firebase/firestore";
-import { AddCategoryType } from "../types/category";
+import { AddCategoryType, GetCategoryType } from "../types/category";
 import { db } from "../services/firebase";
 
 export const addCategory = async ({
@@ -38,6 +40,7 @@ export const getCategories = async (userId: string) => {
       const data = doc.data();
 
       return {
+        id: doc.id,
         name: data.category,
         color: data.color,
         createdAt: data.createdAt,
@@ -48,5 +51,33 @@ export const getCategories = async (userId: string) => {
   } catch (error: any) {
     console.error("Unable to get categories", error);
     throw new Error("Unable to get categories");
+  }
+};
+
+export const getCategoryById = async ({
+  userId,
+  categoryId,
+}: GetCategoryType) => {
+  try {
+    if (!userId) {
+      throw new Error("Unauthorized access");
+    }
+    if (!categoryId) {
+      throw new Error("Missing category id");
+    }
+    const docSnap = await getDoc(
+      doc(db, `users/${userId}/category`, categoryId),
+    );
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      return {
+        id: categoryId,
+        category: data.category,
+        color: data.color,
+        createdAt: data.createdAt,
+      };
+    }
+  } catch (error: any) {
+    throw new Error("Failed to fetch category detail " + error);
   }
 };

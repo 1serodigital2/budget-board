@@ -1,4 +1,4 @@
 export interface TableBodyType {
-  item?: string | Number;
+  item?: string | undefined;
   children?: any;
 }

@@ -20,7 +20,20 @@ const ExpenseList = () => {
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["expenses"],
-    queryFn: () => getExpenses(userId),
+    queryFn: () => {
+      if (!userId) {
+        setDeleteMessage({
+          type: "error",
+          message: "Unauthorized access",
+        });
+        setTimeout(() => {
+          setDeleteMessage({ message: "" });
+        }, 3000);
+
+        return;
+      }
+      return getExpenses(userId);
+    },
     enabled: !!userId,
   });
 
@@ -67,7 +80,7 @@ const ExpenseList = () => {
 
   const handleDelete = (expenseId: string) => {
     if (confirm("Are you sure to delete this event") === true) {
-      mutate({ uid: userId, id: expenseId });
+      mutate({ uid: userId!, id: expenseId });
     }
   };
 
@@ -86,14 +99,18 @@ const ExpenseList = () => {
             key={expense.id}
             className="bg-neutral-primary border-b border-default"
           >
-            <TableBodyData item={i + 1} />
+            <TableBodyData>{i + 1}</TableBodyData>
             <TableBodyData item={expense.category} />
             <TableBodyData item={expense.amount} />
             <TableBodyData item={expense.note} />
-            <TableBodyData item={expense.createdAt?.toDate
-                    ? expense.createdAt.toDate().toLocaleDateString()
-                    : "No date"} />
-            <TableBodyData >
+            <TableBodyData
+              item={
+                expense.createdAt?.toDate
+                  ? expense.createdAt.toDate().toLocaleDateString()
+                  : "No date"
+              }
+            />
+            <TableBodyData>
               <NavLink
                 to={expense.id}
                 className="cursor-pointer btn-primary mr-4 text-green-700"

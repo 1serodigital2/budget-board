@@ -7,3 +7,8 @@ export interface AddCategoryType {
   userId: string;
   categoryDetail: CategoryFormType;
 }
+
+export interface GetCategoryType{
+  categoryId: string,
+  userId: string,
+}

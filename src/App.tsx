@@ -20,6 +20,7 @@ import ExpensePage from "./pages/expenses/ExpensePage";
 import EditExpensePage from "./pages/expenses/EditExpensePage";
 import CategoriesPage from "./pages/categories/Categories";
 import AddCategoryPage from "./pages/categories/AddCategoryPage";
+import CategoryPage from "./pages/categories/CategoryPage";
 
 const router = createBrowserRouter([
   {
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
           {
             path: "categories/add",
             element: <AddCategoryPage />,
+          },
+          {
+            path: "categories/:id",
+            element: <CategoryPage />,
           },
         ],
       },
