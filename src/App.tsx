@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./api/expenses";
+import { queryClient } from "./services/firebase";
 
 // components
 import RootLayout from "./layouts/RootLayout";

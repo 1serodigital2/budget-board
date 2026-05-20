@@ -4,7 +4,8 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteExpense, getExpenses, queryClient } from "../../api/expenses";
+import { deleteExpense, getExpenses } from "../../api/expenses";
+import { queryClient } from "../../services/firebase";
 import { useAuth } from "../../context/AuthContext";
 import Alert from "../ui/Alert";
 import Table from "../ui/Table";

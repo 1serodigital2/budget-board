@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -79,5 +80,13 @@ export const getCategoryById = async ({
     }
   } catch (error: any) {
     throw new Error("Failed to fetch category detail " + error);
+  }
+};
+
+export const deleteCategory = async ({ userId, categoryId }: GetCategoryType) => {
+  try {
+    await deleteDoc(doc(db, `users/${userId}/category`, categoryId));
+  } catch (error) {
+    throw new Error("Fatal error while deleting category " + error);
   }
 };

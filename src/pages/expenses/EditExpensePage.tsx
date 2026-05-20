@@ -7,8 +7,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 // types
-import { ExpenseProps } from "../../types/FormTypes";
-import { getExpenseById, queryClient, updateExpense } from "../../api/expenses";
+import { getExpenseById, updateExpense } from "../../api/expenses";
+import { queryClient } from "../../services/firebase";
 import ExpenseForm from "../../components/form/Expense";
 import Alert from "../../components/ui/Alert";
 import useExpenseForm from "../../hooks/useExpenseForm";

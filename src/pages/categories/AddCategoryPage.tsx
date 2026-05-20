@@ -1,27 +1,22 @@
 import { useMutation } from "@tanstack/react-query";
 
-import Submit from "../../components/form/Submit";
-import Input from "../../components/Input";
 import H1 from "../../components/ui/Heading";
 import useCategoryForm from "../../hooks/useCategorForm";
 import { addCategory } from "../../api/category";
 import { queryClient } from "../../services/firebase";
 import { useAuth } from "../../context/AuthContext";
-import Alert from "../../components/ui/Alert";
+import CategoryForm from "../../components/form/Category";
+import useSubmitMessage from "../../hooks/useSubmitMessage";
 
 const AddCategoryPage = () => {
-  const {
-    handleInputChange,
-    inputValues,
-    showSubmitMessage,
-    resetForm,
-    submitMessage,
-  } = useCategoryForm();
+  const { inputValues, resetForm, handleInputChange } = useCategoryForm();
+  const { showSubmitMessage, submitMessage } = useSubmitMessage();
   const { user } = useAuth();
 
   const { mutate, isPending } = useMutation({
     mutationFn: addCategory,
     onSuccess: () => {
+      console.log("category added");
       showSubmitMessage("Category added successfully");
       resetForm();
       queryClient.invalidateQueries({
@@ -36,45 +31,25 @@ const AddCategoryPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     try {
+      if (!user?.uid) {
+        throw new Error("User id is missing");
+      }
       mutate({ userId: user.uid, categoryDetail: inputValues });
-    } catch (error) {}
+    } catch (error) {
+      showSubmitMessage("Fatal error " + error);
+    }
   };
 
   return (
     <>
       <H1>Add Category</H1>
-      {isPending && (
-        <Alert message={submitMessage.message} type={submitMessage.type} />
-      )}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-(--color-primary) p-8 rounded-3xl max-w-3xl"
-      >
-        <div className="mb-2">
-          <Input
-            name="category"
-            label="Category"
-            handleInputChange={handleInputChange}
-            inputValues={inputValues.category || ""}
-          />
-        </div>
-        <div className="flex justify-between">
-          <div className="mb-2 flex-1">
-            <Input
-              type="color"
-              name="color"
-              label="Color"
-              sx="p-0 h-20 w-20"
-              handleInputChange={handleInputChange}
-              inputValues={inputValues.color || ""}
-            />
-          </div>
-          {/* <div className="mb-2 flex-1">
-            <Input name="icon" label="Icon" />
-          </div> */}
-        </div>
-        <Submit isPending={isPending} />
-      </form>
+      <CategoryForm
+        isPending={isPending}
+        submitMessage={submitMessage}
+        handleSubmit={handleSubmit}
+        handleInputChange={handleInputChange}
+        inputValues={inputValues}
+      />
     </>
   );
 };
