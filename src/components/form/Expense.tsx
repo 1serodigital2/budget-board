@@ -3,18 +3,35 @@ import { ExpenseFormProps } from "../../types/FormTypes";
 import Alert from "../ui/Alert";
 import Input from "../Input";
 import Submit from "./Submit";
+import { useQuery } from "@tanstack/react-query";
+import { getCategories } from "../../api/category";
+import { useAuth } from "../../context/AuthContext";
+import useSubmitMessage from "../../hooks/useSubmitMessage";
+import Select from "./Select";
 
 const ExpenseForm = ({
   handleFormSubmit,
   handleInputChange,
   inputValues,
   isPending,
-  submitMessage
+  submitMessage,
 }: ExpenseFormProps) => {
+  const { user } = useAuth();
+  const { showSubmitMessage } = useSubmitMessage();
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => {
+      if (!user?.uid) {
+        showSubmitMessage("Unauthorized access", "error");
+        return;
+      }
+      return getCategories(user.uid);
+    },
+  });
 
   return (
     <>
-       {submitMessage && submitMessage.message !== "" && (
+      {submitMessage && submitMessage.message !== "" && (
         <Alert type={submitMessage.type} message={submitMessage.message} />
       )}
       <form
@@ -32,13 +49,14 @@ const ExpenseForm = ({
           />
         </div>
         <div className="mb-2 5">
-          <Input
+          <Select label="Category" name="category" data={data} />
+          {/* <Input
             name="category"
             label="Category"
             required
             handleInputChange={handleInputChange}
             inputValues={inputValues.category || ""}
-          />
+          /> */}
         </div>
         <div className="mb-2 5">
           <Input
