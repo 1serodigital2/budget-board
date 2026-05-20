@@ -2,6 +2,7 @@
 import { useState } from "react";
 
 import { AlertProps, ExpenseProps } from "../types/FormTypes";
+import { HandleInputChangeType } from "../types/category";
 
 const initialValues: ExpenseProps = {
   amount: 0,
@@ -15,7 +16,7 @@ const useExpenseForm = (defaultValues = initialValues) => {
     message: "",
   });
 
-  const handleInputChange = (name: string, inputValue: string | number) => {
+  const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
     console.log("name ", name);
     console.log("inputValue ", inputValue);
     // if (!name || !inputValue) {

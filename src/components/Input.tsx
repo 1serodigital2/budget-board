@@ -7,7 +7,7 @@ const Input = ({
   required = false,
   type = "text",
   inputValues,
-  sx = {},
+  sx = "",
 }: InputProps) => {
   return (
     <div className="flex flex-col">
@@ -22,7 +22,9 @@ const Input = ({
         id={name}
         required={required}
         className={`block mb-2.5 text-sm font-medium text-heading p-3 border rounded-xl text-white ${sx ? sx : ""}`}
-        onChange={(e) => handleInputChange(name, e.target.value)}
+        onChange={(e) =>
+          handleInputChange({ name, inputValue: e.target.value })
+        }
         value={inputValues}
       />
     </div>

@@ -17,18 +17,18 @@ const AddCategoryPage = () => {
     mutationFn: addCategory,
     onSuccess: () => {
       console.log("category added");
-      showSubmitMessage("Category added successfully");
+      showSubmitMessage("Category added successfully", "success");
       resetForm();
       queryClient.invalidateQueries({
         queryKey: ["category"],
       });
     },
     onError: () => {
-      showSubmitMessage("Opps something went wrong");
+      showSubmitMessage("Opps something went wrong", "error");
     },
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     try {
       if (!user?.uid) {

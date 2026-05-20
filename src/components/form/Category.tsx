@@ -1,10 +1,15 @@
-import useCategoryForm from "../../hooks/useCategorForm";
+import { CategoryFormProps } from "../../types/category";
 import Input from "../Input";
 import Alert from "../ui/Alert";
 import Submit from "./Submit";
 
-const Category = ({ isPending, submitMessage, handleSubmit, handleInputChange, inputValues }) => {
-  // const { handleInputChange, inputValues } = useCategoryForm();
+const Category = ({
+  isPending,
+  submitMessage,
+  handleSubmit,
+  handleInputChange,
+  inputValues,
+}: CategoryFormProps) => {
   return (
     <>
       {submitMessage && submitMessage.message !== "" && (

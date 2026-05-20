@@ -1,11 +1,13 @@
+import { HandleInputChangeType } from "./category";
+
 export interface InputProps {
   name: string;
   label: string;
-  handleInputChange: (name: string, value: string | number) => void;
+  handleInputChange: ({ name, inputValue }: HandleInputChangeType) => void;
   required?: boolean;
   type?: string;
   inputValues?: string | number | undefined;
-  sx?: object;
+  sx?: string;
 }
 
 export interface LoginProps {
@@ -26,7 +28,7 @@ export interface AlertProps {
 
 export interface ExpenseFormProps {
   handleFormSubmit: (e: React.SubmitEvent) => void;
-  handleInputChange: (name: string, inputValue: string | number) => void;
+  handleInputChange: ({ name, inputValue }: HandleInputChangeType) => void;
   inputValues: ExpenseProps;
   isPending: boolean;
   submitMessage: AlertProps;

@@ -16,7 +16,6 @@ const AddExpense = () => {
     handleInputChange,
     resetForm,
     showSubmitMessage,
-    setInputValues,
     submitMessage,
     getExpenseDetail,
   } = useExpenseForm();
@@ -26,7 +25,7 @@ const AddExpense = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: createExpense,
     onSuccess: () => {
-      showSubmitMessage("Expense added successfully");
+      showSubmitMessage("Expense added successfully", "success");
       resetForm();
       queryClient.invalidateQueries({
         queryKey: ["users"],
@@ -36,7 +35,7 @@ const AddExpense = () => {
 
     onError: () => {
       console.error("Unable to add expense");
-      showSubmitMessage("Unable to add expense");
+      showSubmitMessage("Unable to add expense", "error");
     },
   });
 

@@ -83,10 +83,14 @@ const CategoriesList = () => {
               <TableBodyData>{i + 1}</TableBodyData>
               <TableBodyData item={category.name} />
               <TableBodyData>
-                <div
-                  className="h-3.5 w-full"
-                  style={{ backgroundColor: category.color }}
-                ></div>
+                {category?.color ? (
+                  <div
+                    className="h-3.5 w-full"
+                    style={{ backgroundColor: category.color }}
+                  ></div>
+                ) : (
+                  "N/A"
+                )}
               </TableBodyData>
               <TableBodyData
                 item={

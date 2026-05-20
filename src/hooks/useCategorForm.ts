@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CategoryFormType } from "../types/category";
+import { CategoryFormType, HandleInputChangeType } from "../types/category";
 
 const defaultValues: CategoryFormType = {
   category: "",
@@ -10,7 +10,7 @@ const useCategoryForm = (initialValues = defaultValues) => {
   const [inputValues, setInputValues] =
     useState<CategoryFormType>(initialValues);
 
-  const handleInputChange = (name: string, inputValue: string | number) => {
+  const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
     console.log("name ", name);
     console.log("inputValues ", inputValue);
     setInputValues((prevState) => {
@@ -25,10 +25,19 @@ const useCategoryForm = (initialValues = defaultValues) => {
     setInputValues(defaultValues);
   };
 
+  const getCategoryDetail = () => {
+    return {
+      category: inputValues.category,
+      color: inputValues.color,
+    };
+  };
+
   return {
     handleInputChange,
     inputValues,
     resetForm,
+    setInputValues,
+    getCategoryDetail
   };
 };
 export default useCategoryForm;

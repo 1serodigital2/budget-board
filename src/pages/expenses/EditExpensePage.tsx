@@ -51,7 +51,7 @@ const EditExpensePage = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: updateExpense,
     onSuccess: () => {
-      showSubmitMessage("Expense updated successfully");
+      showSubmitMessage("Expense updated successfully", "success");
       queryClient.invalidateQueries({
         queryKey: ["users", user?.uid],
       });
@@ -59,7 +59,7 @@ const EditExpensePage = () => {
 
     onError: () => {
       console.error("Unable to update expense");
-      showSubmitMessage("Unable to update expense");
+      showSubmitMessage("Unable to update expense", "error");
     },
   });
 

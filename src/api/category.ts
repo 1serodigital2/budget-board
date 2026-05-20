@@ -6,8 +6,13 @@ import {
   getDoc,
   getDocs,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
-import { AddCategoryType, GetCategoryType } from "../types/category";
+import {
+  AddCategoryType,
+  GetCategoryType,
+  UpdateCategoryType,
+} from "../types/category";
 import { db } from "../services/firebase";
 
 export const addCategory = async ({
@@ -83,10 +88,33 @@ export const getCategoryById = async ({
   }
 };
 
-export const deleteCategory = async ({ userId, categoryId }: GetCategoryType) => {
+export const deleteCategory = async ({
+  userId,
+  categoryId,
+}: GetCategoryType) => {
   try {
     await deleteDoc(doc(db, `users/${userId}/category`, categoryId));
   } catch (error) {
     throw new Error("Fatal error while deleting category " + error);
+  }
+};
+
+export const updateCategory = async ({
+  userId,
+  catId,
+  categoryDetail,
+}: UpdateCategoryType) => {
+  try {
+    const eventRef = doc(db, `users/${userId}/category`, catId);
+
+    await updateDoc(eventRef, {
+      ...categoryDetail,
+      createdAt: serverTimestamp(),
+    });
+
+    return true;
+  } catch (error) {
+    console.error("unable to update category", error);
+    throw new Error("Error while updating category");
   }
 };
