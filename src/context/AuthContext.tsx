@@ -87,6 +87,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const createUser = async ({ email, password }: LoginProps) => {
     try {
+      setLoading(true);
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -94,10 +95,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       );
       const user = userCredential.user;
       console.log("User created:", user.uid);
+      setLoading(false);
     } catch (error: any) {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.error("Error signing up:", errorCode, errorMessage);
+      setAuthError("Error signing up " + error);
+      setTimeout(() => {
+        setAuthError("");
+      }, 5000);
+      setLoading(false);
     }
   };
 
