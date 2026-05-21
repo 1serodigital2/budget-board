@@ -32,3 +32,8 @@ export interface UpdateCategoryType {
   catId: string;
   categoryDetail: CategoryFormType;
 }
+
+interface CategoryType {
+  id: string;
+  name: string;
+}

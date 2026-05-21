@@ -28,6 +28,7 @@ export const createExpense = async ({
     }
     const docRef = await addDoc(collection(db, `users/${uid}/expenses`), {
       ...expenseDetail,
+      isSystem: false,
       createdAt: serverTimestamp(),
     });
     console.log("doc refid", docRef.id);

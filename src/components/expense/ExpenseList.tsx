@@ -1,6 +1,4 @@
 // react
-import { useState } from "react";
-
 import { NavLink } from "react-router-dom";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -10,12 +8,11 @@ import { useAuth } from "../../context/AuthContext";
 import Alert from "../ui/Alert";
 import Table from "../ui/Table";
 import TableBodyData from "../ui/TableBodyData";
-import { AlertProps } from "../../types/FormTypes";
+import { getCategories } from "../../api/category";
+import useSubmitMessage from "../../hooks/useSubmitMessage";
 
 const ExpenseList = () => {
-  const [deleteMessage, setDeleteMessage] = useState<AlertProps>({
-    message: "",
-  });
+  const { submitMessage, showSubmitMessage } = useSubmitMessage();
   const { user } = useAuth();
   const userId = user?.uid;
 
@@ -23,20 +20,30 @@ const ExpenseList = () => {
     queryKey: ["expenses"],
     queryFn: () => {
       if (!userId) {
-        setDeleteMessage({
-          type: "error",
-          message: "Unauthorized access",
-        });
-        setTimeout(() => {
-          setDeleteMessage({ message: "" });
-        }, 3000);
-
+        showSubmitMessage("Unauthorized access", "error");
         return;
       }
       return getExpenses(userId);
     },
     enabled: !!userId,
   });
+
+  const {
+    data: catData,
+    isError: catIsError,
+    error: catError,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => {
+      if (!user?.uid) {
+        showSubmitMessage("Unauthorized access", "error");
+        return;
+      }
+      return getCategories(user?.uid);
+    },
+  });
+
+  console.log("cat data", catData);
 
   const {
     mutate,
@@ -46,23 +53,13 @@ const ExpenseList = () => {
   } = useMutation({
     mutationFn: deleteExpense,
     onSuccess: () => {
-      setDeleteMessage({
-        type: "success",
-        message: "Expense deleted successfully",
-      });
+      showSubmitMessage("Expense deleted successfully", "success");
       queryClient.invalidateQueries({
         queryKey: ["expenses"],
       });
-
-      setTimeout(() => {
-        setDeleteMessage({ message: "" });
-      }, 3000);
     },
     onError: () => {
-      setDeleteMessage({ type: "error", message: "Unable to delete expense" });
-      setTimeout(() => {
-        setDeleteMessage({ message: "" });
-      }, 3000);
+      showSubmitMessage("Unable to delete expense", "error");
     },
   });
 
@@ -79,29 +76,42 @@ const ExpenseList = () => {
     );
   }
 
+  if (!data || !catData) {
+    return <Alert message="Unable to fetch expenses" />;
+  }
+
   const handleDelete = (expenseId: string) => {
     if (confirm("Are you sure to delete this event") === true) {
       mutate({ uid: userId!, id: expenseId });
     }
   };
 
+  const expensedWithCategory = data.map((expense) => {
+    return {
+      ...expense,
+      categoryData: catData.find((cat) => expense.category === cat.id),
+    };
+  });
+
+  console.log("expensedWithCategory", expensedWithCategory);
+
   return (
     <>
-      {deleteMessage && deleteMessage.message !== "" && (
-        <Alert type={deleteMessage.type} message={deleteMessage.message} />
+      {submitMessage && submitMessage.message !== "" && (
+        <Alert type={submitMessage.type} message={submitMessage.message} />
       )}
 
       <Table
         columnNames={["SL No", "Category", "Amount", "Note", "Date", "Action"]}
         data={data}
       >
-        {data?.map((expense, i) => (
+        {expensedWithCategory?.map((expense, i) => (
           <tr
             key={expense.id}
             className="bg-neutral-primary border-b border-default"
           >
             <TableBodyData>{i + 1}</TableBodyData>
-            <TableBodyData item={expense.category} />
+            <TableBodyData item={expense.categoryData?.name} />
             <TableBodyData item={expense.amount} />
             <TableBodyData item={expense.note} />
             <TableBodyData
@@ -137,64 +147,6 @@ const ExpenseList = () => {
           </tr>
         ))}
       </Table>
-
-      {/* <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default rounded">
-        <table className="w-full text-sm text-left rtl:text-right text-body">
-          <thead className="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default rounded">
-            <tr>
-              <th className="px-6 py-3 font-medium">SL No</th>
-              <th className="px-6 py-3 font-medium">Category</th>
-              <th className="px-6 py-3 font-medium">Amount</th>
-              <th className="px-6 py-3 font-medium">Note</th>
-              <th className="px-6 py-3 font-medium">Date</th>
-              <th className="px-6 py-3 font-medium">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {data?.map((expense, i) => (
-              <tr
-                key={expense.id}
-                className="bg-neutral-primary border-b border-default"
-              >
-                <td className="px-6 py-4">{i + 1}</td>
-                <td className="px-6 py-4">{expense.category}</td>
-                <td className="px-6 py-4">{expense.amount}</td>
-                <td className="px-6 py-4">{expense.note}</td>
-                <td className="px-6 py-4">
-                  {expense.createdAt?.toDate
-                    ? expense.createdAt.toDate().toLocaleDateString()
-                    : "No date"}
-                </td>
-
-                <td className="px-6 py-4">
-                  <NavLink
-                    to={expense.id}
-                    className="cursor-pointer btn-primary mr-4 text-green-700"
-                  >
-                    View
-                  </NavLink>
-
-                  <NavLink
-                    to={`${expense.id}/edit`}
-                    className="cursor-pointer btn-primary mr-4 text-blue-600"
-                  >
-                    Edit
-                  </NavLink>
-
-                  <button
-                    disabled={isPending}
-                    onClick={() => handleDelete(expense.id)}
-                    className="cursor-pointer text-red-900 disabled:opacity-50"
-                  >
-                    {isPending ? "Deleting..." : "Delete"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div> */}
     </>
   );
 };

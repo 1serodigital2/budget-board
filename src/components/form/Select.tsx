@@ -1,12 +1,16 @@
-import { InputProps } from "../../types/FormTypes";
+import { SelectType } from "../../types/FormTypes";
 
-const Select = ({
+const Select = <T,>({
   name,
   label,
-  handleInputChange,
+  getOptionValue,
+  getOptionLabel,
   data,
   sx = "",
-}: InputProps) => {
+  required = false,
+  handleInputChange,
+  inputValues = "",
+}: SelectType<T>) => {
   return (
     <div className="flex flex-col">
       <label
@@ -19,12 +23,19 @@ const Select = ({
         name={name}
         id=""
         className={`block mb-2.5 text-sm font-medium text-heading p-3 border rounded-xl ${sx ? sx : ""}`}
+        required={required}
+        value={inputValues}
+        onChange={(e) =>
+          handleInputChange({ name, inputValue: e.target.value })
+        }
       >
         <option value="">Please select category</option>
         {data &&
-          data?.map((category) => {
+          data?.map((item) => {
             return (
-              <option value={category.id}>{category.name || "null"}</option>
+              <option key={getOptionValue(item)} value={getOptionValue(item)}>
+                {getOptionLabel(item) || "null"}
+              </option>
             );
           })}
       </select>

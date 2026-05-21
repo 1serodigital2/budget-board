@@ -49,14 +49,16 @@ const ExpenseForm = ({
           />
         </div>
         <div className="mb-2 5">
-          <Select label="Category" name="category" data={data} />
-          {/* <Input
+          <Select
+            getOptionValue={(category) => category.id}
+            getOptionLabel={(category) => category.name}
             name="category"
+            data={data || []}
             label="Category"
             required
             handleInputChange={handleInputChange}
             inputValues={inputValues.category || ""}
-          /> */}
+          />
         </div>
         <div className="mb-2 5">
           <Input

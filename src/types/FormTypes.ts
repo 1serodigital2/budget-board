@@ -1,10 +1,16 @@
 import { HandleInputChangeType } from "./category";
 
-export interface InputProps {
+interface BaseFieldProps {
   name: string;
   label: string;
-  handleInputChange: ({ name, inputValue }: HandleInputChangeType) => void;
   required?: boolean;
+}
+
+interface HandleInputChangeProps {
+  handleInputChange: ({ name, inputValue }: HandleInputChangeType) => void;
+}
+
+export interface InputProps extends BaseFieldProps, HandleInputChangeProps {
   type?: string;
   inputValues?: string | number | undefined;
   sx?: string;
@@ -26,9 +32,8 @@ export interface AlertProps {
   message: string;
 }
 
-export interface ExpenseFormProps {
+export interface ExpenseFormProps extends HandleInputChangeProps {
   handleFormSubmit: (e: React.SubmitEvent) => void;
-  handleInputChange: ({ name, inputValue }: HandleInputChangeType) => void;
   inputValues: ExpenseProps;
   isPending: boolean;
   submitMessage: AlertProps;
@@ -37,4 +42,13 @@ export interface ExpenseFormProps {
 export interface LoginTypes {
   email: string;
   password: string;
+}
+
+export interface SelectType<T> extends BaseFieldProps, HandleInputChangeProps {
+  data: T[];
+  sx?: string;
+  inputValues?: string | number | undefined;
+
+  getOptionValue: (item: T) => string;
+  getOptionLabel: (item: T) => string;
 }
