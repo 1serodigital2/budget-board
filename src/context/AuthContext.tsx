@@ -34,7 +34,7 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   loading: true,
   resetAuthError: () => {},
-  createUser: async () => {}
+  createUser: async () => {},
 });
 
 interface AuthProviderProps {
