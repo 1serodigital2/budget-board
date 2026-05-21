@@ -6,7 +6,7 @@ interface BaseFieldProps {
   required?: boolean;
 }
 
-interface HandleInputChangeProps {
+export interface HandleInputChangeProps {
   handleInputChange: ({ name, inputValue }: HandleInputChangeType) => void;
 }
 

@@ -5,7 +5,11 @@ import {
   useEffect,
   useState,
 } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  User,
+} from "firebase/auth";
 import { auth } from "../services/firebase";
 
 // auth
@@ -19,6 +23,9 @@ interface AuthContextType {
   logOut: () => Promise<void>;
   login: ({ email, password }: LoginProps) => Promise<void>;
   loading: boolean;
+  authError?: string;
+  resetAuthError: () => void;
+  createUser: ({ email, password }: LoginProps) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -26,6 +33,8 @@ const AuthContext = createContext<AuthContextType>({
   logOut: async () => {},
   login: async () => {},
   loading: true,
+  resetAuthError: () => {},
+  createUser: async () => {}
 });
 
 interface AuthProviderProps {
@@ -34,13 +43,21 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string>("");
 
   const login = async ({ email, password }: LoginProps) => {
     try {
       setLoading(true);
       await loginUser(email, password);
+    } catch (error: any) {
+      console.error("Critical error " + error);
+      setAuthError(error.message || "Unable to login");
+      setTimeout(() => {
+        setAuthError("");
+      }, 3000);
     } finally {
       setLoading(false);
+      // setAuthError("");
     }
   };
 
@@ -53,12 +70,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLoading(false);
     }
   };
+  const resetAuthError = () => {
+    setAuthError("");
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
-      // setUserIdCookie(currentUser.uid, 365);
     });
 
     return () => {
@@ -66,12 +85,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
   }, []);
 
+  const createUser = async ({ email, password }: LoginProps) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      const user = userCredential.user;
+      console.log("User created:", user.uid);
+    } catch (error: any) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.error("Error signing up:", errorCode, errorMessage);
+    }
+  };
+
   const authValue = {
-    // createUser,
+    createUser,
     user,
     login,
     logOut,
     loading,
+    authError,
+    resetAuthError,
   };
 
   return (

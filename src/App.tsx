@@ -22,6 +22,7 @@ import CategoriesPage from "./pages/categories/Categories";
 import AddCategoryPage from "./pages/categories/AddCategoryPage";
 import CategoryPage from "./pages/categories/CategoryPage";
 import EditCategoryPage from "./pages/categories/EditCategoryPage";
+import Signup from "./pages/SignUpPage";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginPage />,
+      },
+      {
+        path: "/signup",
+        element: <Signup />,
       },
     ],
   },

@@ -4,9 +4,10 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth } from "./firebase";
+import { LoginProps } from "../types/FormTypes";
 
-export const createUser = (email, password) => {
-  setLoading(true);
+export const createUser = ({email, password}: LoginProps) => {
+  // setLoading(true);
   return createUserWithEmailAndPassword(auth, email, password);
 };
 
