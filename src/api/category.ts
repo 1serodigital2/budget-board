@@ -5,8 +5,11 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
+  query,
   serverTimestamp,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import {
   AddCategoryType,
@@ -22,6 +25,7 @@ export const addCategory = async ({
   try {
     const docRef = await addDoc(collection(db, `users/${userId}/category`), {
       ...categoryDetail,
+      slug: categoryDetail.category.trim().toLowerCase(),
       createdAt: serverTimestamp(),
     });
     if (!docRef?.id) {
@@ -94,6 +98,43 @@ export const deleteCategory = async ({
   categoryId,
 }: GetCategoryType) => {
   try {
+    // Find uncategorized category
+    const categoryRef = collection(db, `users/${userId}/category`);
+
+    const uncategorizedQuery = query(
+      categoryRef,
+      where("isSystem", "==", true),
+      where("slug", "==", "uncategorized"),
+      limit(1),
+    );
+
+    const uncategorizedSnapshot = await getDocs(uncategorizedQuery);
+
+    if (uncategorizedSnapshot.empty) {
+      throw new Error("Uncategorized category not found");
+    }
+
+    const uncategorizedCategory = uncategorizedSnapshot.docs[0];
+
+    const uncategorizedId = uncategorizedCategory.id;
+
+    // Find expenses using this category
+    const expenseRef = collection(db, `users/${userId}/expenses`);
+
+    const expenseQuery = query(expenseRef, where("category", "==", categoryId));
+
+    const expenseSnapshot = await getDocs(expenseQuery);
+
+    // Update all matched expenses
+    const updatePromises = expenseSnapshot.docs.map((expenseDoc) =>
+      updateDoc(expenseDoc.ref, {
+        category: uncategorizedId,
+      }),
+    );
+
+    await Promise.all(updatePromises);
+
+    // Delete category
     await deleteDoc(doc(db, `users/${userId}/category`, categoryId));
   } catch (error) {
     throw new Error("Fatal error while deleting category " + error);
@@ -125,12 +166,14 @@ export const createDefaultCategories = async (uid: string) => {
     const defaultCategories = [
       {
         category: "Uncategorized",
+        slug: "uncategorized",
         isSystem: true,
         color: "#6b7280",
         createdAt: serverTimestamp(),
       },
       {
         category: "Food",
+        slug: "food",
         isSystem: true,
         color: "#ef4444",
         createdAt: serverTimestamp(),
