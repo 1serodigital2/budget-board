@@ -15,6 +15,7 @@ import { auth } from "../services/firebase";
 // auth
 import { loginUser, logOutUser } from "../services/auth";
 import { LoginProps } from "../types/FormTypes";
+import { createDefaultCategories } from "../api/category";
 
 // import { setUserIdCookie } from "../utils/helpers";
 
@@ -94,6 +95,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         password,
       );
       const user = userCredential.user;
+      if (user.uid) {
+        createDefaultCategories(user.uid);
+      }
       console.log("User created:", user.uid);
       setLoading(false);
     } catch (error: any) {

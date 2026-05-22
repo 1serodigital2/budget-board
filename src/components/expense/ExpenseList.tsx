@@ -93,60 +93,74 @@ const ExpenseList = () => {
     };
   });
 
-  console.log("expensedWithCategory", expensedWithCategory);
+  // console.log("expensedWithCategory", expensedWithCategory);
+  console.log("data", data);
 
   return (
     <>
-      {submitMessage && submitMessage.message !== "" && (
-        <Alert type={submitMessage.type} message={submitMessage.message} />
-      )}
+      {!data || data.length === 0 ? (
+        <Alert message="Please add expenses" />
+      ) : (
+        <>
+          {submitMessage && submitMessage.message !== "" && (
+            <Alert type={submitMessage.type} message={submitMessage.message} />
+          )}
 
-      <Table
-        columnNames={["SL No", "Category", "Amount", "Note", "Date", "Action"]}
-        data={data}
-      >
-        {expensedWithCategory?.map((expense, i) => (
-          <tr
-            key={expense.id}
-            className="bg-neutral-primary border-b border-default"
+          <Table
+            columnNames={[
+              "SL No",
+              "Category",
+              "Amount",
+              "Note",
+              "Date",
+              "Action",
+            ]}
+            data={data}
           >
-            <TableBodyData>{i + 1}</TableBodyData>
-            <TableBodyData item={expense.categoryData?.name} />
-            <TableBodyData item={expense.amount} />
-            <TableBodyData item={expense.note} />
-            <TableBodyData
-              item={
-                expense.createdAt?.toDate
-                  ? expense.createdAt.toDate().toLocaleDateString()
-                  : "No date"
-              }
-            />
-            <TableBodyData>
-              <NavLink
-                to={expense.id}
-                className="cursor-pointer btn-primary mr-4 text-green-700"
+            {expensedWithCategory?.map((expense, i) => (
+              <tr
+                key={expense.id}
+                className="bg-neutral-primary border-b border-default"
               >
-                View
-              </NavLink>
+                <TableBodyData>{i + 1}</TableBodyData>
+                <TableBodyData item={expense.categoryData?.name} />
+                <TableBodyData item={expense.amount} />
+                <TableBodyData item={expense.note} />
+                <TableBodyData
+                  item={
+                    expense.createdAt?.toDate
+                      ? expense.createdAt.toDate().toLocaleDateString()
+                      : "No date"
+                  }
+                />
+                <TableBodyData>
+                  <NavLink
+                    to={expense.id}
+                    className="cursor-pointer btn-primary mr-4 text-green-700"
+                  >
+                    View
+                  </NavLink>
 
-              <NavLink
-                to={`${expense.id}/edit`}
-                className="cursor-pointer btn-primary mr-4 text-blue-600"
-              >
-                Edit
-              </NavLink>
+                  <NavLink
+                    to={`${expense.id}/edit`}
+                    className="cursor-pointer btn-primary mr-4 text-blue-600"
+                  >
+                    Edit
+                  </NavLink>
 
-              <button
-                disabled={isPending}
-                onClick={() => handleDelete(expense.id)}
-                className="cursor-pointer text-red-900 disabled:opacity-50"
-              >
-                {isPending ? "Deleting..." : "Delete"}
-              </button>
-            </TableBodyData>
-          </tr>
-        ))}
-      </Table>
+                  <button
+                    disabled={isPending}
+                    onClick={() => handleDelete(expense.id)}
+                    className="cursor-pointer text-red-900 disabled:opacity-50"
+                  >
+                    {isPending ? "Deleting..." : "Delete"}
+                  </button>
+                </TableBodyData>
+              </tr>
+            ))}
+          </Table>
+        </>
+      )}
     </>
   );
 };

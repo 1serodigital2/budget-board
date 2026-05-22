@@ -50,6 +50,7 @@ export const getCategories = async (userId: string) => {
         name: data.category,
         color: data.color,
         createdAt: data.createdAt,
+        isSystem: data.isSystem || false,
       };
     });
 
@@ -116,5 +117,32 @@ export const updateCategory = async ({
   } catch (error) {
     console.error("unable to update category", error);
     throw new Error("Error while updating category");
+  }
+};
+
+export const createDefaultCategories = async (uid: string) => {
+  try {
+    const defaultCategories = [
+      {
+        category: "Uncategorized",
+        isSystem: true,
+        color: "#6b7280",
+        createdAt: serverTimestamp(),
+      },
+      {
+        category: "Food",
+        isSystem: true,
+        color: "#ef4444",
+        createdAt: serverTimestamp(),
+      },
+    ];
+
+    await Promise.all(
+      defaultCategories.map((category) =>
+        addDoc(collection(db, `users/${uid}/category`), category),
+      ),
+    );
+  } catch (error: any) {
+    console.error("Unable to create default categories " + error);
   }
 };

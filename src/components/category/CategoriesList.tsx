@@ -107,20 +107,23 @@ const CategoriesList = () => {
                   View
                 </NavLink>
 
-                <NavLink
-                  to={`${category.id}/edit`}
-                  className="cursor-pointer btn-primary mr-4 text-blue-600"
-                >
-                  Edit
-                </NavLink>
-
-                <button
-                  disabled={isPending}
-                  onClick={() => handleDelete(category.id)}
-                  className="cursor-pointer text-red-900 disabled:opacity-50"
-                >
-                  {isPending ? "Deleting..." : "Delete"}
-                </button>
+                {!category.isSystem && (
+                  <>
+                    <NavLink
+                      to={`${category.id}/edit`}
+                      className="cursor-pointer btn-primary mr-4 text-blue-600"
+                    >
+                      Edit
+                    </NavLink>
+                    <button
+                      disabled={isPending}
+                      onClick={() => handleDelete(category.id)}
+                      className="cursor-pointer text-red-900 disabled:opacity-50"
+                    >
+                      {isPending ? "Deleting..." : "Delete"}
+                    </button>
+                  </>
+                )}
               </TableBodyData>
             </tr>
           ))}
