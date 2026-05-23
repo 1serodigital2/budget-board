@@ -13,7 +13,7 @@ const AddCategoryPage = () => {
   const { showSubmitMessage, submitMessage } = useSubmitMessage();
   const { user } = useAuth();
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, isError, error } = useMutation({
     mutationFn: addCategory,
     onSuccess: () => {
       console.log("category added");
@@ -23,21 +23,19 @@ const AddCategoryPage = () => {
         queryKey: ["category"],
       });
     },
-    onError: () => {
-      showSubmitMessage("Opps something went wrong", "error");
+    onError: (error: Error) => {
+      showSubmitMessage(error.message, "error");
     },
   });
 
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
-    try {
-      if (!user?.uid) {
-        throw new Error("User id is missing");
-      }
-      mutate({ userId: user.uid, categoryDetail: inputValues });
-    } catch (error) {
+
+    if (!user?.uid) {
       showSubmitMessage("Fatal error " + error);
+      return;
     }
+    mutate({ userId: user.uid, categoryDetail: inputValues });
   };
 
   return (

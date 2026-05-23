@@ -2,12 +2,13 @@ import { InputProps } from "../types/FormTypes";
 
 const Input = ({
   name,
-  label,
+  label = "",
   handleInputChange,
   required = false,
   type = "text",
   inputValues,
   sx = "",
+  placeholder = "",
 }: InputProps) => {
   return (
     <div className="flex flex-col">
@@ -21,11 +22,12 @@ const Input = ({
         type={type}
         id={name}
         required={required}
-        className={`block mb-2.5 text-sm font-medium text-heading p-3 border rounded-xl text-white ${sx ? sx : ""}`}
+        className={`block mb-2.5 text-sm font-medium text-heading p-3 border rounded-xl ${sx ? sx : "text-white"}`}
         onChange={(e) =>
           handleInputChange({ name, inputValue: e.target.value })
         }
         value={inputValues}
+        placeholder={placeholder}
       />
     </div>
   );

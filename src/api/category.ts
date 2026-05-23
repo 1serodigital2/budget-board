@@ -23,9 +23,22 @@ export const addCategory = async ({
   categoryDetail,
 }: AddCategoryType) => {
   try {
+    const normalizedName = categoryDetail.category.trim().toLowerCase();
+
+    const categoryRef = collection(db, `users/${userId}/category`);
+    const q = query(categoryRef, where("normalizedName", "==", normalizedName));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      throw new Error("Category already exists");
+    }
+
+    const slug = normalizedName.replace(/\s+/g, "-");
+
     const docRef = await addDoc(collection(db, `users/${userId}/category`), {
       ...categoryDetail,
-      slug: categoryDetail.category.trim().toLowerCase(),
+      normalizedName,
+      slug,
+      isSystem: false,
       createdAt: serverTimestamp(),
     });
     if (!docRef?.id) {
@@ -33,7 +46,7 @@ export const addCategory = async ({
     }
     console.log("doc refid", docRef.id);
   } catch (error: any) {
-    throw new Error("Unable to add category", error);
+    throw new Error(error);
   }
 };
 
@@ -147,10 +160,15 @@ export const updateCategory = async ({
   categoryDetail,
 }: UpdateCategoryType) => {
   try {
+    const normalizedName = categoryDetail.category.trim().toLowerCase();
+    const slug = normalizedName.replace(/\s+/g, "-");
+
     const eventRef = doc(db, `users/${userId}/category`, catId);
 
     await updateDoc(eventRef, {
       ...categoryDetail,
+      normalizedName,
+      slug,
       createdAt: serverTimestamp(),
     });
 
@@ -166,6 +184,7 @@ export const createDefaultCategories = async (uid: string) => {
     const defaultCategories = [
       {
         category: "Uncategorized",
+        normalizedName: "uncategorized",
         slug: "uncategorized",
         isSystem: true,
         color: "#6b7280",
@@ -173,6 +192,7 @@ export const createDefaultCategories = async (uid: string) => {
       },
       {
         category: "Food",
+        normalizedName: "food",
         slug: "food",
         isSystem: true,
         color: "#ef4444",

@@ -2,8 +2,9 @@ import { HandleInputChangeType } from "./category";
 
 interface BaseFieldProps {
   name: string;
-  label: string;
+  label?: string;
   required?: boolean;
+  placeholder?: string;
 }
 
 export interface HandleInputChangeProps {

@@ -10,6 +10,12 @@ import Table from "../ui/Table";
 import TableBodyData from "../ui/TableBodyData";
 import { getCategories } from "../../api/category";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
+import Input from "../Input";
+import { HandleInputChangeType } from "../../types/category";
+import { useState } from "react";
+import Submit from "../form/Submit";
+import Select from "../form/Select";
+import ExpenseFilter from "./expenseFilter";
 
 const ExpenseList = () => {
   const { submitMessage, showSubmitMessage } = useSubmitMessage();
@@ -96,6 +102,14 @@ const ExpenseList = () => {
   // console.log("expensedWithCategory", expensedWithCategory);
   console.log("data", data);
 
+  const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
+    setInputValue((prevState) => {
+      return {
+        ...prevState,
+        [name]: inputValue,
+      };
+    });
+  };
   return (
     <>
       {!data || data.length === 0 ? (
@@ -106,6 +120,7 @@ const ExpenseList = () => {
             <Alert type={submitMessage.type} message={submitMessage.message} />
           )}
 
+          <ExpenseFilter catData={catData} />
           <Table
             columnNames={[
               "SL No",
