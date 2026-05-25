@@ -8,6 +8,8 @@ import {
   getDocs,
   deleteDoc,
   updateDoc,
+  where,
+  query,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { ExpenseProps } from "../types/FormTypes";
@@ -37,18 +39,30 @@ export const createExpense = async ({
   }
 };
 
-export const getExpenses = async (uid: string) => {
-  console.log("getting expenses for user", uid);
-
+export const getExpenses = async (
+  uid: string,
+  category?: string,
+  keyword?: string,
+) => {
   try {
     if (!uid) {
       throw new Error("Unauthorized access");
     }
-    const querySnapshot = await getDocs(
-      collection(db, `users/${uid}/expenses`),
-    );
 
-    const expenses = querySnapshot.docs.map((doc) => {
+    const collectionRef = collection(db, `users/${uid}/expenses`);
+
+    const constraints = [];
+
+    // category filter
+    if (category) {
+      constraints.push(where("category", "==", category));
+    }
+
+    const q = query(collectionRef, ...constraints);
+
+    const querySnapshot = await getDocs(q);
+
+    let expenses = querySnapshot.docs.map((doc) => {
       const data = doc.data();
 
       return {
@@ -60,8 +74,15 @@ export const getExpenses = async (uid: string) => {
       };
     });
 
+    // keyword filter
+    if (keyword) {
+      expenses = expenses.filter((expense) =>
+        expense.note?.toLowerCase().includes(keyword.toLowerCase()),
+      );
+    }
+
     return expenses;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Unable to get expenses", error);
 
     throw new Error("Unable to get expenses");

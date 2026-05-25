@@ -4,15 +4,12 @@ import Input from "../Input";
 import { CategoryType, HandleInputChangeType } from "../../types/category";
 import Submit from "../form/Submit";
 
-const ExpenseFilter = ({ catData, filter, setFilter }) => {
-  const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
-    setFilter((prevState) => {
-      return {
-        ...prevState,
-        [name]: inputValue,
-      };
-    });
-  };
+const ExpenseFilter = ({
+  catData,
+  handleInputChange,
+  handleFilterSubmit,
+  filter,
+}) => {
   return (
     <form onSubmit={handleFilterSubmit} className="mb-3">
       <div className="flex">
@@ -22,16 +19,15 @@ const ExpenseFilter = ({ catData, filter, setFilter }) => {
           name="category"
           data={catData || []}
           label="Category"
-          required
           handleInputChange={handleInputChange}
-          inputValues={inputValue.category || ""}
+          inputValues={filter.category || ""}
         />
         <Input
           name="keyword"
           placeholder="Search..."
           handleInputChange={handleInputChange}
           sx="text-black mr-2"
-          inputValues={inputValue.keyword}
+          inputValues={filter.keyword}
         />
         <Submit />
       </div>

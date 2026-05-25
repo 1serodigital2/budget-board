@@ -15,11 +15,15 @@ import { HandleInputChangeType } from "../../types/category";
 import { useState } from "react";
 import Submit from "../form/Submit";
 import Select from "../form/Select";
-import ExpenseFilter from "./expenseFilter";
+import ExpenseFilter from "./ExpenseFilter";
 
 const ExpenseList = () => {
   const [filter, setFilter] = useState({
-    categoryId: "",
+    category: "",
+    keyword: "",
+  });
+  const [appliedFilter, setAppliedFilter] = useState({
+    category: "",
     keyword: "",
   });
   const { submitMessage, showSubmitMessage } = useSubmitMessage();
@@ -27,8 +31,9 @@ const ExpenseList = () => {
   const userId = user?.uid!;
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["expenses"],
-    queryFn: () => getExpenses(userId),
+    queryKey: ["expenses", appliedFilter.category, appliedFilter.keyword],
+    queryFn: () =>
+      getExpenses(userId, appliedFilter.category, appliedFilter.keyword),
     enabled: !!userId,
   });
 
@@ -98,22 +103,38 @@ const ExpenseList = () => {
   });
 
   // console.log("expensedWithCategory", expensedWithCategory);
-  
-  const handleFilterSubmit = () => {
+  const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
+    setFilter((prevState) => {
+      return {
+        ...prevState,
+        [name]: inputValue,
+      };
+    });
+  };
 
-  }
+  const handleFilterSubmit = (e: React.SubmitEvent) => {
+    e.preventDefault();
+    if (!filter.category && !filter.keyword) {
+      showSubmitMessage("Please select category or enter search keyword");
+    }
+    setAppliedFilter(filter);
+  };
 
   return (
     <>
+      <ExpenseFilter
+        catData={catData}
+        handleInputChange={handleInputChange}
+        handleFilterSubmit={handleFilterSubmit}
+        filter={filter}
+      />
       {!data || data.length === 0 ? (
-        <Alert message="Please add expenses" />
+        <Alert message="Data not found" />
       ) : (
         <>
           {submitMessage && submitMessage.message !== "" && (
             <Alert type={submitMessage.type} message={submitMessage.message} />
           )}
-
-          {/* <ExpenseFilter catData={catData} setFilter={setFilter} filter={filter} /> */}
           <Table
             columnNames={[
               "SL No",
