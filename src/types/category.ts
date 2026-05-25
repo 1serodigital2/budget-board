@@ -33,7 +33,7 @@ export interface UpdateCategoryType {
   categoryDetail: CategoryFormType;
 }
 
-interface CategoryType {
+export interface CategoryType {
   id: string;
   name: string;
 }

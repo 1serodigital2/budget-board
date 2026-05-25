@@ -1,15 +1,12 @@
 import { useState } from "react";
 import Select from "../form/Select";
 import Input from "../Input";
-import { HandleInputChangeType } from "../../types/category";
+import { CategoryType, HandleInputChangeType } from "../../types/category";
+import Submit from "../form/Submit";
 
-const ExpenseFilter = ({catData}) => {
-  const [inputValue, setInputValue] = useState({
-    category: "",
-    keyword: "",
-  });
+const ExpenseFilter = ({ catData, filter, setFilter }) => {
   const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
-    setInputValue((prevState) => {
+    setFilter((prevState) => {
       return {
         ...prevState,
         [name]: inputValue,
@@ -17,7 +14,7 @@ const ExpenseFilter = ({catData}) => {
     });
   };
   return (
-    <form action="" className="mb-3">
+    <form onSubmit={handleFilterSubmit} className="mb-3">
       <div className="flex">
         <Select
           getOptionValue={(category) => category?.id}
@@ -36,7 +33,7 @@ const ExpenseFilter = ({catData}) => {
           sx="text-black mr-2"
           inputValues={inputValue.keyword}
         />
-        {/* <Submit /> */}
+        <Submit />
       </div>
     </form>
   );

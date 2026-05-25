@@ -18,19 +18,17 @@ import Select from "../form/Select";
 import ExpenseFilter from "./expenseFilter";
 
 const ExpenseList = () => {
+  const [filter, setFilter] = useState({
+    categoryId: "",
+    keyword: "",
+  });
   const { submitMessage, showSubmitMessage } = useSubmitMessage();
   const { user } = useAuth();
-  const userId = user?.uid;
+  const userId = user?.uid!;
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["expenses"],
-    queryFn: () => {
-      if (!userId) {
-        showSubmitMessage("Unauthorized access", "error");
-        return;
-      }
-      return getExpenses(userId);
-    },
+    queryFn: () => getExpenses(userId),
     enabled: !!userId,
   });
 
@@ -100,16 +98,11 @@ const ExpenseList = () => {
   });
 
   // console.log("expensedWithCategory", expensedWithCategory);
-  console.log("data", data);
+  
+  const handleFilterSubmit = () => {
 
-  const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
-    setInputValue((prevState) => {
-      return {
-        ...prevState,
-        [name]: inputValue,
-      };
-    });
-  };
+  }
+
   return (
     <>
       {!data || data.length === 0 ? (
@@ -120,7 +113,7 @@ const ExpenseList = () => {
             <Alert type={submitMessage.type} message={submitMessage.message} />
           )}
 
-          <ExpenseFilter catData={catData} />
+          {/* <ExpenseFilter catData={catData} setFilter={setFilter} filter={filter} /> */}
           <Table
             columnNames={[
               "SL No",
