@@ -10,19 +10,17 @@ import Table from "../ui/Table";
 import TableBodyData from "../ui/TableBodyData";
 import { getCategories } from "../../api/category";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
-import Input from "../Input";
-import { HandleInputChangeType } from "../../types/category";
+import { CategoryProps, HandleInputChangeType } from "../../types/category";
 import { useState } from "react";
-import Submit from "../form/Submit";
-import Select from "../form/Select";
 import ExpenseFilter from "./ExpenseFilter";
+import { FilterProps } from "../../types/expense";
 
 const ExpenseList = () => {
-  const [filter, setFilter] = useState({
+  const [filter, setFilter] = useState<FilterProps>({
     category: "",
     keyword: "",
   });
-  const [appliedFilter, setAppliedFilter] = useState({
+  const [appliedFilter, setAppliedFilter] = useState<FilterProps>({
     category: "",
     keyword: "",
   });
@@ -51,8 +49,6 @@ const ExpenseList = () => {
       return getCategories(user?.uid);
     },
   });
-
-  console.log("cat data", catData);
 
   const {
     mutate,
@@ -127,6 +123,7 @@ const ExpenseList = () => {
         handleInputChange={handleInputChange}
         handleFilterSubmit={handleFilterSubmit}
         filter={filter}
+        isPending={isLoading}
       />
       {!data || data.length === 0 ? (
         <Alert message="Data not found" />

@@ -1,5 +1,5 @@
 interface SubmitType {
-  isPending: boolean;
+  isPending?: boolean;
 }
 
 const Submit = ({ isPending }: SubmitType) => {

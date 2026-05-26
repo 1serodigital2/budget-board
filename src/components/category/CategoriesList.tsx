@@ -72,7 +72,7 @@ const CategoriesList = () => {
       )}
       <Table
         columnNames={["SL No", "Category", "Color", "CreatedAt", "Action"]}
-        data={data}
+        data={data ?? []}
       >
         {data &&
           data.map((category, i) => (

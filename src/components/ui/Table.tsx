@@ -1,4 +1,6 @@
-const Table = ({ columnNames, data, children }) => {
+import { TableProps } from "../../types/table";
+
+const Table = ({ columnNames, data, children }: TableProps) => {
   console.log("data", data);
   return (
     <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default rounded">
@@ -11,9 +13,7 @@ const Table = ({ columnNames, data, children }) => {
           </tr>
         </thead>
 
-        <tbody>
-        {children}
-        </tbody>
+        <tbody>{children}</tbody>
       </table>
     </div>
   );

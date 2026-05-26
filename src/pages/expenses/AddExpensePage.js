@@ -1,0 +1,48 @@
+import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
+// react hooks
+import { useAuth } from "../../context/AuthContext";
+// tanstack
+import { useMutation } from "@tanstack/react-query";
+// types
+import { createExpense, queryClient } from "../../api/expenses";
+import ExpenseForm from "../../components/form/Expense";
+import useExpenseForm from "../../hooks/useExpenseForm";
+import H1 from "../../components/ui/Heading";
+const AddExpense = () => {
+    const { inputValues, handleInputChange, resetForm, showSubmitMessage, submitMessage, getExpenseDetail, } = useExpenseForm();
+    const { user } = useAuth();
+    const { mutate, isPending } = useMutation({
+        mutationFn: createExpense,
+        onSuccess: () => {
+            showSubmitMessage("Expense added successfully", "success");
+            resetForm();
+            queryClient.invalidateQueries({
+                queryKey: ["users"],
+                refetchType: "none",
+            });
+        },
+        onError: () => {
+            console.error("Unable to add expense");
+            showSubmitMessage("Unable to add expense", "error");
+        },
+    });
+    const handleFormSubmit = (e) => {
+        try {
+            e.preventDefault();
+            const expenseDetail = getExpenseDetail();
+            if (expenseDetail.amount <= 0) {
+                showSubmitMessage("Please enter amount");
+                return;
+            }
+            if (!user?.uid) {
+                return;
+            }
+            mutate({ uid: user.uid, expenseDetail });
+        }
+        catch (error) {
+            console.error("Unable to add", error);
+        }
+    };
+    return (_jsxs(_Fragment, { children: [_jsx(H1, { children: "Add Expense" }), _jsx(ExpenseForm, { handleFormSubmit: handleFormSubmit, handleInputChange: handleInputChange, inputValues: inputValues, isPending: isPending, submitMessage: submitMessage })] }));
+};
+export default AddExpense;

@@ -37,3 +37,11 @@ export interface CategoryType {
   id: string;
   name: string;
 }
+
+export interface CategoryProps {
+  id: string;
+  name: string;
+  color: string;
+  createdAt: string;
+  isSystem: boolean;
+}

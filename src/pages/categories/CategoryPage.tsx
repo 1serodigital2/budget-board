@@ -9,10 +9,12 @@ import Alert from "../../components/ui/Alert";
 const CategoryPage = () => {
   const { user } = useAuth();
   const params = useParams();
+  const categoryId = params.id;
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["categories", params.id],
-    queryFn: () => getCategoryById({ userId: user.uid, categoryId: params.id }),
-    enabled: !!user.uid,
+    queryKey: ["categories", categoryId],
+    queryFn: () =>
+      getCategoryById({ userId: user!.uid, categoryId: categoryId! }),
+    enabled: !!user?.uid && !!categoryId,
   });
 
   if (isLoading) {
@@ -27,6 +29,11 @@ const CategoryPage = () => {
       />
     );
   }
+
+  if (!data) {
+    return <Alert message="No category data available." />;
+  }
+
   return (
     <>
       <H1>Category detail</H1>

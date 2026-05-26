@@ -6,12 +6,11 @@ import {
 import { auth } from "./firebase";
 import { LoginProps } from "../types/FormTypes";
 
-export const createUser = ({email, password}: LoginProps) => {
-  // setLoading(true);
+export const createUser = ({ email, password }: LoginProps) => {
   return createUserWithEmailAndPassword(auth, email, password);
 };
 
-export const loginUser = (email, password) => {
+export const loginUser = (email: string, password: string) => {
   console.log("login response ");
   return signInWithEmailAndPassword(auth, email, password);
 };

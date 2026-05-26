@@ -4,6 +4,23 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { QueryClient } from "@tanstack/react-query";
+
+declare global {
+  interface ImportMetaEnv {
+    readonly VITE_FIREBASE_KEY: string;
+    readonly VITE_FIREBASE_DOMAIN: string;
+    readonly VITE_FIREBASE_PROJECTID: string;
+    readonly VITE_FIREBASE_STORAGE_BUCKET: string;
+    readonly VITE_FIREBASE_MESSAGING_SENDERID: string;
+    readonly VITE_FIREBASE_APPID: string;
+    readonly VITE_FIREBASE_MEASUREMENTID: string;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+}
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
