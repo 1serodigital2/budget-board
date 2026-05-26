@@ -11,7 +11,7 @@ const Input = ({
   placeholder = "",
 }: InputProps) => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col flex-1">
       <label
         htmlFor={name}
         className="block mb-2.5 text-md text-white font-medium text-heading"
@@ -22,7 +22,12 @@ const Input = ({
         type={type}
         id={name}
         required={required}
-        className={`block mb-2.5 text-sm font-medium text-heading p-3 border rounded-xl ${sx ? sx : "text-white"}`}
+        max={
+          type === "date" ? new Date().toISOString().split("T")[0] : undefined
+        }
+        className={`block mb-2.5 text-sm font-medium text-heading p-3 border rounded-xl ${
+          sx ? sx : "text-white"
+        }`}
         onChange={(e) =>
           handleInputChange({ name, inputValue: e.target.value })
         }

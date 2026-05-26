@@ -12,6 +12,7 @@ import { queryClient } from "../../services/firebase";
 import ExpenseForm from "../../components/form/Expense";
 import Alert from "../../components/ui/Alert";
 import useExpenseForm from "../../hooks/useExpenseForm";
+import { Timestamp } from "firebase/firestore";
 
 const EditExpensePage = () => {
   const {
@@ -42,11 +43,14 @@ const EditExpensePage = () => {
       setInputValues({
         amount: data.amount || "",
         category: data.category || "",
+        date: data.date || "",
         note: data.note || "",
         createdAt: data.createdAt || "",
       });
     }
   }, [data]);
+
+  console.log("inputValues", inputValues);
 
   const { mutate, isPending } = useMutation({
     mutationFn: updateExpense,
@@ -90,7 +94,16 @@ const EditExpensePage = () => {
         return;
       }
 
-      mutate({ expId: id, expenseDetail, uid: user.uid });
+      const formattedExpenseDetail = {
+        ...expenseDetail,
+        date: Timestamp.fromDate(new Date(expenseDetail.date)),
+      };
+
+      mutate({
+        expId: id,
+        expenseDetail: formattedExpenseDetail,
+        uid: user.uid,
+      });
     } catch (error) {
       console.error("Unable to add", error);
     }

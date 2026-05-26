@@ -35,7 +35,7 @@ export const createExpense = async ({
     });
     console.log("doc refid", docRef.id);
   } catch (error: any) {
-    throw new Error("Unable to add expense", error);
+    throw new Error("Unable to add expense" + error);
   }
 };
 
@@ -102,7 +102,7 @@ export const deleteExpense = async ({ id, uid }: deleteExpenseType) => {
     console.log("delete expense resposne", response);
   } catch (error: any) {
     console.error("Unablet to delete expense", error);
-    throw new Error("Unable to delete expense", error);
+    throw new Error("Unable to delete expense" + error);
   }
 };
 
@@ -122,6 +122,7 @@ export const getExpenseById = async ({ uid, id }: GetExpenseByIdType) => {
         id,
         amount: data.amount,
         category: data.category,
+        date: data.date,
         note: data.note,
         createdAt: data.createdAt || "",
       };
@@ -131,7 +132,7 @@ export const getExpenseById = async ({ uid, id }: GetExpenseByIdType) => {
     }
   } catch (error: any) {
     console.error("Unable to get expense detail", error);
-    throw new Error("Unable to get expense detail", error);
+    throw new Error("Unable to get expense detail" + error);
   }
 };
 

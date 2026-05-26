@@ -3,15 +3,18 @@ import { useState } from "react";
 
 import { AlertProps, ExpenseProps } from "../types/FormTypes";
 import { HandleInputChangeType } from "../types/category";
+import { ExpenseFormData } from "../types/expense";
 
-const initialValues: ExpenseProps = {
+const initialValues: ExpenseFormData = {
   amount: 0,
   category: "",
+  date: "",
   note: "",
 };
 
 const useExpenseForm = (defaultValues = initialValues) => {
-  const [inputValues, setInputValues] = useState<ExpenseProps>(defaultValues);
+  const [inputValues, setInputValues] =
+    useState<ExpenseFormData>(defaultValues);
   const [submitMessage, setSubmitMessage] = useState<AlertProps>({
     message: "",
   });
@@ -19,9 +22,6 @@ const useExpenseForm = (defaultValues = initialValues) => {
   const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
     console.log("name ", name);
     console.log("inputValue ", inputValue);
-    // if (!name || !inputValue) {
-    //   console.error("Please fill up the form properly");
-    // }
     setInputValues((prevState) => {
       return {
         ...prevState,
@@ -46,6 +46,7 @@ const useExpenseForm = (defaultValues = initialValues) => {
     return {
       amount: Number(inputValues.amount) || 0,
       category: inputValues.category?.toString() || "",
+      date: inputValues.date?.toString() || "",
       note: inputValues.note?.toString() || "",
     };
   };

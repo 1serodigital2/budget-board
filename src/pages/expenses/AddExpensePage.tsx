@@ -9,6 +9,7 @@ import { createExpense, queryClient } from "../../api/expenses";
 import ExpenseForm from "../../components/form/Expense";
 import useExpenseForm from "../../hooks/useExpenseForm";
 import H1 from "../../components/ui/Heading";
+import { Timestamp } from "firebase/firestore";
 
 const AddExpense = () => {
   const {
@@ -54,7 +55,12 @@ const AddExpense = () => {
         return;
       }
 
-      mutate({ uid: user.uid, expenseDetail });
+      const formattedExpenseDetail = {
+        ...expenseDetail,
+        date: Timestamp.fromDate(new Date(expenseDetail.date)),
+      };
+
+      mutate({ expenseDetail: formattedExpenseDetail, uid: user.uid });
     } catch (error) {
       console.error("Unable to add", error);
     }

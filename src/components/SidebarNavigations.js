@@ -1,6 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { NavLink } from "react-router-dom";
-const SideBarNavigation = () => {
-    return (_jsxs("div", { className: "bg-(--color-primary) p-10 w-75", children: [_jsx("h5", { className: "text-3xl font-medium mb-5", children: "Budget Board" }), _jsxs("ul", { children: [_jsx("li", { className: "text-white mb-3", children: _jsx(NavLink, { to: "/", children: "Dashboard" }) }), _jsx("li", { className: "text-white", children: _jsx(NavLink, { to: "/expenses", children: "Expenses" }) }), _jsxs("ul", { className: "pl-4 pt-2", children: [_jsx("li", { className: "text-white mb-2", children: _jsx(NavLink, { to: "/expenses/add", children: "Add Expense" }) }), _jsx("li", { className: "text-white", children: _jsx(NavLink, { to: "/expenses", children: "All Expense" }) })] }), _jsx("li", { className: "text-white mt-3", children: _jsx(NavLink, { to: "/categories", children: "Categories" }) }), _jsxs("ul", { className: "pl-4 pt-2", children: [_jsx("li", { className: "text-white mb-2", children: _jsx(NavLink, { to: "/categories/add", children: "Add Category" }) }), _jsx("li", { className: "text-white", children: _jsx(NavLink, { to: "/categories", children: "All Categories" }) })] })] })] }));
-};
-export default SideBarNavigation;

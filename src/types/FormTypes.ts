@@ -22,22 +22,9 @@ export interface LoginProps {
   password: string;
 }
 
-export interface ExpenseProps {
-  amount: number;
-  category: string;
-  note?: string;
-  createdAt?: string;
-}
 export interface AlertProps {
   type?: "success" | "error" | "warning" | "info" | "loading";
   message: string;
-}
-
-export interface ExpenseFormProps extends HandleInputChangeProps {
-  handleFormSubmit: (e: React.SubmitEvent) => void;
-  inputValues: ExpenseProps;
-  isPending: boolean;
-  submitMessage: AlertProps;
 }
 
 export interface LoginTypes {

@@ -21,13 +21,13 @@ const ExpenseFilter = ({
           handleInputChange={handleInputChange}
           inputValues={filter.category || ""}
         />
-        {/* <Input
+        <Input
           name="keyword"
           placeholder="Search..."
           handleInputChange={handleInputChange}
           sx="text-black mr-2"
           inputValues={filter.keyword}
-        /> */}
+        />
         <Submit />
       </div>
     </form>

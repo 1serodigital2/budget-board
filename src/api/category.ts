@@ -44,7 +44,6 @@ export const addCategory = async ({
     if (!docRef?.id) {
       throw new Error("Failed to create category");
     }
-    console.log("doc refid", docRef.id);
   } catch (error: any) {
     throw new Error(error);
   }

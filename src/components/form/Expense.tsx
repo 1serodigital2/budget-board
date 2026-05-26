@@ -1,4 +1,4 @@
-import { ExpenseFormProps } from "../../types/FormTypes";
+import { ExpenseFormProps } from "../../types/expense";
 
 import Alert from "../ui/Alert";
 import Input from "../Input";
@@ -48,7 +48,7 @@ const ExpenseForm = ({
             inputValues={inputValues.amount || ""}
           />
         </div>
-        <div className="mb-2 5">
+        <div className="flex justify-between gap-5">
           <Select
             getOptionValue={(category) => category.id}
             getOptionLabel={(category) => category.name}
@@ -58,6 +58,16 @@ const ExpenseForm = ({
             required
             handleInputChange={handleInputChange}
             inputValues={inputValues.category || ""}
+          />
+          <Input
+            type="date"
+            name="date"
+            label="Expense incurred on"
+            required
+            handleInputChange={handleInputChange}
+            inputValues={
+              inputValues.date || new Date().toISOString().split("T")[0]
+            }
           />
         </div>
         <div className="mb-2 5">

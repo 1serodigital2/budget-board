@@ -10,7 +10,7 @@ import Table from "../ui/Table";
 import TableBodyData from "../ui/TableBodyData";
 import { getCategories } from "../../api/category";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
-import { CategoryProps, HandleInputChangeType } from "../../types/category";
+import { HandleInputChangeType } from "../../types/category";
 import { useState } from "react";
 import ExpenseFilter from "./ExpenseFilter";
 import { FilterProps } from "../../types/expense";
@@ -98,7 +98,6 @@ const ExpenseList = () => {
     };
   });
 
-  // console.log("expensedWithCategory", expensedWithCategory);
   const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
     setFilter((prevState) => {
       return {
@@ -118,17 +117,17 @@ const ExpenseList = () => {
 
   return (
     <>
-      <ExpenseFilter
-        catData={catData}
-        handleInputChange={handleInputChange}
-        handleFilterSubmit={handleFilterSubmit}
-        filter={filter}
-        isPending={isLoading}
-      />
       {!data || data.length === 0 ? (
         <Alert message="Data not found" />
       ) : (
         <>
+          <ExpenseFilter
+            catData={catData}
+            handleInputChange={handleInputChange}
+            handleFilterSubmit={handleFilterSubmit}
+            filter={filter}
+            isPending={isLoading}
+          />
           {submitMessage && submitMessage.message !== "" && (
             <Alert type={submitMessage.type} message={submitMessage.message} />
           )}
