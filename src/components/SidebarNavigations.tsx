@@ -32,7 +32,7 @@ const SideBarNavigation = () => {
             <NavLink to="/categories">All Categories</NavLink>
           </li>
         </ul>
-        {/* <li className="text-white mt-3">
+        <li className="text-white mt-3">
           <NavLink to="/budget">Budget</NavLink>
         </li>
         <ul className="pl-4 pt-2">
@@ -42,7 +42,7 @@ const SideBarNavigation = () => {
           <li className="text-white">
             <NavLink to="/budget">All Budget</NavLink>
           </li>
-        </ul> */}
+        </ul>
       </ul>
     </div>
   );
