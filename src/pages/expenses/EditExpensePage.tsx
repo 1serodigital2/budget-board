@@ -42,7 +42,9 @@ const EditExpensePage = () => {
     if (data) {
       const formattedExpense = {
         ...data,
-        date: data.date?.toDate().toISOString().split("T")[0],
+        date: data.date
+          ? data.date?.toDate().toISOString().split("T")[0]
+          : new Date().toISOString().split("T")[0],
       };
       setInputValues(formattedExpense);
     }
