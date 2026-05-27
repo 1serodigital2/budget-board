@@ -1,14 +1,14 @@
 // hooks
 import { useState } from "react";
 
-import { AlertProps, ExpenseProps } from "../types/FormTypes";
+import { AlertProps } from "../types/FormTypes";
 import { HandleInputChangeType } from "../types/category";
 import { ExpenseFormData } from "../types/expense";
 
 const initialValues: ExpenseFormData = {
   amount: 0,
   category: "",
-  date: "",
+  date: new Date().toISOString().split("T")[0],
   note: "",
 };
 

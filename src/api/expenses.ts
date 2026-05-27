@@ -12,7 +12,7 @@ import {
   query,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
-import { ExpenseProps } from "../types/FormTypes";
+import { ExpenseFormData, ExpenseProps } from "../types/expense";
 
 export const queryClient = new QueryClient();
 
@@ -28,6 +28,7 @@ export const createExpense = async ({
     if (!uid) {
       throw new Error("Uid is missing");
     }
+    console.log("expenseDetail", expenseDetail);
     const docRef = await addDoc(collection(db, `users/${uid}/expenses`), {
       ...expenseDetail,
       isSystem: false,
@@ -70,6 +71,7 @@ export const getExpenses = async (
         amount: data.amount,
         category: data.category,
         note: data.note,
+        date: data.date || "",
         createdAt: data.createdAt || "",
       };
     });
@@ -122,7 +124,7 @@ export const getExpenseById = async ({ uid, id }: GetExpenseByIdType) => {
         id,
         amount: data.amount,
         category: data.category,
-        date: data.date,
+        date: data.date || "",
         note: data.note,
         createdAt: data.createdAt || "",
       };

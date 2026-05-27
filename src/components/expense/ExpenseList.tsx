@@ -14,6 +14,7 @@ import { HandleInputChangeType } from "../../types/category";
 import { useState } from "react";
 import ExpenseFilter from "./ExpenseFilter";
 import { FilterProps } from "../../types/expense";
+import { formatDate } from "../../utils/helpers";
 
 const ExpenseList = () => {
   const [filter, setFilter] = useState<FilterProps>({
@@ -153,9 +154,9 @@ const ExpenseList = () => {
                 <TableBodyData item={expense.note} />
                 <TableBodyData
                   item={
-                    expense.createdAt?.toDate
-                      ? expense.createdAt.toDate().toLocaleDateString()
-                      : "No date"
+                    expense.date?.toDate
+                      ? formatDate(expense.date.toDate())
+                      : formatDate(expense.createdAt.toDate())
                   }
                 />
                 <TableBodyData>

@@ -5,4 +5,8 @@ export const setUserIdCookie = (userId: string, daysToLive: number) => {
   let expires = "expires=" + date.toUTCString();
 
   document.cookie = `userId=${userId}; ${expires}; path=/; SameSite=Lax; Secure`;
-}
+};
+
+export const formatDate = (date: Date) => {
+  return date.toLocaleDateString("en-IN").replace(/\//g, "-");
+};

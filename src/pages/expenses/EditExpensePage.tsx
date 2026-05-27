@@ -40,13 +40,11 @@ const EditExpensePage = () => {
 
   useEffect(() => {
     if (data) {
-      setInputValues({
-        amount: data.amount || "",
-        category: data.category || "",
-        date: data.date || "",
-        note: data.note || "",
-        createdAt: data.createdAt || "",
-      });
+      const formattedExpense = {
+        ...data,
+        date: data.date?.toDate().toISOString().split("T")[0],
+      };
+      setInputValues(formattedExpense);
     }
   }, [data]);
 

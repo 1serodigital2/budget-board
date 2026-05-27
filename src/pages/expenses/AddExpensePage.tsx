@@ -59,6 +59,7 @@ const AddExpense = () => {
         ...expenseDetail,
         date: Timestamp.fromDate(new Date(expenseDetail.date)),
       };
+      console.log("formattedExpenseDetail", formattedExpenseDetail)
 
       mutate({ expenseDetail: formattedExpenseDetail, uid: user.uid });
     } catch (error) {

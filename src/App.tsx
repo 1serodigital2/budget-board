@@ -81,6 +81,10 @@ const router = createBrowserRouter([
             path: "categories/:id/edit",
             element: <EditCategoryPage />,
           },
+          // {
+          //   path: "budget/",
+          //   element: <EditCategoryPage />,
+          // },
         ],
       },
     ],

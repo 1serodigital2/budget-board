@@ -10,24 +10,23 @@ const ExpenseFilter = ({
   filter,
 }: ExpenseFilterProps) => {
   return (
-    <form onSubmit={handleFilterSubmit} className="mb-3">
-      <div className="flex">
+    <form onSubmit={handleFilterSubmit} className="mb-3 max-w-2xl">
+      <div className="flex gap-5 items-center">
         <Select
           getOptionValue={(category: any) => category?.id}
           getOptionLabel={(category: any) => category?.name}
           name="category"
           data={Array.isArray(catData) ? catData : catData ? [catData] : []}
-          label="Category"
           handleInputChange={handleInputChange}
           inputValues={filter.category || ""}
         />
-        <Input
+        {/* <Input
           name="keyword"
           placeholder="Search..."
           handleInputChange={handleInputChange}
           sx="text-black mr-2"
           inputValues={filter.keyword}
-        />
+        /> */}
         <Submit />
       </div>
     </form>

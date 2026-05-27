@@ -1,5 +1,4 @@
 import { Timestamp } from "firebase/firestore";
-import { CategoryProps } from "./category";
 import { AlertProps, HandleInputChangeProps } from "./FormTypes";
 
 export interface ExpenseFilterProps extends HandleInputChangeProps {
