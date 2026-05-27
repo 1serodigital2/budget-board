@@ -83,14 +83,14 @@ const router = createBrowserRouter([
             path: "categories/:id/edit",
             element: <EditCategoryPage />,
           },
-          {
-            path: "budget/",
-            element: <BudgetPage />,
-          },
-          {
-            path: "budget/add",
-            element: <AddBudgetPage />,
-          },
+          // {
+          //   path: "budget/",
+          //   element: <BudgetPage />,
+          // },
+          // {
+          //   path: "budget/add",
+          //   element: <AddBudgetPage />,
+          // },
         ],
       },
     ],
