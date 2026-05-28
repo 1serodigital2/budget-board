@@ -1,20 +1,18 @@
 import { HandleInputChangeProps } from "./FormTypes";
 
-export interface BudgetFormComponentType {
+export interface BudgetInputType {
   category: string;
   amount: number;
   month: string;
 }
 
 export interface BudgetType {
-  budgetDetail: BudgetFormComponentType;
+  budgetDetail: BudgetInputType;
   uid: string;
 }
 
 export interface BudgetFormType extends HandleInputChangeProps {
   handleFormSubmit: (e: React.SubmitEvent) => void;
-  data: object;
-  inputValue: string | number;
+  inputValue: BudgetInputType;
   isPending?: boolean;
-  category: string;
 }
