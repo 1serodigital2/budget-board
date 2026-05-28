@@ -1,7 +1,6 @@
 import { TableProps } from "../../types/table";
 
-const Table = ({ columnNames, data, children }: TableProps) => {
-  console.log("data", data);
+const Table = ({ columnNames, data = [], children }: TableProps) => {
   return (
     <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default rounded">
       <table className="w-full text-sm text-left rtl:text-right text-body">

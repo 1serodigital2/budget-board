@@ -25,6 +25,7 @@ import EditCategoryPage from "./pages/categories/EditCategoryPage";
 import Signup from "./pages/SignUpPage";
 import BudgetListingPage from "./pages/budgets/BudgetListingPage";
 import AddBudgetPage from "./pages/budgets/AddBudgetPage";
+import EditBudgetPage from "./pages/budgets/EditBudgetPage";
 
 const router = createBrowserRouter([
   {
@@ -90,6 +91,10 @@ const router = createBrowserRouter([
           {
             path: "budget/add",
             element: <AddBudgetPage />,
+          },
+          {
+            path: "budget/:id/edit",
+            element: <EditBudgetPage />,
           },
         ],
       },
