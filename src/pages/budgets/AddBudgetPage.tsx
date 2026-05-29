@@ -15,7 +15,7 @@ const AddBudgetPage = () => {
     showSubmitMessage,
   } = useBudget();
 
-  const { mutate, isPending } = submitBudgetForm();
+  const { mutate, isPending, isError, error } = submitBudgetForm();
 
   const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
     setInputValue((prevState) => {
@@ -41,8 +41,11 @@ const AddBudgetPage = () => {
   return (
     <>
       <H1>Budget page</H1>
-      {submitMessage && submitMessage.message !== "" && (
+      {submitMessage && submitMessage.message !== "" && !isError && (
         <Alert type={submitMessage.type} message={submitMessage.message} />
+      )}
+      {isError && (
+        <Alert type="error" message={error.message || "error adding budget"} />
       )}
 
       <BudgetForm

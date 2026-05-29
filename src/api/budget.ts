@@ -1,20 +1,43 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
+  query,
   serverTimestamp,
+  where,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 
-import { BudgetType } from "../types/budget";
+import { BudgetType, GetBudgetByIdType } from "../types/budget";
 import { getCategories } from "./category";
 
 export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
   try {
+    //check for duplicate budget
+    const allBudgets = await getBudgets(uid);
+    const docId = budgetDetail.category + "_" + budgetDetail.month;
+    const finalDocid = docId.toLowerCase().trim();
+
+    if (allBudgets && allBudgets.length > 0) {
+      const duplicateBudget = allBudgets.find(
+        (budget) => budget.slug === finalDocid,
+      );
+
+      console.log("finalDocid", finalDocid);
+      console.log("duplicateBudget", duplicateBudget);
+
+      if (duplicateBudget) {
+        throw new Error("This budget already exist");
+      }
+    }
+
+    //Add budget
     const docRef = await addDoc(collection(db, `users/${uid}/budgets`), {
       ...budgetDetail,
+      slug: finalDocid,
       createdAt: serverTimestamp(),
     });
 
@@ -39,6 +62,7 @@ export const getBudgets = async (uid: string) => {
 
       return {
         id: doc.id,
+        slug: data.slug,
         amount: data.amount,
         category: matchedCategory?.name || "",
         month: data.month,
@@ -53,7 +77,7 @@ export const getBudgets = async (uid: string) => {
   }
 };
 
-export const getBudgetById = async ({ uid, budgetId }) => {
+export const getBudgetById = async ({ uid, budgetId }: GetBudgetByIdType) => {
   try {
     const docSnap = await getDoc(doc(db, `users/${uid}/budgets`, budgetId));
 
@@ -65,8 +89,18 @@ export const getBudgetById = async ({ uid, budgetId }) => {
         category: data.category,
         month: data.month,
       };
-      console.log("getBudgetById", budgetData);
       return budgetData;
     }
   } catch (error) {}
+};
+
+export const deleteBudgetById = async ({
+  uid,
+  budgetId,
+}: GetBudgetByIdType) => {
+  try {
+    await deleteDoc(doc(db, `users/${uid}/budgets`, budgetId));
+  } catch (error: any) {
+    throw new Error("Fatal error while deleting budget" + error);
+  }
 };

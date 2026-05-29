@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createBudget, getBudgetById, getBudgets } from "../api/budget";
+import {
+  createBudget,
+  deleteBudgetById,
+  getBudgetById,
+  getBudgets,
+} from "../api/budget";
 import useSubmitMessage from "./useSubmitMessage";
 import { queryClient } from "../services/firebase";
 import { useAuth } from "../context/AuthContext";
-import { BudgetInputType } from "../types/budget";
+import { BudgetInputType, GetBudgetByIdType } from "../types/budget";
 
-const initialValues = {
+const initialValues: BudgetInputType = {
   category: "",
   amount: 0,
   month: "",
@@ -49,6 +54,22 @@ const useBudget = () => {
     });
   };
 
+  const useDeleteBudget = () => {
+    return useMutation({
+      mutationFn: (budgetId: string) =>
+        deleteBudgetById({ uid: user?.uid!, budgetId }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["budgets"],
+        });
+        showSubmitMessage("Budget deleted successfully", "success");
+      },
+      onError: () => {
+        showSubmitMessage("Budget unable to delete", "error");
+      },
+    });
+  };
+
   return {
     submitBudgetForm,
     submitMessage,
@@ -57,6 +78,7 @@ const useBudget = () => {
     showSubmitMessage,
     getAllBudgets,
     getBudget,
+    useDeleteBudget,
   };
 };
 export default useBudget;

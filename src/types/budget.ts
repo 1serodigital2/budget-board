@@ -16,3 +16,8 @@ export interface BudgetFormType extends HandleInputChangeProps {
   inputValue: BudgetInputType;
   isPending?: boolean;
 }
+
+export interface GetBudgetByIdType {
+  uid: string;
+  budgetId: string;
+}
