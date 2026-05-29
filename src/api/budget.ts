@@ -7,11 +7,16 @@ import {
   getDocs,
   query,
   serverTimestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 
-import { BudgetType, GetBudgetByIdType } from "../types/budget";
+import {
+  BudgetType,
+  GetBudgetByIdType,
+  UpdateBudgetType,
+} from "../types/budget";
 import { getCategories } from "./category";
 
 export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
@@ -102,5 +107,59 @@ export const deleteBudgetById = async ({
     await deleteDoc(doc(db, `users/${uid}/budgets`, budgetId));
   } catch (error: any) {
     throw new Error("Fatal error while deleting budget" + error);
+  }
+};
+
+export const getBudgetExceptCurrent = async ({
+  uid,
+  budgetId,
+}: GetBudgetByIdType) => {
+  const budgetsRef = collection(db, `users/${uid}/budgets`);
+
+  const querySnapshot = await getDocs(budgetsRef);
+
+  const budgetSnap = querySnapshot.docs.filter((doc) => doc.id !== budgetId);
+  const budgetRef = budgetSnap.map((doc) => {
+    const data = doc.data();
+
+    return {
+      id: doc.id,
+      category: data.category,
+      month: data.month,
+      slug: data.slug,
+    };
+  });
+
+  return budgetRef;
+};
+
+export const updateBudget = async ({
+  uid,
+  budgetId,
+  budgetDetail,
+}: UpdateBudgetType) => {
+  try {
+    const existingBudgets = await getBudgetExceptCurrent({
+      uid,
+      budgetId,
+    });
+
+    const isDuplicate = existingBudgets.some(
+      (budget) =>
+        budget.category === budgetDetail.category &&
+        budget.month === budgetDetail.month,
+    );
+
+    if (isDuplicate) {
+      throw new Error("Budget already exists for this category and month");
+    }
+
+    const budgetRef = doc(db, `users/${uid}/budgets`, budgetId);
+
+    await updateDoc(budgetRef, budgetDetail);
+
+    return true;
+  } catch (error) {
+    throw error;
   }
 };

@@ -21,3 +21,9 @@ export interface GetBudgetByIdType {
   uid: string;
   budgetId: string;
 }
+
+export interface UpdateBudgetType {
+  uid: string;
+  budgetId: string;
+  budgetDetail: BudgetInputType;
+}
