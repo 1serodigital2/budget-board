@@ -8,14 +8,14 @@ import BudgetForm from "../../components/form/Budget";
 const AddBudgetPage = () => {
   const { user } = useAuth();
   const {
-    submitBudgetForm,
+    useAddBudgetForm,
     submitMessage,
     setInputValue,
     inputValue,
     showSubmitMessage,
   } = useBudget();
 
-  const { mutate, isPending, isError, error } = submitBudgetForm();
+  const { mutate, isPending, isError, error } = useAddBudgetForm();
 
   const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
     setInputValue((prevState) => {

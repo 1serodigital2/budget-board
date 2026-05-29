@@ -5,11 +5,12 @@ import {
   deleteBudgetById,
   getBudgetById,
   getBudgets,
+  updateBudget,
 } from "../api/budget";
 import useSubmitMessage from "./useSubmitMessage";
 import { queryClient } from "../services/firebase";
 import { useAuth } from "../context/AuthContext";
-import { BudgetInputType, GetBudgetByIdType } from "../types/budget";
+import { BudgetInputType, UpdateBudgetType } from "../types/budget";
 
 const initialValues: BudgetInputType = {
   category: "",
@@ -22,7 +23,7 @@ const useBudget = () => {
   const { submitMessage, showSubmitMessage } = useSubmitMessage();
   const { user } = useAuth();
 
-  const submitBudgetForm = () => {
+  const useAddBudgetForm = () => {
     return useMutation({
       mutationFn: createBudget,
       onSuccess: () => {
@@ -70,8 +71,24 @@ const useBudget = () => {
     });
   };
 
+  const useBudgetUpdate = (budgetId: string) => {
+    return useMutation({
+      mutationFn: (budgetDetail: BudgetInputType) =>
+        updateBudget({ uid: user?.uid!, budgetId, budgetDetail }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["budgets", budgetId],
+        });
+        showSubmitMessage("Budget updated successfully", "success");
+      },
+      onError: () => {
+        showSubmitMessage("Unable to update error", "error");
+      },
+    });
+  };
+
   return {
-    submitBudgetForm,
+    useAddBudgetForm,
     submitMessage,
     inputValue,
     setInputValue,
@@ -79,6 +96,7 @@ const useBudget = () => {
     getAllBudgets,
     getBudget,
     useDeleteBudget,
+    useBudgetUpdate,
   };
 };
 export default useBudget;

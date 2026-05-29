@@ -23,8 +23,11 @@ export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
   try {
     //check for duplicate budget
     const allBudgets = await getBudgets(uid);
-    const docId = budgetDetail.category + "_" + budgetDetail.month;
-    const finalDocid = docId.toLowerCase().trim();
+
+    const finalDocid = normalizeBudgetSlug(
+      budgetDetail.category,
+      budgetDetail.month,
+    );
 
     if (allBudgets && allBudgets.length > 0) {
       const duplicateBudget = allBudgets.find(
@@ -154,12 +157,28 @@ export const updateBudget = async ({
       throw new Error("Budget already exists for this category and month");
     }
 
+    const budgetSlug = normalizeBudgetSlug(
+      budgetDetail.category,
+      budgetDetail.month,
+    );
+
+    const updatedBudgetDetail = {
+      ...budgetDetail,
+      slug: budgetSlug,
+    };
+
     const budgetRef = doc(db, `users/${uid}/budgets`, budgetId);
 
-    await updateDoc(budgetRef, budgetDetail);
+    await updateDoc(budgetRef, { ...updatedBudgetDetail });
 
     return true;
-  } catch (error) {
+  } catch (error: any) {
     throw error;
   }
+};
+
+const normalizeBudgetSlug = (category: string, month: string) => {
+  const docId = category + "_" + month;
+  const finalDocid = docId.toLowerCase().trim();
+  return finalDocid;
 };

@@ -14,7 +14,7 @@ const EditBudgetPage = () => {
   const budgetId = params.id;
   const {
     inputValue,
-    submitBudgetForm,
+    useBudgetUpdate,
     submitMessage,
     getBudget,
     setInputValue,
@@ -23,7 +23,12 @@ const EditBudgetPage = () => {
 
   const { data, isLoading, isError, error } = getBudget(budgetId!);
 
-  const { mutate, isPending } = submitBudgetForm();
+  const {
+    mutate,
+    isPending,
+    isError: updateIsError,
+    error: updateError,
+  } = useBudgetUpdate(params.id!);
 
   useEffect(() => {
     if (data) {
@@ -36,12 +41,13 @@ const EditBudgetPage = () => {
     }
   }, [data]);
 
-  const handleFormSubmit = () => {
+  const handleFormSubmit = (e: React.SubmitEvent) => {
+    e.preventDefault();
     if (inputValue.amount < 0 || !inputValue.category) {
       showSubmitMessage("Please fill up the form properly", "error");
       return;
     }
-    mutate({ budgetDetail: inputValue, uid: user?.uid! });
+    mutate(inputValue);
   };
 
   const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
@@ -60,6 +66,18 @@ const EditBudgetPage = () => {
   return (
     <>
       <H1>Edit Budget</H1>
+      {updateIsError && (
+        <Alert
+          type="error"
+          message={updateError.message || "Failed to update"}
+        />
+      )}
+      {updateIsError && (
+        <Alert
+          type="error"
+          message={updateError.message || "Failed to update"}
+        />
+      )}
       {submitMessage && submitMessage.message !== "" && (
         <Alert type={submitMessage.type} message={submitMessage.message} />
       )}
