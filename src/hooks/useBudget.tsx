@@ -4,6 +4,7 @@ import {
   createBudget,
   deleteBudgetById,
   getBudgetById,
+  getBudgetMonthYear,
   getBudgets,
   updateBudget,
 } from "../api/budget";
@@ -87,6 +88,18 @@ const useBudget = () => {
     });
   };
 
+  const useBudgetMonthYear = (monthYear: string) => {
+    return useQuery({
+      queryKey: ["budgets", monthYear],
+      queryFn: () =>
+        getBudgetMonthYear({
+          monthYear,
+          uid: user!.uid,
+        }),
+      enabled: !!user?.uid,
+    });
+  };
+
   return {
     useAddBudgetForm,
     submitMessage,
@@ -97,6 +110,7 @@ const useBudget = () => {
     getBudget,
     useDeleteBudget,
     useBudgetUpdate,
+    useBudgetMonthYear
   };
 };
 export default useBudget;

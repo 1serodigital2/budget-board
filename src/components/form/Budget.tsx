@@ -11,7 +11,8 @@ const BudgetForm = ({
   handleInputChange,
   isPending,
 }: BudgetFormType) => {
-  const { data, isError, error } = useCategories();
+  const { useGetCategories } = useCategories();
+  const { data, isError, error } = useGetCategories();
 
   if (isError) {
     return (

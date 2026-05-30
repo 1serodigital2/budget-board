@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CategoryFormType, HandleInputChangeType } from "../types/category";
+import { useQuery } from "@tanstack/react-query";
 
 const defaultValues: CategoryFormType = {
   category: "",

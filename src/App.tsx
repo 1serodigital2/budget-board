@@ -26,6 +26,7 @@ import Signup from "./pages/SignUpPage";
 import BudgetListingPage from "./pages/budgets/BudgetListingPage";
 import AddBudgetPage from "./pages/budgets/AddBudgetPage";
 import EditBudgetPage from "./pages/budgets/EditBudgetPage";
+import BudgetOverview from "./pages/budgets/BudgetOverview";
 
 const router = createBrowserRouter([
   {
@@ -95,6 +96,10 @@ const router = createBrowserRouter([
           {
             path: "budget/:id/edit",
             element: <EditBudgetPage />,
+          },
+          {
+            path: "budget/overview",
+            element: <BudgetOverview />,
           },
         ],
       },

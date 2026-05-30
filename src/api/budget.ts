@@ -182,3 +182,34 @@ const normalizeBudgetSlug = (category: string, month: string) => {
   const finalDocid = docId.toLowerCase().trim();
   return finalDocid;
 };
+
+export const getBudgetMonthYear = async ({
+  monthYear,
+  uid,
+}: {
+  monthYear: string;
+  uid: string;
+}) => {
+  try {
+    const budgetRef = collection(db, `users/${uid}/budgets`);
+    const q = query(budgetRef, where("month", "==", monthYear));
+    const budgetSnapshot = await getDocs(q);
+    const budget = budgetSnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        amount: data.amount,
+        category: data.category,
+        month: data.month,
+        createdAt: data.createdAt,
+        slug: data.slug,
+      };
+    });
+
+    console.log("budget", budget);
+
+    return budget;
+  } catch (error) {
+    throw new Error("Failed to fetch budget for specific month");
+  }
+};
