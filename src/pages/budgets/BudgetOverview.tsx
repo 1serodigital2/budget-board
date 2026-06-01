@@ -6,14 +6,14 @@ import useExpenses from "../../hooks/useExpenses";
 import { getMonthYear } from "../../utils/helpers";
 
 const BudgetOverview = () => {
-  const { useBudgetMonthYear } = useBudget();
+  const { useGetBudgetMonthYear, useGetBudgetTable } = useBudget();
 
   const currentMntYr = getMonthYear();
 
-  const { data: budgets } = useBudgetMonthYear(currentMntYr);
+  const { data: budgets } = useGetBudgetMonthYear(currentMntYr);
 
-  const { useGetCategoryMonthYear } = useCategories();
-  const { data: categories } = useGetCategoryMonthYear();
+  const { useCategoriesQuery } = useCategories();
+  const { data: categories } = useCategoriesQuery();
 
   const { useGetExpenseMonthYear } = useExpenses();
   const {
@@ -25,6 +25,10 @@ const BudgetOverview = () => {
   console.log("budgets", budgets);
   console.log("categories", categories);
   console.log("expenses", expenses);
+
+  const budgetTable = useGetBudgetTable({ budgets, expenses, categories });
+
+  console.log("budgetTable", budgetTable);
 
   return (
     <>

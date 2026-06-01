@@ -11,7 +11,11 @@ import {
 import useSubmitMessage from "./useSubmitMessage";
 import { queryClient } from "../services/firebase";
 import { useAuth } from "../context/AuthContext";
-import { BudgetInputType, UpdateBudgetType } from "../types/budget";
+import {
+  BudgetInputType,
+  BudgetTableTypes,
+  UpdateBudgetType,
+} from "../types/budget";
 
 const initialValues: BudgetInputType = {
   category: "",
@@ -88,7 +92,7 @@ const useBudget = () => {
     });
   };
 
-  const useBudgetMonthYear = (monthYear: string) => {
+  const useGetBudgetMonthYear = (monthYear: string) => {
     return useQuery({
       queryKey: ["budgets", monthYear],
       queryFn: () =>
@@ -98,6 +102,58 @@ const useBudget = () => {
         }),
       enabled: !!user?.uid,
     });
+  };
+
+  const useGetBudgetTable = ({
+    budgets,
+    expenses,
+    categories,
+  }: BudgetTableTypes) => {
+    if (!budgets || !expenses || !categories) return;
+    const budgetData = budgets.map((budget) => {
+      const category = categories.find((cat) => cat.id === budget.category);
+
+      const [yearStr, monthStr] = budget.month.split("-");
+      const year = parseInt(yearStr, 10);
+      const month = parseInt(monthStr, 10) - 1;
+      const budgetStartDate = new Date(year, month, 1);
+      const budgetEndDate = new Date(year, month + 1, 1);
+
+      const spent = expenses
+        .filter(
+          (expense) =>
+            expense.category === budget.category &&
+            expense.date >= budgetStartDate &&
+            expense.date <= budgetEndDate,
+        )
+        .reduce((total, expense) => total + expense.amount, 0);
+
+      const remaining = budget.amount - spent;
+
+      const percentage =
+        budget.amount > 0
+          ? Number(((spent / budget.amount) * 100).toFixed(2))
+          : 0;
+
+      const formattedMonth = new Date(
+        Number(year),
+        Number(month),
+      ).toLocaleString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+
+      return {
+        categoryName: category?.name ?? "Unknown",
+        budget: budget.amount,
+        spent,
+        remaining,
+        percentage,
+        budgetMonth: formattedMonth,
+      };
+    });
+
+    return budgetData;
   };
 
   return {
@@ -110,7 +166,8 @@ const useBudget = () => {
     getBudget,
     useDeleteBudget,
     useBudgetUpdate,
-    useBudgetMonthYear
+    useGetBudgetMonthYear,
+    useGetBudgetTable,
   };
 };
 export default useBudget;

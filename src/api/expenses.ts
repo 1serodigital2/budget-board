@@ -179,6 +179,9 @@ export const getExpensesMonthYear = async ({
     const startDate = new Date(year, month, 1);
     const endDate = new Date(year, month + 1, 1);
 
+    console.log("startDate", startDate);
+    console.log("endDate", endDate);
+
     const expensesRef = collection(db, `users/${uid}/expenses`);
     const q = query(
       expensesRef,
@@ -194,7 +197,7 @@ export const getExpensesMonthYear = async ({
     console.log(startDate);
     console.log(endDate);
     if (expensesSnap.docs.length <= 0) {
-      throw new Error("Expenses does not exist");
+      return [];
     }
     const expensesData = expensesSnap.docs.map((doc) => {
       const data = doc.data();
@@ -203,7 +206,7 @@ export const getExpensesMonthYear = async ({
         id: doc.id,
         amount: data.amount,
         category: data.category,
-        date: data.date,
+        date: data.date.toDate(),
       };
     });
 

@@ -1,4 +1,7 @@
+import { Timestamp } from "firebase/firestore";
 import { HandleInputChangeProps } from "./FormTypes";
+import { GetExpenseDetailsType } from "./expense";
+import { CategoryProps } from "./category";
 
 export interface BudgetInputType {
   category: string;
@@ -26,4 +29,19 @@ export interface UpdateBudgetType {
   uid: string;
   budgetId: string;
   budgetDetail: BudgetInputType;
+}
+
+export interface GetBudgetDetailsTypes {
+  id: string;
+  amount: number;
+  category: string;
+  month: string;
+  createdAt: Timestamp;
+  slug: string;
+}
+
+export interface BudgetTableTypes {
+  budgets: GetBudgetDetailsTypes[];
+  expenses: GetExpenseDetailsType[];
+  categories: CategoryProps[];
 }

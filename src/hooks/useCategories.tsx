@@ -13,7 +13,7 @@ export const useCategories = () => {
     });
   };
 
-  const useGetCategoryMonthYear = () => {
+  const useCategoriesQuery = () => {
     return useQuery({
       queryKey: ["categories"],
       queryFn: () => getCategories(user!.uid),
@@ -22,6 +22,6 @@ export const useCategories = () => {
 
   return {
     useGetCategories,
-    useGetCategoryMonthYear,
+    useCategoriesQuery,
   };
 };
