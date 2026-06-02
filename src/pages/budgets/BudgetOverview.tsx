@@ -40,7 +40,8 @@ const BudgetOverview = () => {
     categories: categories || [],
   });
 
-  console.log("budgetTable", budgetTable);
+  console.log("expenses", expenses);
+
   if (expensesIsError) {
     return (
       <Alert

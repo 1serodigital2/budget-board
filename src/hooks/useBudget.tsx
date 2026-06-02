@@ -119,6 +119,11 @@ const useBudget = () => {
       const budgetStartDate = new Date(year, month, 1);
       const budgetEndDate = new Date(year, month + 1, 1);
 
+      console.log("Budget test start ====================");
+      console.log("budgetStartDate", budgetStartDate);
+      console.log("budgetEndDate", budgetEndDate);
+      console.log("Budget test end ====================");
+
       const spent = expenses
         .filter(
           (expense) =>
