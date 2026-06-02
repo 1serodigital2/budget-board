@@ -28,7 +28,6 @@ export const createExpense = async ({
     if (!uid) {
       throw new Error("Uid is missing");
     }
-    console.log("expenseDetail", expenseDetail);
     const docRef = await addDoc(collection(db, `users/${uid}/expenses`), {
       ...expenseDetail,
       isSystem: false,

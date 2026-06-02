@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Alert from "../../components/ui/Alert";
 import H1 from "../../components/ui/Heading";
@@ -17,7 +17,7 @@ const currentMntYr = getMonthYear();
 
 const BudgetOverview = () => {
   const [monthFilter, setMonthFilter] = useState(currentMntYr);
-  const [inputValue, setInputValue] = useState({ budgetMonth: currentMntYr });
+  const [inputValue, setInputValue] = useState({ budgetMonth: monthFilter });
   const { useGetBudgetMonthYear, useGetBudgetTable } = useBudget();
 
   const { showSubmitMessage, submitMessage } = useSubmitMessage();
@@ -32,15 +32,13 @@ const BudgetOverview = () => {
     data: expenses,
     isError: expensesIsError,
     error: expensesError,
-  } = useGetExpenseMonthYear(currentMntYr);
+  } = useGetExpenseMonthYear(monthFilter);
 
   const budgetTable = useGetBudgetTable({
     budgets: budgets || [],
     expenses: expenses || [],
     categories: categories || [],
   });
-
-  console.log("expenses", expenses);
 
   if (expensesIsError) {
     return (
@@ -66,7 +64,6 @@ const BudgetOverview = () => {
       const date = inputValue.budgetMonth.toString();
       setMonthFilter(date);
     } catch (error) {
-      showSubmitMessage("Unable to get filtered budget", "error");
     }
   };
 

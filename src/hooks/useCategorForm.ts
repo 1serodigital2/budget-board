@@ -12,8 +12,6 @@ const useCategoryForm = (initialValues = defaultValues) => {
     useState<CategoryFormType>(initialValues);
 
   const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
-    console.log("name ", name);
-    console.log("inputValues ", inputValue);
     setInputValues((prevState) => {
       return {
         ...prevState,

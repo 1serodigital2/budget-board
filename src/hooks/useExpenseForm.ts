@@ -20,8 +20,6 @@ const useExpenseForm = (defaultValues = initialValues) => {
   });
 
   const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
-    console.log("name ", name);
-    console.log("inputValue ", inputValue);
     setInputValues((prevState) => {
       return {
         ...prevState,
