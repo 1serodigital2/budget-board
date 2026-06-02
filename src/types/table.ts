@@ -2,6 +2,6 @@ import { ReactNode } from "react";
 
 export interface TableProps {
   columnNames: string[];
-  data: object[];
+  data?: object[];
   children?: ReactNode;
 }
