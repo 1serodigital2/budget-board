@@ -145,7 +145,7 @@ const useBudget = () => {
       const formattedMonth = new Date(
         Number(year),
         Number(month),
-      ).toLocaleString("en-US", {
+      ).toLocaleString("en-IN", {
         month: "long",
         year: "numeric",
       });
