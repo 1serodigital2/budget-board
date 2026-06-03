@@ -110,6 +110,10 @@ const useBudget = () => {
     categories,
   }: BudgetTableTypes) => {
     if (!budgets || !expenses || !categories) return;
+
+    let totalSpent = 0;
+    let totalBudgetAmount = 0;
+    let totalRemaining = 0;
     const budgetData = budgets.map((budget) => {
       const category = categories.find((cat) => cat.id === budget.category);
 
@@ -128,7 +132,10 @@ const useBudget = () => {
         )
         .reduce((total, expense) => total + expense.amount, 0);
 
+      totalSpent += spent;
+
       const remaining = budget.amount - spent;
+      totalRemaining += remaining;
 
       const percentage =
         budget.amount > 0
@@ -143,6 +150,7 @@ const useBudget = () => {
         year: "numeric",
       });
 
+      totalBudgetAmount += Number(budget.amount);
       return {
         categoryName: category?.name ?? "Unknown",
         budget: budget.amount,
@@ -153,7 +161,12 @@ const useBudget = () => {
       };
     });
 
-    return budgetData;
+    return {
+      totalBudgetAmount,
+      totalSpent,
+      totalRemaining,
+      budgetData,
+    };
   };
 
   return {

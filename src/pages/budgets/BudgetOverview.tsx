@@ -12,6 +12,7 @@ import Input from "../../components/Input";
 import { HandleInputChangeType } from "../../types/category";
 import Submit from "../../components/form/Submit";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
+import { BudgetTableResponseTypes } from "../../types/budget";
 
 const currentMntYr = getMonthYear();
 
@@ -34,11 +35,25 @@ const BudgetOverview = () => {
     error: expensesError,
   } = useGetExpenseMonthYear(monthFilter);
 
-  const budgetTable = useGetBudgetTable({
+  const {
+    budgetData: budgetTable,
+    totalSpent,
+    totalBudgetAmount,
+    totalRemaining,
+  } = useGetBudgetTable({
     budgets: budgets || [],
     expenses: expenses || [],
     categories: categories || [],
-  });
+  }) ?? {
+    budgetData: [],
+    totalSpent: 0,
+    totalBudgetAmount: 0,
+    totalRemaining: 0,
+  };
+
+  console.log("budgetTable", budgetTable);
+  console.log("totalSpent", totalSpent);
+  console.log("totalBudgetAmount", totalBudgetAmount);
 
   if (expensesIsError) {
     return (
@@ -63,8 +78,7 @@ const BudgetOverview = () => {
       e.preventDefault();
       const date = inputValue.budgetMonth.toString();
       setMonthFilter(date);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   return (
@@ -104,7 +118,7 @@ const BudgetOverview = () => {
           ]}
         >
           {budgetTable.map((budget, i) => (
-            <tr>
+            <tr className="bg-neutral-primary border-b border-default">
               <TableBodyData>{i + 1}</TableBodyData>
               <TableBodyData item={budget.categoryName} />
               <TableBodyData>{budget.budget}</TableBodyData>
@@ -114,6 +128,13 @@ const BudgetOverview = () => {
               <TableBodyData>{budget.budgetMonth}</TableBodyData>
             </tr>
           ))}
+          <tr className="bg-neutral-primary border-b border-default">
+            <TableBodyData colSpan={2}>Total</TableBodyData>
+            <TableBodyData>{totalBudgetAmount}</TableBodyData>
+            <TableBodyData>{totalSpent}</TableBodyData>
+            <TableBodyData></TableBodyData>
+            <TableBodyData>{totalRemaining}</TableBodyData>
+          </tr>
         </Table>
       )}
     </>

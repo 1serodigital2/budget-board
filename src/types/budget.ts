@@ -45,3 +45,17 @@ export interface BudgetTableTypes {
   expenses: GetExpenseDetailsType[];
   categories: CategoryProps[];
 }
+
+export interface BudgetTableResponseTypes {
+  totalBudgetAmount: number;
+  totalSpent: number;
+  totalRemaining: number;
+  budgetData: {
+    categoryName: string;
+    budget: number;
+    spent: number;
+    remaining: number;
+    percentage: number;
+    budgetMonth: string;
+  };
+}
