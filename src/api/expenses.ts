@@ -12,7 +12,11 @@ import {
   query,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
-import { ExpenseFormData, ExpenseProps } from "../types/expense";
+import {
+  ExpenseFormData,
+  ExpenseProps,
+  GetExpenseDetailsType,
+} from "../types/expense";
 
 export const queryClient = new QueryClient();
 

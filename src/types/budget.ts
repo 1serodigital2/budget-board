@@ -46,6 +46,10 @@ export interface BudgetTableTypes {
   categories: CategoryProps[];
 }
 
+export interface BudgetsObjTypes {
+  budgets: GetBudgetDetailsTypes[];
+}
+
 export interface BudgetTableResponseTypes {
   totalBudgetAmount: number;
   totalSpent: number;

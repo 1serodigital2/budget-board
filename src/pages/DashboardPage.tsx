@@ -1,5 +1,6 @@
+import Step4 from "../components/budgetSummary/budgetChart";
+import Alert from "../components/ui/Alert";
 import H1 from "../components/ui/Heading";
-import { useAuth } from "../context/AuthContext";
 import useBudget from "../hooks/useBudget";
 import useBudgetSummary from "../hooks/useBudgetSummary";
 import useExpenses from "../hooks/useExpenses";
@@ -7,20 +8,20 @@ import { getMonthYear } from "../utils/helpers";
 
 const date = getMonthYear();
 const Dashboard = () => {
-  const { user } = useAuth();
-
   const { useGetBudgetMonthYear } = useBudget();
   const { data: budgets } = useGetBudgetMonthYear(date);
 
   const { useGetExpenseMonthYear } = useExpenses();
-  const { data: expenses } = useGetExpenseMonthYear(date);
+  const { data: expenses, isLoading } = useGetExpenseMonthYear(date);
 
-  const { getTotalExpenses } = useBudgetSummary();
-  const totalExpenses = getTotalExpenses({ expenses: expenses });
-
-  console.log("budgets", budgets);
-  console.log("expenses", expenses);
-  console.log("totalExpenses", totalExpenses);
+  const { totalExpenses, totalBudget, remainingBudget, budgetPercentageSpent } =
+    useBudgetSummary({
+      budgets,
+      expenses,
+    });
+  if (isLoading) {
+    return <Alert message="Loading data" />;
+  }
 
   return (
     <>
@@ -28,21 +29,22 @@ const Dashboard = () => {
       <div className="grid grid-cols-4 gap-5">
         <div className="border p-6 rounded-2xl">
           <h5 className="mb-3">Total Budget</h5>
-          <div className="text-4xl font-medium">₹ 40000</div>
+          <div className="text-4xl font-medium">₹ {totalBudget}</div>
         </div>
         <div className="border p-6 rounded-2xl">
           <h5 className="mb-3">Total Expenses</h5>
-          <div className="text-4xl font-medium">₹ 40000</div>
+          <div className="text-4xl font-medium">₹ {totalExpenses}</div>
         </div>
         <div className="border p-6 rounded-2xl">
           <h5 className="mb-3">Remaining Budget</h5>
-          <div className="text-4xl font-medium">₹ 40000</div>
+          <div className="text-4xl font-medium">₹ {remainingBudget}</div>
         </div>
         <div className="border p-6 rounded-2xl">
-          <h5 className="mb-3">Savings Rate</h5>
-          <div className="text-4xl font-medium">₹ 40000</div>
+          <h5 className="mb-3">Expense Rate</h5>
+          <div className="text-4xl font-medium">{budgetPercentageSpent} %</div>
         </div>
       </div>
+      {/* <Step4 /> */}
     </>
   );
 };
