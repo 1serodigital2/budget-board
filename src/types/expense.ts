@@ -43,5 +43,5 @@ export interface GetExpenseDetailsType {
 }
 
 export interface GetExpenseObjType {
-  expenses: GetExpenseDetailsType;
+  expenses: GetExpenseDetailsType[];
 }
