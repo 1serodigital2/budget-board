@@ -41,3 +41,7 @@ export interface GetExpenseDetailsType {
   category: string;
   date: Date;
 }
+
+export interface GetExpenseObjType {
+  expenses: GetExpenseDetailsType;
+}
