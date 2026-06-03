@@ -153,11 +153,11 @@ const useBudget = () => {
       totalBudgetAmount += Number(budget.amount);
       return {
         categoryName: category?.name ?? "Unknown",
-        budget: budget.amount,
-        spent,
-        remaining,
-        percentage,
-        budgetMonth: formattedMonth,
+        budget: budget.amount || 0,
+        spent: spent || 0,
+        remaining: remaining || 0,
+        percentage: percentage || 0,
+        budgetMonth: formattedMonth || "N/A",
       };
     });
 
