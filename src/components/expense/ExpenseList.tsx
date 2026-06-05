@@ -15,25 +15,26 @@ import { useState } from "react";
 import ExpenseFilter from "./ExpenseFilter";
 import { FilterProps } from "../../types/expense";
 import { formatDate } from "../../utils/helpers";
+import useExpenses from "../../hooks/useExpenses";
 
 const ExpenseList = () => {
   const [filter, setFilter] = useState<FilterProps>({
     category: "",
-    keyword: "",
+    dateRange: {},
   });
   const [appliedFilter, setAppliedFilter] = useState<FilterProps>({
     category: "",
-    keyword: "",
+    dateRange: {},
   });
   const { submitMessage, showSubmitMessage } = useSubmitMessage();
   const { user } = useAuth();
   const userId = user?.uid!;
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["expenses", appliedFilter.category, appliedFilter.keyword],
-    queryFn: () =>
-      getExpenses(userId, appliedFilter.category, appliedFilter.keyword),
-    enabled: !!userId,
+  const { useGetExpensesQuery } = useExpenses();
+
+  const { data, isLoading, isError, error } = useGetExpensesQuery({
+    category: appliedFilter.category,
+    dateRange: appliedFilter.dateRange,
   });
 
   const {
@@ -108,9 +109,11 @@ const ExpenseList = () => {
     });
   };
 
+  console.log("filter", filter);
+
   const handleFilterSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
-    if (!filter.category && !filter.keyword) {
+    if (!filter.category && !filter.dateRange) {
       showSubmitMessage("Please select category or enter search keyword");
     }
     setAppliedFilter(filter);

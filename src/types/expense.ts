@@ -10,7 +10,7 @@ export interface ExpenseFilterProps extends HandleInputChangeProps {
 
 export interface FilterProps {
   category?: string;
-  keyword?: string;
+  dateRange?: {};
 }
 
 export interface ExpenseFormData {

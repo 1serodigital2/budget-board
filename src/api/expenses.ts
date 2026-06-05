@@ -80,11 +80,11 @@ export const getExpenses = async (
     });
 
     // keyword filter
-    if (keyword) {
-      expenses = expenses.filter((expense) =>
-        expense.note?.toLowerCase().includes(keyword.toLowerCase()),
-      );
-    }
+    // if (keyword) {
+    //   expenses = expenses.filter((expense) =>
+    //     expense.note?.toLowerCase().includes(keyword.toLowerCase()),
+    //   );
+    // }
 
     return expenses;
   } catch (error) {

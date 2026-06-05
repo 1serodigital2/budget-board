@@ -12,7 +12,7 @@ const Select = <T,>({
   inputValues = "",
 }: SelectType<T>) => {
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1  max-w-75">
       <label
         htmlFor={name}
         className="block mb-2.5 text-md text-white font-medium text-heading"

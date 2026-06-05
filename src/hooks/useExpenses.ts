@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getExpensesMonthYear } from "../api/expenses";
+import { getExpenses, getExpensesMonthYear } from "../api/expenses";
 import { useAuth } from "../context/AuthContext";
 
 const useExpenses = () => {
@@ -11,8 +11,17 @@ const useExpenses = () => {
     });
   };
 
+  const useGetExpensesQuery = ({ category, dateRange }) => {
+    return useQuery({
+      queryKey: ["expenses", category, dateRange],
+      queryFn: () => getExpenses(user!.uid, category, dateRange),
+      enabled: !!user!.uid,
+    });
+  };
+
   return {
     useGetExpenseMonthYear,
+    useGetExpensesQuery,
   };
 };
 
