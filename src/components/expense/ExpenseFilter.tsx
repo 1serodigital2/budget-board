@@ -10,6 +10,7 @@ const ExpenseFilter = ({
   handleInputChange,
   handleFilterSubmit,
   filter,
+  isPending
 }: ExpenseFilterProps) => {
   return (
     <form onSubmit={handleFilterSubmit} className="mb-3 max-w-3xl">
@@ -23,7 +24,7 @@ const ExpenseFilter = ({
           inputValues={filter.category || ""}
         />
         <DateRangePicker handleInputChange={handleInputChange} inputValues={filter.dateRange} />
-        <Submit />
+        <Submit isPending={isPending}  />
       </div>
     </form>
   );

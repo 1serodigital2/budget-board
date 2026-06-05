@@ -10,6 +10,7 @@ import {
   updateDoc,
   where,
   query,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import {
@@ -46,7 +47,7 @@ export const createExpense = async ({
 export const getExpenses = async (
   uid: string,
   category?: string,
-  keyword?: string,
+  dateRange?: string,
 ) => {
   try {
     if (!uid) {
@@ -171,16 +172,22 @@ export const getExpensesMonthYear = async ({
   monthYear,
 }: {
   uid: string;
-  monthYear: string;
+  monthYear: string | Timestamp;
 }) => {
   try {
-    const [yearStr, monthStr] = monthYear.split("-");
-
-    const year = parseInt(yearStr, 10);
-    const month = parseInt(monthStr, 10) - 1;
-
-    const startDate = new Date(year, month, 1);
-    const endDate = new Date(year, month + 1, 1);
+    let startDate;
+    let endDate;
+    if(typeof monthYear === "string"){
+      const [yearStr, monthStr] = monthYear.split("-");
+  
+      const year = parseInt(yearStr, 10);
+      const month = parseInt(monthStr, 10) - 1;
+  
+      startDate = new Date(year, month, 1);
+      endDate = new Date(year, month + 1, 1);
+    }else{
+      
+    }
 
     console.log("startDate", startDate);
     console.log("endDate", endDate);

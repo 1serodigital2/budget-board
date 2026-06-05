@@ -83,7 +83,7 @@ const ExpenseList = () => {
     );
   }
 
-  if (!data || !catData) {
+  if ((!data || !catData)) {
     return <Alert message="Unable to fetch expenses" />;
   }
 
