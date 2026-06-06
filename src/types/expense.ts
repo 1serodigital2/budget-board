@@ -45,3 +45,8 @@ export interface GetExpenseDetailsType {
 export interface GetExpenseObjType {
   expenses?: GetExpenseDetailsType[];
 }
+
+export interface DateRange {
+  start: Date;
+  end: Date;
+};

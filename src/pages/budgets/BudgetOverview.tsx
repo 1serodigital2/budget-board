@@ -13,6 +13,7 @@ import { HandleInputChangeType } from "../../types/category";
 import Submit from "../../components/form/Submit";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
 import { BudgetTableResponseTypes } from "../../types/budget";
+import { NavLink } from "react-router-dom";
 
 const currentMntYr = getMonthYear();
 
@@ -115,6 +116,7 @@ const BudgetOverview = () => {
             "Spent Percentage",
             "Remaining",
             "Month",
+            "Action",
           ]}
         >
           {budgetTable.map((budget, i) => (
@@ -126,6 +128,13 @@ const BudgetOverview = () => {
               <TableBodyData>{budget.percentage}</TableBodyData>
               <TableBodyData>{budget.remaining}</TableBodyData>
               <TableBodyData>{budget.budgetMonth}</TableBodyData>
+              <TableBodyData>
+                <NavLink
+                  to={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`}
+                >
+                  View
+                </NavLink>
+              </TableBodyData>
             </tr>
           ))}
           <tr className="bg-neutral-primary border-b border-default">

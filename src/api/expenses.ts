@@ -14,10 +14,12 @@ import {
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import {
+  DateRange,
   ExpenseFormData,
   ExpenseProps,
   GetExpenseDetailsType,
 } from "../types/expense";
+import { getTimeStampFromMonth } from "../utils/helpers";
 
 export const queryClient = new QueryClient();
 
@@ -47,54 +49,32 @@ export const createExpense = async ({
 export const getExpenses = async (
   uid: string,
   category?: string,
-  dateRange?: string,
+  dateRange?: DateRange,
 ) => {
-  try {
-    if (!uid) {
-      throw new Error("Unauthorized access");
-    }
+  const collectionRef = collection(db, `users/${uid}/expenses`);
 
-    const collectionRef = collection(db, `users/${uid}/expenses`);
+  const constraints = [];
 
-    const constraints = [];
-
-    // category filter
-    if (category) {
-      constraints.push(where("category", "==", category));
-    }
-
-    const q = query(collectionRef, ...constraints);
-
-    const querySnapshot = await getDocs(q);
-
-    let expenses = querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-
-      return {
-        id: doc.id,
-        amount: data.amount,
-        category: data.category,
-        note: data.note,
-        date: data.date || "",
-        createdAt: data.createdAt || "",
-      };
-    });
-
-    // keyword filter
-    // if (keyword) {
-    //   expenses = expenses.filter((expense) =>
-    //     expense.note?.toLowerCase().includes(keyword.toLowerCase()),
-    //   );
-    // }
-
-    return expenses;
-  } catch (error) {
-    console.error("Unable to get expenses", error);
-
-    throw new Error("Unable to get expenses");
+  if (category) {
+    constraints.push(where("category", "==", category));
   }
-};
 
+  if (dateRange?.start && !dateRange?.end) {
+    constraints.push(where("date", "==", dateRange.start));
+  } else if (dateRange?.start && dateRange?.end) {
+    constraints.push(where("date", ">=", dateRange.start));
+    constraints.push(where("date", "<=", dateRange.end));
+  }
+
+  const q = query(collectionRef, ...constraints);
+
+  const querySnapshot = await getDocs(q);
+
+  return querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+};
 interface deleteExpenseType {
   id: string;
   uid: string;
@@ -172,22 +152,10 @@ export const getExpensesMonthYear = async ({
   monthYear,
 }: {
   uid: string;
-  monthYear: string | Timestamp;
+  monthYear: string;
 }) => {
   try {
-    let startDate;
-    let endDate;
-    if(typeof monthYear === "string"){
-      const [yearStr, monthStr] = monthYear.split("-");
-  
-      const year = parseInt(yearStr, 10);
-      const month = parseInt(monthStr, 10) - 1;
-  
-      startDate = new Date(year, month, 1);
-      endDate = new Date(year, month + 1, 1);
-    }else{
-      
-    }
+    const { startDate, endDate } = getTimeStampFromMonth(monthYear);
 
     console.log("startDate", startDate);
     console.log("endDate", endDate);

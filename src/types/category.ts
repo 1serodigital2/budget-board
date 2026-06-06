@@ -44,4 +44,5 @@ export interface CategoryProps {
   color: string;
   createdAt: string;
   isSystem: boolean;
+  slug?: string;
 }

@@ -1,5 +1,5 @@
 // react
-import { NavLink } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteExpense, getExpenses } from "../../api/expenses";
@@ -11,20 +11,29 @@ import TableBodyData from "../ui/TableBodyData";
 import { getCategories } from "../../api/category";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
 import { HandleInputChangeType } from "../../types/category";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExpenseFilter from "./ExpenseFilter";
 import { FilterProps } from "../../types/expense";
-import { formatDate } from "../../utils/helpers";
+import { formatDate, getTimeStampFromMonth } from "../../utils/helpers";
 import useExpenses from "../../hooks/useExpenses";
 
 const ExpenseList = () => {
+  const [searchParams] = useSearchParams();
+  const month = searchParams.get("month") || "";
+  const category = searchParams.get("category") || "";
+  const initialDateRange = month
+    ? (() => {
+        const { startDate, endDate } = getTimeStampFromMonth(month);
+        return { start: startDate, end: endDate };
+      })()
+    : undefined;
   const [filter, setFilter] = useState<FilterProps>({
     category: "",
-    dateRange: {},
+    dateRange: initialDateRange,
   });
   const [appliedFilter, setAppliedFilter] = useState<FilterProps>({
     category: "",
-    dateRange: {},
+    dateRange: initialDateRange,
   });
   const { submitMessage, showSubmitMessage } = useSubmitMessage();
   const { user } = useAuth();
@@ -51,6 +60,22 @@ const ExpenseList = () => {
       return getCategories(user?.uid);
     },
   });
+
+  useEffect(() => {
+    if (!category || !catData) return;
+
+    const searchCatId = catData.find((cat) => cat.slug === category)?.id;
+
+    setFilter((prev) => ({
+      ...prev,
+      category: searchCatId ?? "",
+    }));
+
+    setAppliedFilter((prev) => ({
+      ...prev,
+      category: searchCatId ?? "",
+    }));
+  }, [category, catData]);
 
   const {
     mutate,
@@ -83,7 +108,7 @@ const ExpenseList = () => {
     );
   }
 
-  if ((!data || !catData)) {
+  if (!data || !catData) {
     return <Alert message="Unable to fetch expenses" />;
   }
 
