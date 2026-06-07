@@ -67,7 +67,6 @@ const EditCategoryPage = () => {
     e.preventDefault();
     try {
       const categoryDetail = getCategoryDetail();
-      console.log("categoryDetail", categoryDetail);
       if (
         !categoryDetail.category ||
         !categoryDetail.color ||
