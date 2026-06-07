@@ -65,6 +65,7 @@ const ExpenseList = () => {
     if (!category || !catData) return;
 
     const searchCatId = catData.find((cat) => cat.slug === category)?.id;
+    console.log("searchCatId", searchCatId);
 
     setFilter((prev) => ({
       ...prev,
@@ -185,8 +186,8 @@ const ExpenseList = () => {
                     expense.date?.toDate
                       ? formatDate(expense.date.toDate())
                       : expense.createdAt?.toDate
-                      ? formatDate(expense.createdAt.toDate())
-                      : ""
+                        ? formatDate(expense.createdAt.toDate())
+                        : ""
                   }
                 />
                 <TableBodyData>
