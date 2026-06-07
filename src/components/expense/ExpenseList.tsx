@@ -13,7 +13,7 @@ import useSubmitMessage from "../../hooks/useSubmitMessage";
 import { HandleInputChangeType } from "../../types/category";
 import { useEffect, useState } from "react";
 import ExpenseFilter from "./ExpenseFilter";
-import { FilterProps } from "../../types/expense";
+import { DateRange, FilterProps } from "../../types/expense";
 import { formatDate, getTimeStampFromMonth } from "../../utils/helpers";
 import useExpenses from "../../hooks/useExpenses";
 
@@ -21,12 +21,12 @@ const ExpenseList = () => {
   const [searchParams] = useSearchParams();
   const month = searchParams.get("month") || "";
   const category = searchParams.get("category") || "";
-  const initialDateRange = month
+  const initialDateRange: DateRange = month
     ? (() => {
         const { startDate, endDate } = getTimeStampFromMonth(month);
         return { start: startDate, end: endDate };
       })()
-    : undefined;
+    : { start: null, end: null };
   const [filter, setFilter] = useState<FilterProps>({
     category: "",
     dateRange: initialDateRange,
@@ -178,13 +178,15 @@ const ExpenseList = () => {
               >
                 <TableBodyData>{i + 1}</TableBodyData>
                 <TableBodyData item={expense.categoryData?.name} />
-                <TableBodyData item={expense.amount} />
+                <TableBodyData>{expense.amount}</TableBodyData>
                 <TableBodyData item={expense.note} />
                 <TableBodyData
                   item={
                     expense.date?.toDate
                       ? formatDate(expense.date.toDate())
-                      : formatDate(expense.createdAt.toDate())
+                      : expense.createdAt?.toDate
+                      ? formatDate(expense.createdAt.toDate())
+                      : ""
                   }
                 />
                 <TableBodyData>

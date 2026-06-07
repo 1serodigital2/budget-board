@@ -50,7 +50,7 @@ export const getExpenses = async (
   uid: string,
   category?: string,
   dateRange?: DateRange,
-) => {
+): Promise<(ExpenseProps & { id: string })[]> => {
   const collectionRef = collection(db, `users/${uid}/expenses`);
 
   const constraints = [];
@@ -73,7 +73,7 @@ export const getExpenses = async (
   return querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
-  }));
+  })) as (ExpenseProps & { id: string })[];
 };
 interface deleteExpenseType {
   id: string;

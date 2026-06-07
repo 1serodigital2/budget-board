@@ -4,13 +4,20 @@ import DatePicker from "react-datepicker";
 // @ts-ignore: side-effect import for CSS module
 import "react-datepicker/dist/react-datepicker.css";
 
-const DateRangePicker = ({ handleInputChange, inputValues }) => {
+import { DateRange } from "../../types/expense";
+
+interface DateRangePickerProps {
+  handleInputChange: (data: { name: string; inputValue: any }) => void;
+  inputValues?: DateRange;
+}
+
+const DateRangePicker = ({ handleInputChange, inputValues }: DateRangePickerProps) => {
   return (
     <div className="w-64">
       <DatePicker
         selectsRange
-        startDate={inputValues.start || null}
-        endDate={inputValues.end || null}
+        startDate={inputValues?.start || null}
+        endDate={inputValues?.end || null}
         onChange={(dates) => {
           const [start, end] = dates;
           handleInputChange({
