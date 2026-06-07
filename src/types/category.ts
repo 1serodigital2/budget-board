@@ -17,7 +17,7 @@ export interface GetCategoryType {
 
 export interface HandleInputChangeType {
   name: string;
-  inputValue: string | number;
+  inputValue: any;
 }
 export interface CategoryFormProps {
   isPending: boolean;
@@ -44,4 +44,5 @@ export interface CategoryProps {
   color: string;
   createdAt: string;
   isSystem: boolean;
+  slug?: string;
 }

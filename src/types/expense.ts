@@ -10,7 +10,7 @@ export interface ExpenseFilterProps extends HandleInputChangeProps {
 
 export interface FilterProps {
   category?: string;
-  keyword?: string;
+  dateRange?: DateRange;
 }
 
 export interface ExpenseFormData {
@@ -32,7 +32,7 @@ export interface ExpenseProps {
   category: string;
   date: Timestamp;
   note?: string;
-  createdAt?: string;
+  createdAt?: Timestamp;
 }
 
 export interface GetExpenseDetailsType {
@@ -44,4 +44,9 @@ export interface GetExpenseDetailsType {
 
 export interface GetExpenseObjType {
   expenses?: GetExpenseDetailsType[];
+}
+
+export interface DateRange {
+  start: Date | null;
+  end: Date | null;
 }

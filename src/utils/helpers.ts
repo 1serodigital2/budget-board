@@ -16,3 +16,18 @@ export const getMonthYear = (date = new Date()) => {
 
   return `${year}-${month}`;
 };
+
+export const getTimeStampFromMonth = (monthYear: string) => {
+  const [yearStr, monthStr] = monthYear.split("-");
+
+  const year = parseInt(yearStr, 10);
+  const month = parseInt(monthStr, 10) - 1;
+
+  const startDate = new Date(year, month, 1);
+  const endDate = new Date(year, month + 1, 1);
+
+  return {
+    startDate,
+    endDate,
+  };
+};

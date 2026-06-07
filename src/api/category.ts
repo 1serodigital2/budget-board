@@ -67,6 +67,7 @@ export const getCategories = async (userId: string) => {
         color: data.color,
         createdAt: data.createdAt,
         isSystem: data.isSystem || false,
+        slug: data.slug || "",
       };
     });
 

@@ -1,5 +1,5 @@
 // react
-import { NavLink } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteExpense, getExpenses } from "../../api/expenses";
@@ -11,29 +11,39 @@ import TableBodyData from "../ui/TableBodyData";
 import { getCategories } from "../../api/category";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
 import { HandleInputChangeType } from "../../types/category";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExpenseFilter from "./ExpenseFilter";
-import { FilterProps } from "../../types/expense";
-import { formatDate } from "../../utils/helpers";
+import { DateRange, FilterProps } from "../../types/expense";
+import { formatDate, getTimeStampFromMonth } from "../../utils/helpers";
+import useExpenses from "../../hooks/useExpenses";
 
 const ExpenseList = () => {
+  const [searchParams] = useSearchParams();
+  const month = searchParams.get("month") || "";
+  const category = searchParams.get("category") || "";
+  const initialDateRange: DateRange = month
+    ? (() => {
+        const { startDate, endDate } = getTimeStampFromMonth(month);
+        return { start: startDate, end: endDate };
+      })()
+    : { start: null, end: null };
   const [filter, setFilter] = useState<FilterProps>({
     category: "",
-    keyword: "",
+    dateRange: initialDateRange,
   });
   const [appliedFilter, setAppliedFilter] = useState<FilterProps>({
     category: "",
-    keyword: "",
+    dateRange: initialDateRange,
   });
   const { submitMessage, showSubmitMessage } = useSubmitMessage();
   const { user } = useAuth();
   const userId = user?.uid!;
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["expenses", appliedFilter.category, appliedFilter.keyword],
-    queryFn: () =>
-      getExpenses(userId, appliedFilter.category, appliedFilter.keyword),
-    enabled: !!userId,
+  const { useGetExpensesQuery } = useExpenses();
+
+  const { data, isLoading, isError, error } = useGetExpensesQuery({
+    category: appliedFilter.category,
+    dateRange: appliedFilter.dateRange,
   });
 
   const {
@@ -50,6 +60,22 @@ const ExpenseList = () => {
       return getCategories(user?.uid);
     },
   });
+
+  useEffect(() => {
+    if (!category || !catData) return;
+
+    const searchCatId = catData.find((cat) => cat.slug === category)?.id;
+
+    setFilter((prev) => ({
+      ...prev,
+      category: searchCatId ?? "",
+    }));
+
+    setAppliedFilter((prev) => ({
+      ...prev,
+      category: searchCatId ?? "",
+    }));
+  }, [category, catData]);
 
   const {
     mutate,
@@ -108,9 +134,11 @@ const ExpenseList = () => {
     });
   };
 
+  console.log("filter", filter);
+
   const handleFilterSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
-    if (!filter.category && !filter.keyword) {
+    if (!filter.category && !filter.dateRange) {
       showSubmitMessage("Please select category or enter search keyword");
     }
     setAppliedFilter(filter);
@@ -150,13 +178,15 @@ const ExpenseList = () => {
               >
                 <TableBodyData>{i + 1}</TableBodyData>
                 <TableBodyData item={expense.categoryData?.name} />
-                <TableBodyData item={expense.amount} />
+                <TableBodyData>{expense.amount}</TableBodyData>
                 <TableBodyData item={expense.note} />
                 <TableBodyData
                   item={
                     expense.date?.toDate
                       ? formatDate(expense.date.toDate())
-                      : formatDate(expense.createdAt.toDate())
+                      : expense.createdAt?.toDate
+                      ? formatDate(expense.createdAt.toDate())
+                      : ""
                   }
                 />
                 <TableBodyData>
