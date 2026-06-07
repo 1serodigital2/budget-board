@@ -1,10 +1,65 @@
-export interface BudgetFormType {
+import { Timestamp } from "firebase/firestore";
+import { HandleInputChangeProps } from "./FormTypes";
+import { GetExpenseDetailsType } from "./expense";
+import { CategoryProps } from "./category";
+
+export interface BudgetInputType {
   category: string;
   amount: number;
   month: string;
 }
 
 export interface BudgetType {
-  budgetDetail: BudgetFormType;
+  budgetDetail: BudgetInputType;
   uid: string;
+}
+
+export interface BudgetFormType extends HandleInputChangeProps {
+  handleFormSubmit: (e: React.SubmitEvent) => void;
+  inputValue: BudgetInputType;
+  isPending?: boolean;
+}
+
+export interface GetBudgetByIdType {
+  uid: string;
+  budgetId: string;
+}
+
+export interface UpdateBudgetType {
+  uid: string;
+  budgetId: string;
+  budgetDetail: BudgetInputType;
+}
+
+export interface GetBudgetDetailsTypes {
+  id: string;
+  amount: number;
+  category: string;
+  month: string;
+  createdAt: Timestamp;
+  slug: string;
+}
+
+export interface BudgetTableTypes {
+  budgets: GetBudgetDetailsTypes[];
+  expenses: GetExpenseDetailsType[];
+  categories: CategoryProps[];
+}
+
+export interface BudgetsObjTypes {
+  budgets: GetBudgetDetailsTypes[];
+}
+
+export interface BudgetTableResponseTypes {
+  totalBudgetAmount: number;
+  totalSpent: number;
+  totalRemaining: number;
+  budgetData: {
+    categoryName: string;
+    budget: number;
+    spent: number;
+    remaining: number;
+    percentage: number;
+    budgetMonth: string;
+  };
 }

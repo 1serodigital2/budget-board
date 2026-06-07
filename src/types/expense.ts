@@ -34,3 +34,14 @@ export interface ExpenseProps {
   note?: string;
   createdAt?: string;
 }
+
+export interface GetExpenseDetailsType {
+  id: string;
+  amount: number;
+  category: string;
+  date: Date;
+}
+
+export interface GetExpenseObjType {
+  expenses?: GetExpenseDetailsType[];
+}

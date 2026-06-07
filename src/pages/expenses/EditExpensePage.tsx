@@ -50,8 +50,6 @@ const EditExpensePage = () => {
     }
   }, [data]);
 
-  console.log("inputValues", inputValues);
-
   const { mutate, isPending } = useMutation({
     mutationFn: updateExpense,
     onSuccess: () => {

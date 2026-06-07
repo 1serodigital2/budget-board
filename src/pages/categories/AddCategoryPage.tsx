@@ -16,7 +16,6 @@ const AddCategoryPage = () => {
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: addCategory,
     onSuccess: () => {
-      console.log("category added");
       showSubmitMessage("Category added successfully", "success");
       resetForm();
       queryClient.invalidateQueries({

@@ -32,17 +32,20 @@ const SideBarNavigation = () => {
             <NavLink to="/categories">All Categories</NavLink>
           </li>
         </ul>
-        {/* <li className="text-white mt-3">
+        <li className="text-white mt-3">
           <NavLink to="/budget">Budget</NavLink>
         </li>
         <ul className="pl-4 pt-2">
           <li className="text-white mb-2">
             <NavLink to="/budget/add">Add Budget</NavLink>
           </li>
-          <li className="text-white">
+          <li className="text-white mb-2">
             <NavLink to="/budget">All Budget</NavLink>
           </li>
-        </ul> */}
+          <li className="text-white">
+            <NavLink to="/budget/overview">Budget overview</NavLink>
+          </li>
+        </ul>
       </ul>
     </div>
   );

@@ -15,6 +15,7 @@ export interface InputProps extends BaseFieldProps, HandleInputChangeProps {
   type?: string;
   inputValues?: string | number | undefined;
   sx?: string;
+  min?: string;
 }
 
 export interface LoginProps {

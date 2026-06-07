@@ -208,3 +208,15 @@ export const createDefaultCategories = async (uid: string) => {
     console.error("Unable to create default categories " + error);
   }
 };
+
+export const getCategoryMonthYear = ({
+  uid,
+  monthYear,
+}: {
+  uid: string;
+  monthYear: string;
+}) => {
+  try {
+    const categoryRef = collection(db, `users/${uid}/category`);
+  } catch (error) {}
+};

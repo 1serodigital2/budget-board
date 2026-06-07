@@ -38,8 +38,6 @@ const CategoriesList = () => {
     },
   });
 
-  console.log("category data", data);
-
   const handleDelete = (id: string) => {
     if (confirm("Are you sure to delete this category") === false) return;
     try {

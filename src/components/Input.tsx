@@ -9,6 +9,7 @@ const Input = ({
   inputValues,
   sx = "",
   placeholder = "",
+  ...rest
 }: InputProps) => {
   return (
     <div className="flex flex-col flex-1">
@@ -33,6 +34,7 @@ const Input = ({
         }
         value={inputValues}
         placeholder={placeholder}
+        {...rest}
       />
     </div>
   );

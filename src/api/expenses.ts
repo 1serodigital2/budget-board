@@ -12,7 +12,11 @@ import {
   query,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
-import { ExpenseFormData, ExpenseProps } from "../types/expense";
+import {
+  ExpenseFormData,
+  ExpenseProps,
+  GetExpenseDetailsType,
+} from "../types/expense";
 
 export const queryClient = new QueryClient();
 
@@ -28,7 +32,6 @@ export const createExpense = async ({
     if (!uid) {
       throw new Error("Uid is missing");
     }
-    console.log("expenseDetail", expenseDetail);
     const docRef = await addDoc(collection(db, `users/${uid}/expenses`), {
       ...expenseDetail,
       isSystem: false,
@@ -159,6 +162,61 @@ export const updateExpense = async ({
     return true;
   } catch (error) {
     console.error("unable to update expense", error);
-    throw new Error("Error while updating expense");
+    throw new Error("Error while updating expense " + error);
+  }
+};
+
+export const getExpensesMonthYear = async ({
+  uid,
+  monthYear,
+}: {
+  uid: string;
+  monthYear: string;
+}) => {
+  try {
+    const [yearStr, monthStr] = monthYear.split("-");
+
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthStr, 10) - 1;
+
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 1);
+
+    console.log("startDate", startDate);
+    console.log("endDate", endDate);
+
+    const expensesRef = collection(db, `users/${uid}/expenses`);
+    const q = query(
+      expensesRef,
+      where("date", ">=", startDate),
+      where("date", "<", endDate),
+    );
+
+    const expensesSnap = await getDocs(q);
+    console.log("expensesSnap.empty", expensesSnap.empty);
+    console.log("expensesSnap.size", expensesSnap.size);
+
+    console.log(monthYear);
+    console.log(startDate);
+    console.log(endDate);
+    if (expensesSnap.docs.length <= 0) {
+      return [];
+    }
+    const expensesData = expensesSnap.docs.map((doc) => {
+      const data = doc.data();
+
+      return {
+        id: doc.id,
+        amount: data.amount,
+        category: data.category,
+        date: data.date.toDate(),
+      };
+    });
+
+    console.log("getExpensesMonthYear", expensesData);
+
+    return expensesData;
+  } catch (error) {
+    throw new Error("Unable to get expense for month year " + error);
   }
 };
