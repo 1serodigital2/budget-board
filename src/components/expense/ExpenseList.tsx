@@ -65,6 +65,8 @@ const ExpenseList = () => {
     if (!category || !catData) return;
 
     const searchCatId = catData.find((cat) => cat.slug === category)?.id;
+
+    console.log("category ", category);
     console.log("searchCatId", searchCatId);
 
     setFilter((prev) => ({
