@@ -168,12 +168,6 @@ export const getExpensesMonthYear = async ({
     );
 
     const expensesSnap = await getDocs(q);
-    console.log("expensesSnap.empty", expensesSnap.empty);
-    console.log("expensesSnap.size", expensesSnap.size);
-
-    console.log(monthYear);
-    console.log(startDate);
-    console.log(endDate);
     if (expensesSnap.docs.length <= 0) {
       return [];
     }

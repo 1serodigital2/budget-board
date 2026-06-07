@@ -52,10 +52,6 @@ const BudgetOverview = () => {
     totalRemaining: 0,
   };
 
-  console.log("budgetTable", budgetTable);
-  console.log("totalSpent", totalSpent);
-  console.log("totalBudgetAmount", totalBudgetAmount);
-
   if (expensesIsError) {
     return (
       <Alert
