@@ -119,26 +119,28 @@ const BudgetOverview = () => {
             <tr className="bg-neutral-primary border-b border-default">
               <TableBodyData>{i + 1}</TableBodyData>
               <TableBodyData item={budget.categoryName} />
-              <TableBodyData>{budget.budget}</TableBodyData>
-              <TableBodyData>{budget.spent}</TableBodyData>
-              <TableBodyData>{budget.percentage}</TableBodyData>
-              <TableBodyData>{budget.remaining}</TableBodyData>
+              <TableBodyData>₹ {budget.budget}</TableBodyData>
+              <TableBodyData>₹ {budget.spent}</TableBodyData>
+              <TableBodyData>{budget.percentage}%</TableBodyData>
+              <TableBodyData>₹ {budget.remaining}</TableBodyData>
               <TableBodyData>{budget.budgetMonth}</TableBodyData>
               <TableBodyData>
-                <NavLink
-                  to={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`}
-                >
-                  View
-                </NavLink>
+                {budget.spent > 0 && (
+                  <NavLink
+                    to={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`}
+                  >
+                    View
+                  </NavLink>
+                )}
               </TableBodyData>
             </tr>
           ))}
           <tr className="bg-neutral-primary border-b border-default">
             <TableBodyData colSpan={2}>Total</TableBodyData>
-            <TableBodyData>{totalBudgetAmount}</TableBodyData>
-            <TableBodyData>{totalSpent}</TableBodyData>
+            <TableBodyData>₹ {totalBudgetAmount}</TableBodyData>
+            <TableBodyData>₹ {totalSpent}</TableBodyData>
             <TableBodyData></TableBodyData>
-            <TableBodyData>{totalRemaining}</TableBodyData>
+            <TableBodyData>₹ {totalRemaining}</TableBodyData>
           </tr>
         </Table>
       )}
