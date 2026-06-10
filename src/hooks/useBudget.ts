@@ -116,7 +116,6 @@ const useBudget = () => {
     let totalRemaining = 0;
     const budgetData = budgets.map((budget) => {
       const category = categories.find((cat) => cat.id === budget.category);
-      console.log("fetched category", category);
 
       const [yearStr, monthStr] = budget.month.split("-");
       const year = parseInt(yearStr, 10);

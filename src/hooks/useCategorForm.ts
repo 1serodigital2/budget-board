@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { CategoryFormType, HandleInputChangeType } from "../types/category";
-import { useQuery } from "@tanstack/react-query";
 
 const defaultValues: CategoryFormType = {
   category: "",
@@ -25,6 +24,7 @@ const useCategoryForm = (initialValues = defaultValues) => {
   };
 
   const getCategoryDetail = () => {
+    console.log("getCategoryDetail", inputValues);
     return {
       category: inputValues.category,
       color: inputValues.color,
@@ -36,7 +36,7 @@ const useCategoryForm = (initialValues = defaultValues) => {
     inputValues,
     resetForm,
     setInputValues,
-    getCategoryDetail
+    getCategoryDetail,
   };
 };
 export default useCategoryForm;

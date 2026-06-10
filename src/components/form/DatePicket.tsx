@@ -11,7 +11,10 @@ interface DateRangePickerProps {
   inputValues?: DateRange;
 }
 
-const DateRangePicker = ({ handleInputChange, inputValues }: DateRangePickerProps) => {
+const DateRangePicker = ({
+  handleInputChange,
+  inputValues,
+}: DateRangePickerProps) => {
   return (
     <div className="w-64">
       <DatePicker
@@ -33,6 +36,7 @@ const DateRangePicker = ({ handleInputChange, inputValues }: DateRangePickerProp
         dateFormat="dd-MM-yyyy"
         className="w-64 border rounded-xl text-sm p-3"
         name="dateRange"
+        autoComplete="off"
       />
     </div>
   );

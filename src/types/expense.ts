@@ -1,4 +1,8 @@
-import { Timestamp } from "firebase/firestore";
+import {
+  DocumentData,
+  QueryDocumentSnapshot,
+  Timestamp,
+} from "firebase/firestore";
 import { AlertProps, HandleInputChangeProps } from "./FormTypes";
 
 export interface ExpenseFilterProps extends HandleInputChangeProps {
@@ -49,4 +53,14 @@ export interface GetExpenseObjType {
 export interface DateRange {
   start: Date | null;
   end: Date | null;
+}
+
+export interface ExpensesResponse {
+  expenses: ExpensesDetailTyps[];
+  lastVisible: QueryDocumentSnapshot<DocumentData> | null;
+  hasMore: boolean;
+}
+
+export interface ExpensesDetailTyps extends ExpenseProps {
+  id: string;
 }
