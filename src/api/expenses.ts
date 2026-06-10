@@ -11,6 +11,11 @@ import {
   where,
   query,
   Timestamp,
+  QueryDocumentSnapshot,
+  orderBy,
+  limit,
+  startAfter,
+  DocumentData,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
 import {
@@ -50,7 +55,9 @@ export const getExpenses = async (
   uid: string,
   category?: string,
   dateRange?: DateRange,
-): Promise<(ExpenseProps & { id: string })[]> => {
+  lastDoc?: QueryDocumentSnapshot<DocumentData> | null,
+  pageSize = 10,
+) => {
   const collectionRef = collection(db, `users/${uid}/expenses`);
 
   const constraints = [];
@@ -66,14 +73,35 @@ export const getExpenses = async (
     constraints.push(where("date", "<=", dateRange.end));
   }
 
+  constraints.push(orderBy("date", "desc"));
+
+  if (lastDoc) {
+    constraints.push(startAfter(lastDoc));
+  }
+
+  constraints.push(limit(pageSize));
+
   const q = query(collectionRef, ...constraints);
 
-  const querySnapshot = await getDocs(q);
+  const snapshot = await getDocs(q);
 
-  return querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as (ExpenseProps & { id: string })[];
+  const expensesData = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      amount: data.amount,
+      category: data.category,
+      note: data.note,
+      date: data.date,
+      createdAt: data.createdAt,
+    };
+  });
+
+  return {
+    expenses: expensesData,
+    lastVisible: snapshot.docs[snapshot.docs.length - 1],
+    hasMore: snapshot.docs.length === pageSize,
+  };
 };
 interface deleteExpenseType {
   id: string;

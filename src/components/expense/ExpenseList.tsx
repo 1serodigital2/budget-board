@@ -13,7 +13,12 @@ import useSubmitMessage from "../../hooks/useSubmitMessage";
 import { HandleInputChangeType } from "../../types/category";
 import { useEffect, useState } from "react";
 import ExpenseFilter from "./ExpenseFilter";
-import { DateRange, FilterProps } from "../../types/expense";
+import {
+  DateRange,
+  ExpenseProps,
+  ExpensesDetailTyps,
+  FilterProps,
+} from "../../types/expense";
 import { formatDate, getTimeStampFromMonth } from "../../utils/helpers";
 import useExpenses from "../../hooks/useExpenses";
 
@@ -41,10 +46,22 @@ const ExpenseList = () => {
 
   const { useGetExpensesQuery } = useExpenses();
 
-  const { data, isLoading, isError, error } = useGetExpensesQuery({
+  const {
+    data: expensesData,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetExpensesQuery({
     category: appliedFilter.category,
     dateRange: appliedFilter.dateRange,
   });
+
+  const expenses = expensesData?.pages.flatMap((page) => page.expenses) ?? [];
+
+  console.log("expense data1", expensesData);
 
   const {
     data: catData,
@@ -65,9 +82,6 @@ const ExpenseList = () => {
     if (!category || !catData) return;
 
     const searchCatId = catData.find((cat) => cat.slug === category)?.id;
-
-    console.log("category ", category);
-    console.log("searchCatId", searchCatId);
 
     setFilter((prev) => ({
       ...prev,
@@ -111,8 +125,8 @@ const ExpenseList = () => {
     );
   }
 
-  if (!data || !catData) {
-    return <Alert message="Unable to fetch expenses" />;
+  if (!expensesData?.pages || !catData || expensesData?.pages?.length <= 0) {
+    return <Alert message="Unable to fetch expenses" type="error" />;
   }
 
   const handleDelete = (expenseId: string) => {
@@ -121,7 +135,7 @@ const ExpenseList = () => {
     }
   };
 
-  const expensedWithCategory = data.map((expense) => {
+  const expensedWithCategory = expenses.map((expense) => {
     return {
       ...expense,
       categoryData: catData.find((cat) => expense.category === cat.id),
@@ -149,7 +163,7 @@ const ExpenseList = () => {
 
   return (
     <>
-      {!data || data.length === 0 ? (
+      {!expenses || expenses.length === 0 ? (
         <Alert message="Data not found" />
       ) : (
         <>
@@ -172,7 +186,7 @@ const ExpenseList = () => {
               "Date",
               "Action",
             ]}
-            data={data}
+            data={expenses}
           >
             {expensedWithCategory?.map((expense, i) => (
               <tr
@@ -218,6 +232,17 @@ const ExpenseList = () => {
               </tr>
             ))}
           </Table>
+          {hasNextPage && (
+            <div className="text-center">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="bg-[#1e3a8a] py-2 px-4 h-11.5 text-white rounded-xl cursor-pointer mt-3"
+              >
+                {isFetchingNextPage ? "Loading..." : "Load more"}
+              </button>
+            </div>
+          )}
         </>
       )}
     </>
