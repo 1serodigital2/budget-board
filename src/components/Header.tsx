@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 const Header = () => {
   const { logOut } = useAuth();
   return (
-    <div className="flex justify-between px-10 py-5 border-b">
+    <div className="flex justify-between px-10 py-5 border-b h-max">
       <h1>Header</h1>
       <button onClick={() => logOut()} className="cursor-pointer">
         Logout
