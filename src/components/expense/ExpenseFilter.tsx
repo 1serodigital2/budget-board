@@ -4,16 +4,22 @@ import Submit from "../form/Submit";
 import { ExpenseFilterProps } from "../../types/expense";
 import DateRangePicker from "../form/DatePicket";
 import Datep from "../form/DatePicket";
+import { Timestamp } from "firebase/firestore";
 
 const ExpenseFilter = ({
   catData,
   handleInputChange,
   handleFilterSubmit,
+  handleFilterReset,
   filter,
-  isPending
+  isPending,
 }: ExpenseFilterProps) => {
   return (
-    <form onSubmit={handleFilterSubmit} className="mb-3 max-w-3xl">
+    <form
+      onSubmit={handleFilterSubmit}
+      onReset={handleFilterReset}
+      className="mb-3 max-w-3xl"
+    >
       <div className="flex gap-5 items-center">
         <Select
           getOptionValue={(category: any) => category?.id}
@@ -23,8 +29,16 @@ const ExpenseFilter = ({
           handleInputChange={handleInputChange}
           inputValues={filter.category || ""}
         />
-        <DateRangePicker handleInputChange={handleInputChange} inputValues={filter.dateRange} />
-        <Submit isPending={isPending}  />
+        <DateRangePicker
+          handleInputChange={handleInputChange}
+          inputValues={filter.dateRange}
+        />
+        <Submit isPending={isPending} />
+        {(filter.category !== "" ||
+          (filter.dateRange?.start instanceof Date &&
+            filter.dateRange?.end instanceof Date)) && (
+              <Submit type="reset" isPending={isPending} />
+            )}
       </div>
     </form>
   );

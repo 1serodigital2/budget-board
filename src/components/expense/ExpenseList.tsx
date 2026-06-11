@@ -32,14 +32,15 @@ const ExpenseList = () => {
         return { start: startDate, end: endDate };
       })()
     : { start: null, end: null };
-  const [filter, setFilter] = useState<FilterProps>({
+
+  const initialFilter = {
     category: "",
     dateRange: initialDateRange,
-  });
-  const [appliedFilter, setAppliedFilter] = useState<FilterProps>({
-    category: "",
-    dateRange: initialDateRange,
-  });
+  };
+  const [filter, setFilter] = useState<FilterProps>(initialFilter);
+  const [appliedFilter, setAppliedFilter] =
+    useState<FilterProps>(initialFilter);
+
   const { submitMessage, showSubmitMessage } = useSubmitMessage();
   const { user } = useAuth();
   const userId = user?.uid!;
@@ -161,19 +162,25 @@ const ExpenseList = () => {
     setAppliedFilter(filter);
   };
 
+  const handleFilterReset = () => {
+    setAppliedFilter(initialFilter);
+    setFilter(initialFilter);
+  };
+
   return (
     <>
+      <ExpenseFilter
+        catData={catData}
+        handleInputChange={handleInputChange}
+        handleFilterSubmit={handleFilterSubmit}
+        handleFilterReset={handleFilterReset}
+        filter={filter}
+        isPending={isLoading}
+      />
       {!expenses || expenses.length === 0 ? (
         <Alert message="Data not found" />
       ) : (
         <>
-          <ExpenseFilter
-            catData={catData}
-            handleInputChange={handleInputChange}
-            handleFilterSubmit={handleFilterSubmit}
-            filter={filter}
-            isPending={isLoading}
-          />
           {submitMessage && submitMessage.message !== "" && (
             <Alert type={submitMessage.type} message={submitMessage.message} />
           )}
@@ -237,7 +244,7 @@ const ExpenseList = () => {
               <button
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="bg-[#1e3a8a] py-2 px-4 h-11.5 text-white rounded-xl cursor-pointer mt-3"
+                className="bg-(--color-primary) py-2 px-4 h-11.5 text-white rounded-xl cursor-pointer mt-3"
               >
                 {isFetchingNextPage ? "Loading..." : "Load more"}
               </button>
