@@ -8,6 +8,7 @@ import { AlertProps, HandleInputChangeProps } from "./FormTypes";
 export interface ExpenseFilterProps extends HandleInputChangeProps {
   catData: object;
   handleFilterSubmit: (e: React.SubmitEvent) => void;
+  handleFilterReset: () => void;
   filter: FilterProps;
   isPending: boolean;
 }
