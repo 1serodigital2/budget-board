@@ -26,6 +26,8 @@ import {
 } from "../types/expense";
 import { getTimeStampFromMonth } from "../utils/helpers";
 
+import { format } from "date-fns";
+
 export const queryClient = new QueryClient();
 
 interface CreateExpenseProp {
@@ -216,4 +218,37 @@ export const getExpensesMonthYear = async ({
   } catch (error) {
     throw new Error("Unable to get expense for month year " + error);
   }
+};
+
+export const getMonthlyExpenses = async (uid: string) => {
+  const expensesSnap = await getDocs(collection(db, `users/${uid}/expenses`));
+
+  const monthlyData: Record<string, { expense: number; sortDate: Date }> = {};
+
+  expensesSnap.forEach((doc) => {
+    const expense = doc.data();
+
+    const date = expense.date.toDate();
+
+    const month = date.toLocaleString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
+
+    if (!monthlyData[month]) {
+      monthlyData[month] = {
+        expense: 0,
+        sortDate: new Date(date.getFullYear(), date.getMonth(), 1),
+      };
+    }
+
+    monthlyData[month].expense += expense.amount;
+  });
+
+  return Object.entries(monthlyData)
+    .sort(([, a], [, b]) => a.sortDate.getTime() - b.sortDate.getTime())
+    .map(([month, data]) => ({
+      month,
+      expense: data.expense,
+    }));
 };

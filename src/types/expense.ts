@@ -65,3 +65,11 @@ export interface ExpensesResponse {
 export interface ExpensesDetailTyps extends ExpenseProps {
   id: string;
 }
+
+export interface MothlyExpenseData {
+  month: string;
+  expense: number;
+}
+export interface MothlyExpenseDataType {
+  data: MothlyExpenseData[];
+}

@@ -8,41 +8,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { MothlyExpenseDataType } from "../../types/expense";
 
-const data = [
-  {
-    month: "Jan",
-    budget: 20000,
-    expense: 18000,
-  },
-  {
-    month: "Feb",
-    budget: 20000,
-    expense: 23000,
-  },
-  {
-    month: "Mar",
-    budget: 20000,
-    expense: 19000,
-  },
-  {
-    month: "Apr",
-    budget: 25000,
-    expense: 22000,
-  },
-  {
-    month: "May",
-    budget: 25000,
-    expense: 28000,
-  },
-  {
-    month: "Jun",
-    budget: 25000,
-    expense: 21000,
-  },
-];
-
-export default function BudgetExpenseChart() {
+export default function MonthlyExpenseTred({data}: MothlyExpenseDataType) {
   return (
     <div style={{ width: "100%", aspectRatio: 1.618 }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -67,14 +35,14 @@ export default function BudgetExpenseChart() {
 
           <Legend />
 
-          <Line
+          {/* <Line
             type="monotone"
             dataKey="budget"
             name="Budget"
             stroke="#22c55e"
             strokeWidth={2}
             activeDot={{ r: 8 }}
-          />
+          /> */}
 
           <Line
             type="monotone"

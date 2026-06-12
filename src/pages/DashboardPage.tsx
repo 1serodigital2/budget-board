@@ -4,6 +4,7 @@ import H1 from "../components/ui/Heading";
 import useBudget from "../hooks/useBudget";
 import useBudgetSummary from "../hooks/useBudgetSummary";
 import useExpenses from "../hooks/useExpenses";
+import useEpxenseTrend from "../hooks/useExpenseTrend";
 import { getMonthYear } from "../utils/helpers";
 
 const date = getMonthYear();
@@ -19,6 +20,11 @@ const Dashboard = () => {
       budgets,
       expenses,
     });
+
+  const { data: monthlyExpenses } = useEpxenseTrend();
+
+  console.log("Monthly expenses", monthlyExpenses);
+
   if (isLoading) {
     return <Alert message="Loading data" />;
   }
@@ -44,7 +50,7 @@ const Dashboard = () => {
           <div className="text-4xl font-medium">{budgetPercentageSpent} %</div>
         </div>
       </div>
-      <DailyExpenseChart />
+      <DailyExpenseChart data={monthlyExpenses || []} />
     </>
   );
 };
