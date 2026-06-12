@@ -1,4 +1,4 @@
-import Step4 from "../components/budgetSummary/budgetChart";
+import DailyExpenseChart from "../components/dashbaord/DailyExpenseChart";
 import Alert from "../components/ui/Alert";
 import H1 from "../components/ui/Heading";
 import useBudget from "../hooks/useBudget";
@@ -44,7 +44,7 @@ const Dashboard = () => {
           <div className="text-4xl font-medium">{budgetPercentageSpent} %</div>
         </div>
       </div>
-      {/* <Step4 /> */}
+      <DailyExpenseChart />
     </>
   );
 };
