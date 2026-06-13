@@ -5,10 +5,16 @@ import { useAuth } from "../context/AuthContext";
 const useEpxenseTrend = () => {
   const { user } = useAuth();
 
-  return useQuery({
-    queryKey: ["monthtlyExpenses"],
-    queryFn: () => getMonthlyExpenses(user!.uid),
-  });
+  const useMonthlyExpenseTrend = () => {
+    return useQuery({
+      queryKey: ["monthtlyExpenses"],
+      queryFn: () => getMonthlyExpenses(user!.uid),
+    });
+  };
+
+  return {
+    useMonthlyExpenseTrend,
+  };
 };
 
 export default useEpxenseTrend;

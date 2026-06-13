@@ -27,6 +27,7 @@ import {
 import { getTimeStampFromMonth } from "../utils/helpers";
 
 import { format } from "date-fns";
+import { getBudgets } from "./budget";
 
 export const queryClient = new QueryClient();
 
@@ -222,6 +223,18 @@ export const getExpensesMonthYear = async ({
 
 export const getMonthlyExpenses = async (uid: string) => {
   const expensesSnap = await getDocs(collection(db, `users/${uid}/expenses`));
+
+  const budgetSnap = await getBudgets(uid);
+
+  // let monthlyBudget = [];
+  // budgetSnap.forEach((budget) => {
+  //   const bud = [];
+  //   bud[budget.month] =
+  //     monthlyBudget[budget.month] + parseInt(budget.amount);
+  // });
+
+  // console.log("budgetSDnap", budgetSnap);
+  // console.log("monthlyBudget", monthlyBudget);
 
   const monthlyData: Record<string, { expense: number; sortDate: Date }> = {};
 

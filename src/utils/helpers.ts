@@ -31,3 +31,10 @@ export const getTimeStampFromMonth = (monthYear: string) => {
     endDate,
   };
 };
+
+export const moneyFormat = (amount: number) => {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  }).format(amount);
+};
