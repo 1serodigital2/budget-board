@@ -1,3 +1,4 @@
+import CategoryBudgetProgress from "../components/dashbaord/CategoryBudgetProgress";
 import DailyExpenseChart from "../components/dashbaord/DailyExpenseChart";
 import Alert from "../components/ui/Alert";
 import H1 from "../components/ui/Heading";
@@ -40,18 +41,18 @@ const Dashboard = () => {
   return (
     <>
       <H1>Budget Summary for {todaysMonth}</H1>
-      <div className="grid grid-cols-4 gap-5">
-        <div className="border p-6 rounded-2xl">
+      <div className="grid grid-cols-4 gap-5 mb-5">
+        <div className="border p-6 rounded-lg">
           <h5 className="mb-3">Total Budget</h5>
           <div className="text-4xl font-medium">{moneyFormat(totalBudget)}</div>
         </div>
-        <div className="border p-6 rounded-2xl">
+        <div className="border p-6 rounded-lg">
           <h5 className="mb-3">Total Expenses</h5>
           <div className="text-4xl font-medium">
             {moneyFormat(totalExpenses)}
           </div>
         </div>
-        <div className="border p-6 rounded-2xl">
+        <div className="border p-6 rounded-lg">
           <h5 className="mb-3">Remaining Budget</h5>
           <div
             className={`text-4xl font-medium ${remainingBudget < 0 ? "text-red-800" : "text-green-700"}`}
@@ -59,12 +60,13 @@ const Dashboard = () => {
             {moneyFormat(remainingBudget)}
           </div>
         </div>
-        <div className="border p-6 rounded-2xl">
+        <div className="border p-6 rounded-lg">
           <h5 className="mb-3">Expense Rate</h5>
           <div className="text-4xl font-medium">{budgetPercentageSpent} %</div>
         </div>
       </div>
-      <div className="grid grid-cols-2 mt-8">
+      <CategoryBudgetProgress />
+      <div className="grid grid-cols-2 mt-6">
         <DailyExpenseChart data={monthlyExpenses || []} />
       </div>
     </>
