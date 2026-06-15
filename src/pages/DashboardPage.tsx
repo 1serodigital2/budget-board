@@ -21,7 +21,7 @@ const Dashboard = () => {
       expenses,
     });
 
-  const {useMonthlyExpenseTrend} = useEpxenseTrend()
+  const { useMonthlyExpenseTrend } = useEpxenseTrend();
   const { data: monthlyExpenses } = useMonthlyExpenseTrend();
 
   console.log("Monthly expenses", monthlyExpenses);
@@ -30,9 +30,16 @@ const Dashboard = () => {
     return <Alert message="Loading data" />;
   }
 
+  const todaysMonth =
+    new Date().toLocaleString("en-US", {
+      month: "short",
+    }) +
+    ", " +
+    new Date().getFullYear();
+
   return (
     <>
-      <H1>Budget Summary</H1>
+      <H1>Budget Summary for {todaysMonth}</H1>
       <div className="grid grid-cols-4 gap-5">
         <div className="border p-6 rounded-2xl">
           <h5 className="mb-3">Total Budget</h5>
@@ -40,11 +47,17 @@ const Dashboard = () => {
         </div>
         <div className="border p-6 rounded-2xl">
           <h5 className="mb-3">Total Expenses</h5>
-          <div className="text-4xl font-medium">{moneyFormat(totalExpenses)}</div>
+          <div className="text-4xl font-medium">
+            {moneyFormat(totalExpenses)}
+          </div>
         </div>
         <div className="border p-6 rounded-2xl">
           <h5 className="mb-3">Remaining Budget</h5>
-          <div className={`text-4xl font-medium ${remainingBudget < 0 ? 'text-red-800' : 'text-green-700'}`}>{moneyFormat(remainingBudget)}</div>
+          <div
+            className={`text-4xl font-medium ${remainingBudget < 0 ? "text-red-800" : "text-green-700"}`}
+          >
+            {moneyFormat(remainingBudget)}
+          </div>
         </div>
         <div className="border p-6 rounded-2xl">
           <h5 className="mb-3">Expense Rate</h5>

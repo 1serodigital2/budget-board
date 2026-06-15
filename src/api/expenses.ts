@@ -223,21 +223,40 @@ export const getExpensesMonthYear = async ({
 
 export const getMonthlyExpenses = async (uid: string) => {
   const expensesSnap = await getDocs(collection(db, `users/${uid}/expenses`));
+  const budgets = await getBudgets(uid);
 
-  const budgetSnap = await getBudgets(uid);
+  const monthlyData: Record<
+    string,
+    {
+      expense: number;
+      budget: number;
+      sortDate: Date;
+    }
+  > = {};
 
-  // let monthlyBudget = [];
-  // budgetSnap.forEach((budget) => {
-  //   const bud = [];
-  //   bud[budget.month] =
-  //     monthlyBudget[budget.month] + parseInt(budget.amount);
-  // });
+  // Add budgets
+  budgets.forEach((budget) => {
+    const [year, month] = budget.month.split("-").map(Number);
 
-  // console.log("budgetSDnap", budgetSnap);
-  // console.log("monthlyBudget", monthlyBudget);
+    const date = new Date(year, month - 1, 1);
 
-  const monthlyData: Record<string, { expense: number; sortDate: Date }> = {};
+    const monthKey = date.toLocaleString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
 
+    if (!monthlyData[monthKey]) {
+      monthlyData[monthKey] = {
+        expense: 0,
+        budget: 0,
+        sortDate: date,
+      };
+    }
+
+    monthlyData[monthKey].budget += Number(budget.amount);
+  });
+
+  // Add expenses
   expensesSnap.forEach((doc) => {
     const expense = doc.data();
 
@@ -251,11 +270,12 @@ export const getMonthlyExpenses = async (uid: string) => {
     if (!monthlyData[month]) {
       monthlyData[month] = {
         expense: 0,
+        budget: 0,
         sortDate: new Date(date.getFullYear(), date.getMonth(), 1),
       };
     }
 
-    monthlyData[month].expense += expense.amount;
+    monthlyData[month].expense += Number(expense.amount);
   });
 
   return Object.entries(monthlyData)
@@ -263,5 +283,6 @@ export const getMonthlyExpenses = async (uid: string) => {
     .map(([month, data]) => ({
       month,
       expense: data.expense,
+      budget: data.budget,
     }));
 };

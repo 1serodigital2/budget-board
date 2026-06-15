@@ -12,6 +12,7 @@ import {
 import { MothlyExpenseDataType } from "../../types/expense";
 
 export default function MonthlyExpenseTrend({ data }: MothlyExpenseDataType) {
+  console.log("data in char", data);
   return (
     <div>
       <h3 className="text-xl font-medium mb-5">Monthly Expense</h3>
@@ -53,14 +54,13 @@ export default function MonthlyExpenseTrend({ data }: MothlyExpenseDataType) {
               stroke="#ef4444"
               fill="url(#expenseGradient)"
             />
-
-            <Line
+            <Area
               type="monotone"
               dataKey="budget"
               name="Budget"
               stroke="#22c55e"
-              strokeWidth={2}
-              dot={{ r: 4 }}
+              fill="#22c55e"
+              fillOpacity={0.15}
             />
           </AreaChart>
         </ResponsiveContainer>
