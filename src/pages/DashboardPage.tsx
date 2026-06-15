@@ -25,7 +25,7 @@ const Dashboard = () => {
   const { useMonthlyExpenseTrend } = useEpxenseTrend();
   const { data: monthlyExpenses } = useMonthlyExpenseTrend();
 
-  console.log("Monthly expenses", monthlyExpenses);
+  console.log("Monthly expenses", expenses);
 
   if (isLoading) {
     return <Alert message="Loading data" />;
@@ -65,7 +65,7 @@ const Dashboard = () => {
           <div className="text-4xl font-medium">{budgetPercentageSpent} %</div>
         </div>
       </div>
-      <CategoryBudgetProgress />
+      <CategoryBudgetProgress expenses={expenses} />
       <div className="grid grid-cols-2 mt-6">
         <DailyExpenseChart data={monthlyExpenses || []} />
       </div>

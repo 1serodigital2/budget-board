@@ -1,4 +1,10 @@
-const categories = [
+import { useQuery } from "@tanstack/react-query";
+import { getCategories } from "../../api/category";
+import { useAuth } from "../../context/AuthContext";
+import { getMonthYear } from "../../utils/helpers";
+import useBudgetVsCategory from "../../hooks/useBudgetVsCategory";
+
+const catgs = [
   {
     category: "Food",
     budget: 5000,
@@ -20,11 +26,33 @@ const categories = [
     spent: 1900,
   },
 ];
+const CategoryBudgetProgress = ({ expenses }) => {
+  const { user } = useAuth();
+  const month = getMonthYear();
+  console.log(month); // Output: "2026-06"
 
-export default function CategoryBudgetProgress() {
+  const {
+    data: categories,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => getCategories(user!.uid),
+    enabled: !!user!.uid,
+  });
+
+  const monthlyCategorySpent = useBudgetVsCategory({
+    month,
+    expenses,
+    categories,
+  });
+
+  console.log("monthlyCategorySpent", monthlyCategorySpent);
+
   return (
     <div className="grid grid-cols-4 gap-5">
-      {categories.map((item) => {
+      {catgs.map((item) => {
         const percentage = (item.spent / item.budget) * 100;
 
         const barColor =
@@ -71,4 +99,6 @@ export default function CategoryBudgetProgress() {
       })}
     </div>
   );
-}
+};
+
+export default CategoryBudgetProgress;
