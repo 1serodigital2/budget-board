@@ -23,6 +23,7 @@ import {
   ExpenseFormData,
   ExpenseProps,
   GetExpenseDetailsType,
+  MonthlyExpenseSummaryResponseType,
 } from "../types/expense";
 import { getTimeStampFromMonth } from "../utils/helpers";
 
@@ -184,7 +185,7 @@ export const getExpensesMonthYear = async ({
 }: {
   uid: string;
   monthYear: string;
-}) => {
+}): Promise<GetExpenseDetailsType[]> => {
   try {
     const { startDate, endDate } = getTimeStampFromMonth(monthYear);
 
@@ -221,7 +222,9 @@ export const getExpensesMonthYear = async ({
   }
 };
 
-export const getMonthlyExpenses = async (uid: string) => {
+export const getMonthlyExpenses = async (
+  uid: string,
+): Promise<MonthlyExpenseSummaryResponseType[]> => {
   const expensesSnap = await getDocs(collection(db, `users/${uid}/expenses`));
   const budgets = await getBudgets(uid);
 

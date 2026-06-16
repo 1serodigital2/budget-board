@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase/firestore";
 import { AlertProps } from "./FormTypes";
 
 export interface CategoryFormType {
@@ -42,7 +43,7 @@ export interface CategoryProps {
   id: string;
   name: string;
   color: string;
-  createdAt: string;
+  createdAt: Timestamp;
   isSystem: boolean;
   slug?: string;
 }

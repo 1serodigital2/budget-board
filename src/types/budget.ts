@@ -63,3 +63,10 @@ export interface BudgetTableResponseTypes {
     budgetMonth: string;
   };
 }
+
+export interface BudgetVsCategoryTypes {
+  month: string;
+  budgets: GetBudgetDetailsTypes[];
+  expenses: GetExpenseDetailsType[];
+  categories: CategoryProps[];
+}

@@ -4,6 +4,7 @@ import Table from "../../components/ui/Table";
 import TableBodyData from "../../components/ui/TableBodyData";
 import useBudget from "../../hooks/useBudget";
 import Alert from "../../components/ui/Alert";
+import { moneyFormat } from "../../utils/helpers";
 
 const BudgetListingPage = () => {
   const { getAllBudgets, useDeleteBudget, submitMessage } = useBudget();
@@ -45,7 +46,7 @@ const BudgetListingPage = () => {
               >
                 <TableBodyData>{i + 1}</TableBodyData>
                 <TableBodyData item={budget.category} />
-                <TableBodyData item={budget.amount} />
+                <TableBodyData item={moneyFormat(budget.amount)} />
                 <TableBodyData>{budget.month}</TableBodyData>
                 <TableBodyData>
                   <button className="mr-3 text-blue-600 cursor-pointer">

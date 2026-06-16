@@ -15,6 +15,7 @@ import { db } from "../services/firebase";
 import {
   BudgetType,
   GetBudgetByIdType,
+  GetBudgetDetailsTypes,
   UpdateBudgetType,
 } from "../types/budget";
 import { getCategories } from "./category";
@@ -189,7 +190,7 @@ export const getBudgetMonthYear = async ({
 }: {
   monthYear: string;
   uid: string;
-}) => {
+}): Promise<GetBudgetDetailsTypes[]> => {
   try {
     const budgetRef = collection(db, `users/${uid}/budgets`);
     const q = query(budgetRef, where("month", "==", monthYear));

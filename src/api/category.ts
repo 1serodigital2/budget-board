@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import {
   AddCategoryType,
+  CategoryProps,
   GetCategoryType,
   UpdateCategoryType,
 } from "../types/category";
@@ -49,7 +50,7 @@ export const addCategory = async ({
   }
 };
 
-export const getCategories = async (userId: string) => {
+export const getCategories = async (userId: string): Promise<CategoryProps[]> => {
   try {
     if (!userId) {
       throw new Error("User id is required");
