@@ -7,7 +7,7 @@ import TableBodyData from "../../components/ui/TableBodyData";
 import useBudget from "../../hooks/useBudget";
 import { useCategories } from "../../hooks/useCategories";
 import useExpenses from "../../hooks/useExpenses";
-import { getMonthYear } from "../../utils/helpers";
+import { getMonthYear, moneyFormat } from "../../utils/helpers";
 import Input from "../../components/Input";
 import { HandleInputChangeType } from "../../types/category";
 import Submit from "../../components/form/Submit";
@@ -119,10 +119,10 @@ const BudgetOverview = () => {
             <tr className="bg-neutral-primary border-b border-default">
               <TableBodyData>{i + 1}</TableBodyData>
               <TableBodyData item={budget.categoryName} />
-              <TableBodyData>₹ {budget.budget}</TableBodyData>
-              <TableBodyData>₹ {budget.spent}</TableBodyData>
+              <TableBodyData>{moneyFormat(budget.budget)}</TableBodyData>
+              <TableBodyData>{moneyFormat(budget.spent)}</TableBodyData>
               <TableBodyData>{budget.percentage}%</TableBodyData>
-              <TableBodyData>₹ {budget.remaining}</TableBodyData>
+              <TableBodyData>{moneyFormat(budget.remaining)}</TableBodyData>
               <TableBodyData>{budget.budgetMonth}</TableBodyData>
               <TableBodyData>
                 {budget.spent > 0 && (
@@ -137,10 +137,10 @@ const BudgetOverview = () => {
           ))}
           <tr className="bg-neutral-primary border-b border-default">
             <TableBodyData colSpan={2}>Total</TableBodyData>
-            <TableBodyData>₹ {totalBudgetAmount}</TableBodyData>
-            <TableBodyData>₹ {totalSpent}</TableBodyData>
+            <TableBodyData>{moneyFormat(totalBudgetAmount)}</TableBodyData>
+            <TableBodyData>{moneyFormat(totalSpent)}</TableBodyData>
             <TableBodyData></TableBodyData>
-            <TableBodyData>₹ {totalRemaining}</TableBodyData>
+            <TableBodyData>{moneyFormat(totalRemaining)}</TableBodyData>
           </tr>
         </Table>
       )}

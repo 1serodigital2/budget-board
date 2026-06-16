@@ -1,14 +1,17 @@
-import { getBudgetMonthYear } from "../api/budget";
-import { useAuth } from "../context/AuthContext";
+import { BudgetVsCategoryTypes } from "../types/budget";
 
-const useBudgetVsCategory = async ({ month, expenses, categories }) => {
-  const { user } = useAuth();
-  const currentMonthBudget = await getBudgetMonthYear({
-    monthYear: month,
-    uid: user!.uid,
-  });
+type GroupedExpense = {
+  category: string;
+  spent: number;
+};
 
-  const groupedExp = expenses.reduce((accumulator, expense) => {
+const useBudgetVsCategory = ({
+  month,
+  budgets,
+  expenses,
+  categories,
+}: BudgetVsCategoryTypes) => {
+  const groupedExp = expenses.reduce<Record<string, GroupedExpense>>((accumulator, expense) => {
     const { amount, category } = expense;
 
     if (!accumulator[category]) {
@@ -16,7 +19,6 @@ const useBudgetVsCategory = async ({ month, expenses, categories }) => {
     }
 
     accumulator[category].spent += amount;
-    // accumulator[category] = accumulator[category].amount + amount;
 
     return accumulator;
   }, {});
@@ -24,21 +26,18 @@ const useBudgetVsCategory = async ({ month, expenses, categories }) => {
   const expensesResult = Object.values(groupedExp);
   console.log("expensesResult", expensesResult);
 
-  const expenseWithCatName = expensesResult.map((expense) => {
+  const expenseWithCatName = expensesResult.map((expense: GroupedExpense) => {
     return {
       ...expense,
       month,
-      budget: currentMonthBudget.find(
-        (budget) => expense.category === budget.category,
-      )?.amount,
-      catName: categories.find((category) => expense.category === category.id)
+      budget: Number(budgets.find((budget) => expense.category === budget.category)
+        ?.amount) || 0,
+      category: categories.find((category) => expense.category === category.id)
         ?.name,
     };
   });
 
   return expenseWithCatName;
-  // console.log("expenseWithCatName", expenseWithCatName);
-  return { monthlyCategorySpent: expenseWithCatName || [] };
 };
 
 export default useBudgetVsCategory;

@@ -74,3 +74,9 @@ export interface MothlyExpenseData {
 export interface MothlyExpenseDataType {
   data: MothlyExpenseData[];
 }
+
+export interface MonthlyExpenseSummaryResponseType {
+  month: string;
+  expense: number;
+  budget: number;
+}

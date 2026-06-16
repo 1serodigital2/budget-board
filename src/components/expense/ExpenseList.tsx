@@ -19,7 +19,7 @@ import {
   ExpensesDetailTyps,
   FilterProps,
 } from "../../types/expense";
-import { formatDate, getTimeStampFromMonth } from "../../utils/helpers";
+import { formatDate, getTimeStampFromMonth, moneyFormat } from "../../utils/helpers";
 import useExpenses from "../../hooks/useExpenses";
 
 const ExpenseList = () => {
@@ -202,7 +202,7 @@ const ExpenseList = () => {
               >
                 <TableBodyData>{i + 1}</TableBodyData>
                 <TableBodyData item={expense.categoryData?.name} />
-                <TableBodyData>{expense.amount}</TableBodyData>
+                <TableBodyData>{moneyFormat(expense.amount)}</TableBodyData>
                 <TableBodyData item={expense.note} />
                 <TableBodyData
                   item={

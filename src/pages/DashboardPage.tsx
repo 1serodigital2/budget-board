@@ -65,7 +65,7 @@ const Dashboard = () => {
           <div className="text-4xl font-medium">{budgetPercentageSpent} %</div>
         </div>
       </div>
-      <CategoryBudgetProgress expenses={expenses} />
+      <CategoryBudgetProgress expenses={expenses || []} />
       <div className="grid grid-cols-2 mt-6">
         <DailyExpenseChart data={monthlyExpenses || []} />
       </div>

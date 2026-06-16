@@ -3,6 +3,8 @@ import { getCategories } from "../../api/category";
 import { useAuth } from "../../context/AuthContext";
 import { getMonthYear } from "../../utils/helpers";
 import useBudgetVsCategory from "../../hooks/useBudgetVsCategory";
+import useBudget from "../../hooks/useBudget";
+import { GetExpenseDetailsType } from "../../types/expense";
 
 const catgs = [
   {
@@ -26,10 +28,13 @@ const catgs = [
     spent: 1900,
   },
 ];
-const CategoryBudgetProgress = ({ expenses }) => {
+const CategoryBudgetProgress = ({
+  expenses,
+}: {
+  expenses: GetExpenseDetailsType[];
+}) => {
   const { user } = useAuth();
   const month = getMonthYear();
-  console.log(month); // Output: "2026-06"
 
   const {
     data: categories,
@@ -42,17 +47,21 @@ const CategoryBudgetProgress = ({ expenses }) => {
     enabled: !!user!.uid,
   });
 
+  const { useGetBudgetMonthYear } = useBudget();
+  const { data: currentMonthBudgets } = useGetBudgetMonthYear(month);
+
   const monthlyCategorySpent = useBudgetVsCategory({
     month,
+    budgets: currentMonthBudgets || [],
     expenses,
-    categories,
+    categories: categories || [],
   });
 
   console.log("monthlyCategorySpent", monthlyCategorySpent);
 
   return (
-    <div className="grid grid-cols-4 gap-5">
-      {catgs.map((item) => {
+    <div className="grid grid-cols-5 gap-5">
+      {monthlyCategorySpent.map((item) => {
         const percentage = (item.spent / item.budget) * 100;
 
         const barColor =

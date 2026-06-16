@@ -63,6 +63,8 @@ const CategoriesList = () => {
     );
   }
 
+  console.log("categories data", data);
+
   return (
     <>
       {submitMessage && submitMessage.message !== "" && (
@@ -92,7 +94,7 @@ const CategoriesList = () => {
               </TableBodyData>
               <TableBodyData
                 item={
-                  category.createdAt?.toDate
+                  category.createdAt
                     ? category.createdAt.toDate().toLocaleDateString()
                     : "No date"
                 }
