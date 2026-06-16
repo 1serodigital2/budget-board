@@ -1,33 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "../../api/category";
 import { useAuth } from "../../context/AuthContext";
-import { getMonthYear } from "../../utils/helpers";
+import { getMonthYear, moneyFormat } from "../../utils/helpers";
 import useBudgetVsCategory from "../../hooks/useBudgetVsCategory";
 import useBudget from "../../hooks/useBudget";
 import { GetExpenseDetailsType } from "../../types/expense";
 
-const catgs = [
-  {
-    category: "Food",
-    budget: 5000,
-    spent: 6200,
-  },
-  {
-    category: "Shopping",
-    budget: 4000,
-    spent: 2500,
-  },
-  {
-    category: "Transport",
-    budget: 3000,
-    spent: 2100,
-  },
-  {
-    category: "Bills",
-    budget: 2000,
-    spent: 1900,
-  },
-];
 const CategoryBudgetProgress = ({
   expenses,
 }: {
@@ -50,6 +28,8 @@ const CategoryBudgetProgress = ({
   const { useGetBudgetMonthYear } = useBudget();
   const { data: currentMonthBudgets } = useGetBudgetMonthYear(month);
 
+  console.log("useGetBudgetMonthYear", currentMonthBudgets);
+
   const monthlyCategorySpent = useBudgetVsCategory({
     month,
     budgets: currentMonthBudgets || [],
@@ -62,7 +42,7 @@ const CategoryBudgetProgress = ({
   return (
     <div className="grid grid-cols-5 gap-5">
       {monthlyCategorySpent.map((item) => {
-        const percentage = (item.spent / item.budget) * 100;
+        const percentage = (item.spent / item.budget) * 100 || 0;
 
         const barColor =
           percentage > 100
@@ -88,18 +68,26 @@ const CategoryBudgetProgress = ({
             </div>
 
             <div className="flex justify-between text-sm text-gray-600 mt-2">
-              <span>Budget: ₹{item.budget.toLocaleString()}</span>
-              <span>Spent: ₹{item.spent.toLocaleString()}</span>
+              <span>
+                Budget: {item.budget > 0 ? moneyFormat(item.budget) : 0}
+              </span>
+              <span>Spent: {item.spent > 0 ? moneyFormat(item.spent) : 0}</span>
             </div>
 
             <div className="mt-1 text-sm">
               {percentage > 100 ? (
                 <span className="text-red-600">
-                  Over by ₹{(item.spent - item.budget).toLocaleString()}
+                  Over by ₹
+                  {item.spent > 0
+                    ? (item.spent - item.budget).toLocaleString()
+                    : 0}
                 </span>
               ) : (
                 <span className="text-green-600">
-                  Remaining ₹{(item.budget - item.spent).toLocaleString()}
+                  Remaining ₹
+                  {item.spent > 0
+                    ? (item.budget - item.spent).toLocaleString()
+                    : 0}
                 </span>
               )}
             </div>
