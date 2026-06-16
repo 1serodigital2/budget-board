@@ -11,33 +11,55 @@ const useBudgetVsCategory = ({
   expenses,
   categories,
 }: BudgetVsCategoryTypes) => {
-  const groupedExp = expenses.reduce<Record<string, GroupedExpense>>((accumulator, expense) => {
-    const { amount, category } = expense;
+  const groupedExp = expenses.reduce<Record<string, GroupedExpense>>(
+    (acc, expense) => {
+      if (!acc[expense.category]) {
+        acc[expense.category] = {
+          category: expense.category,
+          spent: 0,
+        };
+      }
 
-    if (!accumulator[category]) {
-      accumulator[category] = { category, spent: 0 };
-    }
+      acc[expense.category].spent += expense.amount;
 
-    accumulator[category].spent += amount;
-
-    return accumulator;
-  }, {});
+      return acc;
+    },
+    {},
+  );
 
   const expensesResult = Object.values(groupedExp);
-  console.log("expensesResult", expensesResult);
 
-  const expenseWithCatName = expensesResult.map((expense: GroupedExpense) => {
-    return {
-      ...expense,
-      month,
-      budget: Number(budgets.find((budget) => expense.category === budget.category)
-        ?.amount) || 0,
-      category: categories.find((category) => expense.category === category.id)
-        ?.name,
-    };
-  });
+  const expenseCategories = new Set(
+    expensesResult.map((expense) => expense.category),
+  );
 
-  return expenseWithCatName;
+  const budgetMap = new Map(
+    budgets.map((budget) => [budget.category, budget.amount]),
+  );
+
+  const categoryMap = new Map(
+    categories.map((category) => [category.id, category.name]),
+  );
+
+  const expenseWithCatName = expensesResult.map((expense) => ({
+    ...expense,
+    month,
+    budget: budgetMap.get(expense.category) ?? 0,
+    category: categoryMap.get(expense.category),
+  }));
+
+  const budgetWithNoExpense = budgets.filter(
+    (budget) => !expenseCategories.has(budget.category),
+  );
+
+  const emptyBudget = budgetWithNoExpense.map((budget) => ({
+    spent: 0,
+    category: categoryMap.get(budget.category),
+    month,
+    budget: budget.amount,
+  }));
+
+  return [...expenseWithCatName, ...emptyBudget];
 };
 
 export default useBudgetVsCategory;

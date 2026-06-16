@@ -12,7 +12,6 @@ import {
 import { MothlyExpenseDataType } from "../../types/expense";
 
 export default function MonthlyExpenseTrend({ data }: MothlyExpenseDataType) {
-  console.log("data in char", data);
   return (
     <div>
       <h3 className="text-xl font-medium mb-5">Monthly Expense</h3>

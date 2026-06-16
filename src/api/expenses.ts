@@ -189,9 +189,6 @@ export const getExpensesMonthYear = async ({
   try {
     const { startDate, endDate } = getTimeStampFromMonth(monthYear);
 
-    console.log("startDate", startDate);
-    console.log("endDate", endDate);
-
     const expensesRef = collection(db, `users/${uid}/expenses`);
     const q = query(
       expensesRef,

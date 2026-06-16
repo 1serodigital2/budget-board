@@ -207,8 +207,6 @@ export const getBudgetMonthYear = async ({
       };
     });
 
-    console.log("budget", budget);
-
     return budget;
   } catch (error) {
     throw new Error("Failed to fetch budget for specific month");
