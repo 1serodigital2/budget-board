@@ -8,6 +8,9 @@ import useExpenses from "../hooks/useExpenses";
 import useEpxenseTrend from "../hooks/useExpenseTrend";
 import { getMonthYear, moneyFormat } from "../utils/helpers";
 
+import { Lineicons } from "@lineiconshq/react-lineicons";
+import { Wallet1Stroke } from "@lineiconshq/free-icons";
+
 const date = getMonthYear();
 const Dashboard = () => {
   const { useGetBudgetMonthYear } = useBudget();
@@ -43,6 +46,7 @@ const Dashboard = () => {
       <H1>Budget Summary for {todaysMonth}</H1>
       <div className="grid grid-cols-4 gap-5 mb-5">
         <div className="border p-6 rounded-lg">
+          <Lineicons icon={Wallet1Stroke} size={24} color="blue" strokeWidth={1.5} />
           <h5 className="mb-3">Total Budget</h5>
           <div className="text-4xl font-medium">{moneyFormat(totalBudget)}</div>
         </div>

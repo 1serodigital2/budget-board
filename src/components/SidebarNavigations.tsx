@@ -1,11 +1,24 @@
 import { useState } from "react";
 
+import { Lineicons } from "@lineiconshq/react-lineicons";
+import { ShieldDollarStroke } from "@lineiconshq/free-icons";
+
 import { NavLink } from "react-router-dom";
 
 const SideBarNavigation = () => {
   return (
-    <div className="bg-(--color-primary) p-10 w-75">
-      <h5 className="text-3xl font-medium mb-5">Budget Board</h5>
+    <div className="bg-(--color-sidebar) p-5 w-75">
+      <div className="flex gap-3 items-center mb-5">
+        <div className="bg-(--color-primary) w-8 h-8 rounded flex justify-center items-center shrink-0">
+          <Lineicons
+            icon={ShieldDollarStroke}
+            size={20}
+            color="white"
+            strokeWidth={1.5}
+          />
+        </div>
+        <h5 className="text-xl font-medium text-sidebar-accent-foreground font-family-mono">Budget Board</h5>
+      </div>
       <ul>
         <li className="text-white mb-3">
           <NavLink to="/">Dashboard</NavLink>
