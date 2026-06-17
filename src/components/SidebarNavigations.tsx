@@ -17,10 +17,10 @@ const SideBarNavigation = () => {
             strokeWidth={1.5}
           />
         </div>
-        <h5 className="text-xl font-medium text-sidebar-accent-foreground font-family-mono">Budget Board</h5>
+        <h5 className="text-xl font-medium text-sidebar-accent-foreground">Budget Board</h5>
       </div>
       <ul>
-        <li className="text-white mb-3">
+        <li className="text-white mb-3 font-mono">
           <NavLink to="/">Dashboard</NavLink>
         </li>
         <li className="text-white">
