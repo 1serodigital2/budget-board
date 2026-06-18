@@ -41,6 +41,7 @@ const Dashboard = () => {
   return (
     <>
       <H1>Budget Summary for {todaysMonth}</H1>
+
       <div className="grid grid-cols-4 gap-5 mb-5">
         <div className="border p-6 rounded-lg">
           <h5 className="mb-3">Total Budget</h5>
