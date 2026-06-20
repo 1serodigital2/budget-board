@@ -3,11 +3,30 @@ import { useAuth } from "../context/AuthContext";
 const Header = () => {
   const { logOut } = useAuth();
   return (
-    <div className="flex justify-between px-10 py-5 border-b h-max">
-      <h1>Header</h1>
-      <button onClick={() => logOut()} className="cursor-pointer">
-        Logout
-      </button>
+    <div className="flex border-b h-15 items-center">
+      <div className="pl-5 pr-4 border-r flex cursor-pointer">
+        <span
+          className="material-symbols-outlined"
+          style={{ fontVariationSettings: "'wght' 300", fontSize: 23 }}
+        >
+          dock_to_right
+        </span>
+      </div>
+      <div className="flex justify-between w-full pl-4 pr-5 items-center">
+        <div>
+          <h5 className="font-medium text-[.9rem]">Dashboard</h5>
+          <div className="text-[.7rem]">Budget summary & insight</div>
+        </div>
+        <button onClick={() => logOut()} className="cursor-pointer flex items-center gap-1">
+          <span
+            className="material-symbols-outlined"
+            style={{ fontVariationSettings: "'wght' 300", fontSize: 20 }}
+          >
+            logout
+          </span>
+          <span className="text-[.8rem] font-medium">Logout</span>
+        </button>
+      </div>
     </div>
   );
 };

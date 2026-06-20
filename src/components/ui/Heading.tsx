@@ -5,7 +5,7 @@ type H1Props = {
 };
 
 const H1 = ({ children }: H1Props) => {
-  return <h1 className="text-2xl font-medium mb-4">{children}</h1>;
+  return <h1 className="text-xl font-semibold mb-4">{children}</h1>;
 };
 
 export default H1;
