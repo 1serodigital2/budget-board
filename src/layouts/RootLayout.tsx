@@ -8,7 +8,7 @@ const RootLayout = () => {
       <SideBarNavigation />
       <main className="w-full">
         <Header />
-        <div className="px-10 py-5 bg-(--color-background)">
+        <div className="px-6 py-5 bg-(--color-background)">
           <Outlet />
         </div>
       </main>

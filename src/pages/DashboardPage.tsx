@@ -1,14 +1,46 @@
 import CategoryBudgetProgress from "../components/dashbaord/CategoryBudgetProgress";
 import DailyExpenseChart from "../components/dashbaord/DailyExpenseChart";
+import SpendingByCategory from "../components/dashbaord/SpendigByCategory";
 import Alert from "../components/ui/Alert";
 import H1 from "../components/ui/Heading";
 import useBudget from "../hooks/useBudget";
 import useBudgetSummary from "../hooks/useBudgetSummary";
 import useExpenses from "../hooks/useExpenses";
 import useEpxenseTrend from "../hooks/useExpenseTrend";
+import { BudgetSummaryCardType } from "../types/dashboard";
 import { getMonthYear, moneyFormat } from "../utils/helpers";
 
 const date = getMonthYear();
+
+const BudgetSummaryCard = ({
+  children,
+  iconBg,
+  total,
+  title,
+  footer,
+  showColor,
+}: BudgetSummaryCardType) => {
+  return (
+    <div className="border px-6 py-9 rounded-lg bg-white">
+      <div className="flex justify-between items-center mb-3 ">
+        <h5 className="text-[.8rem]">{title}</h5>
+        <div
+          className={`${iconBg} w-7.5 h-7.5 rounded flex justify-center items-center`}
+        >
+          {children}
+        </div>
+      </div>
+      <div
+        className={`text-2xl font-semibold mb-2 ${showColor && typeof total === "number" && (total < 0 ? "text-red-800" : "text-green-700")}`}
+      >
+        {typeof total === "number" && moneyFormat(total)}
+        {typeof total === "string" && total}
+      </div>
+      <div className="text-[.7rem]">{footer}</div>
+    </div>
+  );
+};
+
 const Dashboard = () => {
   const { useGetBudgetMonthYear } = useBudget();
   const { data: budgets } = useGetBudgetMonthYear(date);
@@ -41,35 +73,90 @@ const Dashboard = () => {
   return (
     <>
       <H1>Budget Summary for {todaysMonth}</H1>
+      {/* <div className="text-[.7rem]">An overview of your spending for {todaysMonth}</div> */}
 
-      <div className="grid grid-cols-4 gap-5 mb-5">
-        <div className="border p-6 rounded-lg">
-          <h5 className="mb-3">Total Budget</h5>
-          <div className="text-4xl font-medium">{moneyFormat(totalBudget)}</div>
-        </div>
-        <div className="border p-6 rounded-lg">
-          <h5 className="mb-3">Total Expenses</h5>
-          <div className="text-4xl font-medium">
-            {moneyFormat(totalExpenses)}
-          </div>
-        </div>
-        <div className="border p-6 rounded-lg">
-          <h5 className="mb-3">Remaining Budget</h5>
-          <div
-            className={`text-4xl font-medium ${remainingBudget < 0 ? "text-red-800" : "text-green-700"}`}
+      <div className="grid grid-cols-4 gap-3 mb-5">
+        <BudgetSummaryCard
+          title="Total Budget"
+          iconBg="bg-blue-300"
+          footer="Allocated this month"
+          total={totalBudget}
+        >
+          <span
+            className="material-symbols-outlined"
+            style={{
+              fontVariationSettings: "'wght' 300",
+              fontSize: 20,
+              color: "blue",
+            }}
           >
-            {moneyFormat(remainingBudget)}
-          </div>
+            account_balance_wallet
+          </span>
+        </BudgetSummaryCard>
+        <BudgetSummaryCard
+          title="Total Expenses"
+          iconBg="bg-orange-200"
+          footer={`${budgetPercentageSpent}% of budget used`}
+          total={totalExpenses}
+        >
+          <span
+            className="material-symbols-outlined"
+            style={{
+              fontVariationSettings: "'wght' 300",
+              fontSize: 20,
+              color: "darkorange",
+            }}
+          >
+            finance
+          </span>
+        </BudgetSummaryCard>
+        <BudgetSummaryCard
+          title="Remaining Budget"
+          iconBg="bg-green-200"
+          footer={`${remainingBudget < 0 ? "Control yourself idiot" : "Available to spend"}`}
+          total={remainingBudget}
+          showColor
+        >
+          <span
+            className="material-symbols-outlined"
+            style={{
+              fontVariationSettings: "'wght' 300",
+              fontSize: 20,
+              color: "green",
+            }}
+          >
+            savings
+          </span>
+        </BudgetSummaryCard>
+        <BudgetSummaryCard
+          title="Spend Rate"
+          iconBg="bg-yellow-100"
+          footer={`${parseInt(budgetPercentageSpent) > 100 ? "Over spent" : "On track"}`}
+          total={`${budgetPercentageSpent} %`}
+        >
+          <span
+            className="material-symbols-outlined"
+            style={{
+              fontVariationSettings: "'wght' 300",
+              fontSize: 20,
+              color: "darkyellow",
+            }}
+          >
+            speed_4
+          </span>
+        </BudgetSummaryCard>
+      </div>
+      <div className="grid grid-cols-5 mt-6 gap-3">
+        <div className="col-span-3">
+          <DailyExpenseChart data={monthlyExpenses || []} />
         </div>
-        <div className="border p-6 rounded-lg">
-          <h5 className="mb-3">Expense Rate</h5>
-          <div className="text-4xl font-medium">{budgetPercentageSpent} %</div>
+        <div className="col-span-2 h-full">
+          <SpendingByCategory />
+          {/* <div className="border bg-white p-4 rounded-lg">
+          </div> */}
         </div>
       </div>
       <CategoryBudgetProgress expenses={expenses || []} />
-      <div className="grid grid-cols-2 mt-6">
-        <DailyExpenseChart data={monthlyExpenses || []} />
-      </div>
     </>
   );
 };

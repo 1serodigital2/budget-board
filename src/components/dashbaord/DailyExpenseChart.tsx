@@ -13,10 +13,20 @@ import { MothlyExpenseDataType } from "../../types/expense";
 
 export default function MonthlyExpenseTrend({ data }: MothlyExpenseDataType) {
   return (
-    <div>
-      <h3 className="text-xl font-medium mb-5">Monthly Expense</h3>
+    <div className="bg-white border rounded-lg p-4">
+      <div className="flex justify-between items-center mb-5">
+        <h3 className="text-[.9rem] font-medium">Budget vs Expense</h3>
+        <div className="flex justify-between items-center gap-3">
+          <button className="bg-gray-200 rounded-lg py-0.5 px-2 text-[.7rem]  cursor-pointer">
+            Last 6 month
+          </button>
+          <button className="rounded-lg py-0.5 px-2 text-[.7rem]  cursor-pointer">
+            1 year
+          </button>
+        </div>
+      </div>
 
-      <div style={{ width: "100%", aspectRatio: 1.618 }}>
+      <div style={{ width: "100%", aspectRatio: 1.618  }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
@@ -36,15 +46,22 @@ export default function MonthlyExpenseTrend({ data }: MothlyExpenseDataType) {
 
             <CartesianGrid strokeDasharray="3 3" />
 
-            <XAxis dataKey="month" />
+            <XAxis dataKey="month" tick={{ fontSize: "12px" }} />
 
-            <YAxis />
+            <YAxis tick={{ fontSize: "12px" }} />
 
             <Tooltip
               formatter={(value) => `₹${Number(value).toLocaleString("en-IN")}`}
+              contentStyle={{
+                fontSize: "12px",
+              }}
             />
 
-            <Legend />
+            <Legend
+              wrapperStyle={{
+                fontSize: "12px",
+              }}
+            />
 
             <Area
               type="monotone"
