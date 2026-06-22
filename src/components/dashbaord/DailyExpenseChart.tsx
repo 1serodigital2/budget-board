@@ -26,7 +26,7 @@ export default function MonthlyExpenseTrend({ data }: MothlyExpenseDataType) {
         </div>
       </div>
 
-      <div style={{ width: "100%", aspectRatio: 1.618 }}>
+      <div style={{ width: "100%", aspectRatio: 1.618  }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
