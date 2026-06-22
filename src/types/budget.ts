@@ -44,24 +44,29 @@ export interface BudgetTableTypes {
   budgets: GetBudgetDetailsTypes[];
   expenses: GetExpenseDetailsType[];
   categories: CategoryProps[];
+  limit?: number;
+  showTotal?: boolean;
 }
 
 export interface BudgetsObjTypes {
   budgets: GetBudgetDetailsTypes[];
 }
 
+export interface BudgetDataResponse {
+  categoryName: string;
+  categoryId: string;
+  categorySlug: string | undefined;
+  budget: number;
+  spent: number;
+  remaining: number;
+  percentage: number;
+  budgetMonth: string;
+}
 export interface BudgetTableResponseTypes {
   totalBudgetAmount: number;
   totalSpent: number;
   totalRemaining: number;
-  budgetData: {
-    categoryName: string;
-    budget: number;
-    spent: number;
-    remaining: number;
-    percentage: number;
-    budgetMonth: string;
-  };
+  budgetData: BudgetDataResponse[];
 }
 
 export interface BudgetVsCategoryTypes {
@@ -69,4 +74,10 @@ export interface BudgetVsCategoryTypes {
   budgets: GetBudgetDetailsTypes[];
   expenses: GetExpenseDetailsType[];
   categories: CategoryProps[];
+}
+
+export interface BudgetTableProps extends BudgetTableResponseTypes {
+  showTotal?: boolean;
+  hideMonth?: boolean;
+  monthFilter: string;
 }

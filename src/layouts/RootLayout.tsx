@@ -4,7 +4,7 @@ import SideBarNavigation from "../components/SidebarNavigations";
 
 const RootLayout = () => {
   return (
-    <div className="flex h-screen">
+    <div className="flex">
       <SideBarNavigation />
       <main className="w-full">
         <Header />

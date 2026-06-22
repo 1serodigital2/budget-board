@@ -12,8 +12,8 @@ import Input from "../../components/Input";
 import { HandleInputChangeType } from "../../types/category";
 import Submit from "../../components/form/Submit";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
-import { BudgetTableResponseTypes } from "../../types/budget";
 import { NavLink } from "react-router-dom";
+import CategoryWiseBudget from "../../components/budget/CategoryWiseBudget";
 
 const currentMntYr = getMonthYear();
 
@@ -100,50 +100,13 @@ const BudgetOverview = () => {
         <Alert type={submitMessage.type} message={submitMessage.message} />
       )}
 
-      {!budgetTable ? (
-        <Alert message="Data not found" />
-      ) : (
-        <Table
-          columnNames={[
-            "Sl No",
-            "Category",
-            "Budget",
-            "Spent",
-            "Spent Percentage",
-            "Remaining",
-            "Month",
-            "Action",
-          ]}
-        >
-          {budgetTable.map((budget, i) => (
-            <tr className="bg-neutral-primary border-b border-default">
-              <TableBodyData>{i + 1}</TableBodyData>
-              <TableBodyData item={budget.categoryName} />
-              <TableBodyData>{moneyFormat(budget.budget)}</TableBodyData>
-              <TableBodyData>{moneyFormat(budget.spent)}</TableBodyData>
-              <TableBodyData>{budget.percentage}%</TableBodyData>
-              <TableBodyData>{moneyFormat(budget.remaining)}</TableBodyData>
-              <TableBodyData>{budget.budgetMonth}</TableBodyData>
-              <TableBodyData>
-                {budget.spent > 0 && (
-                  <NavLink
-                    to={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`}
-                  >
-                    View
-                  </NavLink>
-                )}
-              </TableBodyData>
-            </tr>
-          ))}
-          <tr className="bg-neutral-primary border-b border-default">
-            <TableBodyData colSpan={2}>Total</TableBodyData>
-            <TableBodyData>{moneyFormat(totalBudgetAmount)}</TableBodyData>
-            <TableBodyData>{moneyFormat(totalSpent)}</TableBodyData>
-            <TableBodyData></TableBodyData>
-            <TableBodyData>{moneyFormat(totalRemaining)}</TableBodyData>
-          </tr>
-        </Table>
-      )}
+      <CategoryWiseBudget
+        budgetData={budgetTable}
+        monthFilter={monthFilter}
+        totalBudgetAmount={totalBudgetAmount}
+        totalRemaining={totalRemaining}
+        totalSpent={totalSpent}
+      />
     </>
   );
 };
