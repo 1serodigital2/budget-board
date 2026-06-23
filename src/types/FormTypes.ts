@@ -41,3 +41,11 @@ export interface SelectType<T> extends BaseFieldProps, HandleInputChangeProps {
   getOptionValue: (item: T) => string;
   getOptionLabel: (item: T) => string;
 }
+
+export interface MyButtonTypes {
+  btnType: string;
+  id?: string;
+  deleteFn?: (id: string) => void;
+  isPending?: boolean;
+  btnSlug?: string;
+}

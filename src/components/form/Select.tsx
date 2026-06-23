@@ -22,7 +22,7 @@ const Select = <T,>({
       <select
         name={name}
         id=""
-        className={`block text-sm font-medium text-heading p-3 border rounded-xl ${sx ? sx : ""}`}
+        className={`block text-sm font-medium text-heading py-2 px-3 border rounded-lg ${sx ? sx : ""}`}
         required={required}
         value={inputValues}
         onChange={(e) =>

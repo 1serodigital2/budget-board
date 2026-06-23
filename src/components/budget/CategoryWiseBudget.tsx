@@ -6,6 +6,7 @@ import TableBodyData from "../ui/TableBodyData";
 
 import { moneyFormat } from "../../utils/helpers";
 import { BudgetTableProps, BudgetTableTypes } from "../../types/budget";
+import MyButton from "../form/MyButton";
 
 const CategoryWiseBudget = ({
   budgetData,
@@ -98,20 +99,21 @@ const CategoryWiseBudget = ({
 
             <TableBodyData>
               {budget.spent > 0 && (
-                <NavLink
-                  to={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`}
-                  className="bg-blue-100 rounded px-2 py-[.1rem] cursor-pointer hover:bg-blue-600 transition duration-200 hover:text-white flex gap-1 items-center text-[.7rem]"
-                >
-                  <span
-                    className="material-symbols-outlined"
-                    style={{
-                      fontSize: ".8rem",
-                    }}
-                  >
-                    visibility
-                  </span>
-                  <span>View</span>
-                </NavLink>
+                <MyButton btnSlug={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`} btnType="view" />
+                // <NavLink
+                //   to={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`}
+                //   className="bg-blue-100 rounded px-2 py-[.1rem] cursor-pointer hover:bg-blue-600 transition duration-200 hover:text-white flex gap-1 items-center text-[.7rem]"
+                // >
+                //   <span
+                //     className="material-symbols-outlined"
+                //     style={{
+                //       fontSize: ".8rem",
+                //     }}
+                //   >
+                //     visibility
+                //   </span>
+                //   <span>View</span>
+                // </NavLink>
               )}
             </TableBodyData>
           </tr>

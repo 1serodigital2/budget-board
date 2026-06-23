@@ -5,6 +5,7 @@ import TableBodyData from "../../components/ui/TableBodyData";
 import useBudget from "../../hooks/useBudget";
 import Alert from "../../components/ui/Alert";
 import { moneyFormat } from "../../utils/helpers";
+import MyButton from "../../components/form/MyButton";
 
 const BudgetListingPage = () => {
   const { getAllBudgets, useDeleteBudget, submitMessage } = useBudget();
@@ -51,37 +52,13 @@ const BudgetListingPage = () => {
                   <TableBodyData>{budget.month}</TableBodyData>
                   <TableBodyData>
                     <div className="flex items-center gap-2">
-                      <button className="text-blue-600 cursor-pointer bg-blue-100 py-1 px-2 rounded  hover:bg-blue-600 hover:text-white transition duration-200">
-                        <Link
-                          to={`${budget.id}/edit`}
-                          className=" text-[.7rem] flex items-center gap-1"
-                        >
-                          <span
-                            className="material-symbols-outlined"
-                            style={{
-                              fontSize: ".8rem",
-                            }}
-                          >
-                            edit
-                          </span>
-                          <span>Edit</span>
-                        </Link>
-                      </button>
-                      <button
-                        className="text-red-800 cursor-pointer flex items-center gap-1 text-[.7rem] bg-red-100 rounded py-1 px-2 hover:bg-red-700 hover:text-white transition duration-200"
-                        onClick={() => deleteBudget(budget.id)}
-                        disabled={isPending}
-                      >
-                        <span
-                          className="material-symbols-outlined"
-                          style={{
-                            fontSize: ".8rem",
-                          }}
-                        >
-                          delete
-                        </span>
-                        {isPending ? "Deleting..." : "Delete"}
-                      </button>
+                      <MyButton  btnType="edit" id={budget.id} btnSlug={`${budget.id}/edit`} />
+                      <MyButton
+                        btnType="delete"
+                        id={budget.id}
+                        deleteFn={deleteBudget}
+                        isPending={isPending}
+                      />
                     </div>
                   </TableBodyData>
                 </tr>
