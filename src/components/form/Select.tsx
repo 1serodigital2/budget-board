@@ -13,16 +13,19 @@ const Select = <T,>({
 }: SelectType<T>) => {
   return (
     <div className="flex flex-col flex-1  max-w-75">
-      <label
-        htmlFor={name}
-        className="block mb-2.5 text-md text-white font-medium text-heading"
-      >
-        {label}
-      </label>
+      {label && (
+        <label
+          htmlFor={name}
+          className="block mb-2.5 text-md text-white font-medium text-heading"
+        >
+          {label}
+        </label>
+      )}
+
       <select
         name={name}
         id=""
-        className={`block text-sm font-medium text-heading p-3 border rounded-xl ${sx ? sx : ""}`}
+        className={`block text-sm font-medium text-heading py-2 px-3 border rounded-lg ${sx ? sx : ""}`}
         required={required}
         value={inputValues}
         onChange={(e) =>

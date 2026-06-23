@@ -14,6 +14,7 @@ import Submit from "../../components/form/Submit";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
 import { NavLink } from "react-router-dom";
 import CategoryWiseBudget from "../../components/budget/CategoryWiseBudget";
+import MyForm from "../../components/form/Form";
 
 const currentMntYr = getMonthYear();
 
@@ -81,11 +82,7 @@ const BudgetOverview = () => {
   return (
     <>
       <H1>Budget overview</H1>
-
-      <form
-        onSubmit={handleFormSubmit}
-        className="flex items-center gap-3 max-w-md"
-      >
+      <MyForm onSubmit={handleFormSubmit}>
         <Input
           type="month"
           name="budgetMonth"
@@ -94,7 +91,7 @@ const BudgetOverview = () => {
           inputValues={inputValue.budgetMonth}
         />
         <Submit />
-      </form>
+      </MyForm>
 
       {submitMessage && submitMessage.message !== "" && (
         <Alert type={submitMessage.type} message={submitMessage.message} />

@@ -5,6 +5,7 @@ import TableBodyData from "../../components/ui/TableBodyData";
 import useBudget from "../../hooks/useBudget";
 import Alert from "../../components/ui/Alert";
 import { moneyFormat } from "../../utils/helpers";
+import MyButton from "../../components/form/MyButton";
 
 const BudgetListingPage = () => {
   const { getAllBudgets, useDeleteBudget, submitMessage } = useBudget();
@@ -34,35 +35,36 @@ const BudgetListingPage = () => {
         <Alert message={submitMessage.message} type={submitMessage.type} />
       )}
       {data && data.length > 0 && (
-        <Table
-          columnNames={["SL No.", "Category", "Amount", "Month", "Action"]}
-          data={data ?? []}
-        >
-          {data &&
-            data.map((budget, i) => (
-              <tr
-                key={budget.id}
-                className="bg-neutral-primary border-b border-default"
-              >
-                <TableBodyData>{i + 1}</TableBodyData>
-                <TableBodyData item={budget.category} />
-                <TableBodyData item={moneyFormat(budget.amount)} />
-                <TableBodyData>{budget.month}</TableBodyData>
-                <TableBodyData>
-                  <button className="mr-3 text-blue-600 cursor-pointer">
-                    <Link to={`${budget.id}/edit`}>Edit</Link>
-                  </button>
-                  <button
-                    className="text-red-800 cursor-pointer"
-                    onClick={() => deleteBudget(budget.id)}
-                    disabled={isPending}
-                  >
-                    {isPending ? "Deleting..." : "Delete"}
-                  </button>
-                </TableBodyData>
-              </tr>
-            ))}
-        </Table>
+        <div className="mb-5 bg-white rounded-lg border p-4">
+          <Table
+            columnNames={["SL No.", "Category", "Amount", "Month", "Action"]}
+            data={data ?? []}
+          >
+            {data &&
+              data.map((budget, i) => (
+                <tr
+                  key={budget.id}
+                  className={`bg-neutral-primary ${i !== data.length - 1 ? "border-b border-default" : ""}`}
+                >
+                  <TableBodyData>{i + 1}</TableBodyData>
+                  <TableBodyData item={budget.category} />
+                  <TableBodyData item={moneyFormat(budget.amount)} />
+                  <TableBodyData>{budget.month}</TableBodyData>
+                  <TableBodyData>
+                    <div className="flex items-center gap-2">
+                      <MyButton  btnType="edit" id={budget.id} btnSlug={`${budget.id}/edit`} />
+                      <MyButton
+                        btnType="delete"
+                        id={budget.id}
+                        deleteFn={deleteBudget}
+                        isPending={isPending}
+                      />
+                    </div>
+                  </TableBodyData>
+                </tr>
+              ))}
+          </Table>
+        </div>
       )}
     </>
   );

@@ -8,6 +8,7 @@ import TableBodyData from "../ui/TableBodyData";
 import Alert from "../ui/Alert";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
 import { queryClient } from "../../services/firebase";
+import MyButton from "../form/MyButton";
 
 const CategoriesList = () => {
   const { user } = useAuth();
@@ -70,64 +71,61 @@ const CategoriesList = () => {
       {submitMessage && submitMessage.message !== "" && (
         <Alert type={submitMessage.type} message={submitMessage.message} />
       )}
-      <Table
-        columnNames={["SL No", "Category", "Color", "CreatedAt", "Action"]}
-        data={data ?? []}
-      >
-        {data &&
-          data.map((category, i) => (
-            <tr
-              key={category.id}
-              className="bg-neutral-primary border-b border-default"
-            >
-              <TableBodyData>{i + 1}</TableBodyData>
-              <TableBodyData item={category.name} />
-              <TableBodyData>
-                {category?.color ? (
-                  <div
-                    className="h-3.5 w-full"
-                    style={{ backgroundColor: category.color }}
-                  ></div>
-                ) : (
-                  "N/A"
-                )}
-              </TableBodyData>
-              <TableBodyData
-                item={
-                  category.createdAt
-                    ? category.createdAt.toDate().toLocaleDateString()
-                    : "No date"
-                }
-              />
-              <TableBodyData>
-                <NavLink
-                  to={category.id}
-                  className="cursor-pointer btn-primary mr-4 text-green-700"
-                >
-                  View
-                </NavLink>
+      <div className="bg-white rounded-lg border p-4">
+        <Table
+          columnNames={["SL No", "Category", "Color", "CreatedAt", "Action"]}
+          data={data ?? []}
+        >
+          {data &&
+            data.map((category, i) => (
+              <tr
+                key={category.id}
+                className={`bg-neutral-primary ${i !== data.length - 1 ? "border-b border-default" : ""}`}
+              >
+                <TableBodyData>{i + 1}</TableBodyData>
+                <TableBodyData item={category.name} />
+                <TableBodyData>
+                  {category?.color ? (
+                    <div
+                      className="h-3.5 w-full"
+                      style={{ backgroundColor: category.color }}
+                    ></div>
+                  ) : (
+                    "N/A"
+                  )}
+                </TableBodyData>
+                <TableBodyData
+                  item={
+                    category.createdAt
+                      ? category.createdAt.toDate().toLocaleDateString()
+                      : "No date"
+                  }
+                />
+                <TableBodyData>
+                  <div className="flex gap-1 items-center">
+                    <MyButton btnType="view" btnSlug={category.id} />
 
-                {!category.isSystem && (
-                  <>
-                    <NavLink
-                      to={`${category.id}/edit`}
-                      className="cursor-pointer btn-primary mr-4 text-blue-600"
-                    >
-                      Edit
-                    </NavLink>
-                    <button
-                      disabled={isPending}
-                      onClick={() => handleDelete(category.id)}
-                      className="cursor-pointer text-red-900 disabled:opacity-50"
-                    >
-                      {isPending ? "Deleting..." : "Delete"}
-                    </button>
-                  </>
-                )}
-              </TableBodyData>
-            </tr>
-          ))}
-      </Table>
+                    {!category.isSystem && (
+                      <>
+                        <MyButton
+                          btnType="edit"
+                          btnSlug={`${category.id}/edit`}
+                        />
+                        <MyButton
+                          btnType="delete"
+                          btnSlug={category.id}
+                          isPending={isPending}
+                          deleteFn={handleDelete}
+                          id={category.id}
+                        />
+                      </>
+                    )}
+                  </div>
+                </TableBodyData>
+              </tr>
+            ))}
+        </Table>
+      </div>
     </>
   );
 };

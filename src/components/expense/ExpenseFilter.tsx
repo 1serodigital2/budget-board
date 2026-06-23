@@ -5,6 +5,7 @@ import { ExpenseFilterProps } from "../../types/expense";
 import DateRangePicker from "../form/DatePicket";
 import Datep from "../form/DatePicket";
 import { Timestamp } from "firebase/firestore";
+import MyForm from "../form/Form";
 
 const ExpenseFilter = ({
   catData,
@@ -15,12 +16,12 @@ const ExpenseFilter = ({
   isPending,
 }: ExpenseFilterProps) => {
   return (
-    <form
+    <MyForm
       onSubmit={handleFilterSubmit}
       onReset={handleFilterReset}
-      className="mb-3 max-w-3xl"
+      // className="mb-3 max-w-3xl"
     >
-      <div className="flex gap-5 items-center">
+      <div className="flex gap-3 items-center">
         <Select
           getOptionValue={(category: any) => category?.id}
           getOptionLabel={(category: any) => category?.name}
@@ -37,10 +38,10 @@ const ExpenseFilter = ({
         {(filter.category !== "" ||
           (filter.dateRange?.start instanceof Date &&
             filter.dateRange?.end instanceof Date)) && (
-              <Submit type="reset" isPending={isPending} />
-            )}
+          <Submit type="reset" isPending={isPending} />
+        )}
       </div>
-    </form>
+    </MyForm>
   );
 };
 
