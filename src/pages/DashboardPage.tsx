@@ -175,21 +175,16 @@ const Dashboard = () => {
           <SpendingByCategory />
         </div>
       </div>
-      <div className="mb-5 bg-white rounded-lg border p-4">
-        <h2 className="text-[.9rem] font-medium mb-1">Category Breakdown</h2>
-        <div className="mb-3 text-[.8rem] text-gray-500">
-          {budgetTable?.length} categories tracked this month
-        </div>
-        <CategoryWiseBudget
-          budgetData={budgetTable}
-          monthFilter={date}
-          totalBudgetAmount={totalBudgetAmount}
-          totalRemaining={totalRemaining}
-          totalSpent={totalSpent}
-          showTotal={false}
-          hideMonth
-        />
-      </div>
+
+      <CategoryWiseBudget
+        budgetData={budgetTable}
+        monthFilter={date}
+        totalBudgetAmount={totalBudgetAmount}
+        totalRemaining={totalRemaining}
+        totalSpent={totalSpent}
+        showTotal={false}
+        hideMonth
+      />
     </>
   );
 };
