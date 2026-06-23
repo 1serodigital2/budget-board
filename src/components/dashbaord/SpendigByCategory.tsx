@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import useExpenses from "../../hooks/useExpenses";
-import { formatDate } from "../../utils/helpers";
 import { useCategories } from "../../hooks/useCategories";
 
 export default function SpendingByCategory() {

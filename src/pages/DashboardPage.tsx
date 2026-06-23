@@ -1,3 +1,4 @@
+import CategoryWiseBudget from "../components/budget/CategoryWiseBudget";
 import CategoryBudgetProgress from "../components/dashbaord/CategoryBudgetProgress";
 import DailyExpenseChart from "../components/dashbaord/DailyExpenseChart";
 import SpendingByCategory from "../components/dashbaord/SpendigByCategory";
@@ -5,6 +6,7 @@ import Alert from "../components/ui/Alert";
 import H1 from "../components/ui/Heading";
 import useBudget from "../hooks/useBudget";
 import useBudgetSummary from "../hooks/useBudgetSummary";
+import { useCategories } from "../hooks/useCategories";
 import useExpenses from "../hooks/useExpenses";
 import useEpxenseTrend from "../hooks/useExpenseTrend";
 import { BudgetSummaryCardType } from "../types/dashboard";
@@ -31,7 +33,7 @@ const BudgetSummaryCard = ({
         </div>
       </div>
       <div
-        className={`text-2xl font-semibold mb-2 ${showColor && typeof total === "number" && (total < 0 ? "text-red-800" : "text-green-700")}`}
+        className={`text-2xl font-semibold mb-2 text-gray-700 ${showColor && typeof total === "number" && (total < 0 ? "text-red-800" : "text-green-700")}`}
       >
         {typeof total === "number" && moneyFormat(total)}
         {typeof total === "string" && total}
@@ -42,7 +44,7 @@ const BudgetSummaryCard = ({
 };
 
 const Dashboard = () => {
-  const { useGetBudgetMonthYear } = useBudget();
+  const { useGetBudgetMonthYear, useGetBudgetTable } = useBudget();
   const { data: budgets } = useGetBudgetMonthYear(date);
 
   const { useGetExpenseMonthYear } = useExpenses();
@@ -53,6 +55,25 @@ const Dashboard = () => {
       budgets,
       expenses,
     });
+
+  const { useGetCategories } = useCategories();
+  const { data: categories } = useGetCategories();
+
+  const {
+    budgetData: budgetTable,
+    totalSpent,
+    totalBudgetAmount,
+    totalRemaining,
+  } = useGetBudgetTable({
+    budgets: budgets || [],
+    expenses: expenses || [],
+    categories: categories || [],
+  }) ?? {
+    budgetData: [],
+    totalSpent: 0,
+    totalBudgetAmount: 0,
+    totalRemaining: 0,
+  };
 
   const { useMonthlyExpenseTrend } = useEpxenseTrend();
   const { data: monthlyExpenses } = useMonthlyExpenseTrend();
@@ -146,17 +167,24 @@ const Dashboard = () => {
           </span>
         </BudgetSummaryCard>
       </div>
-      <div className="grid grid-cols-5 mt-6 gap-3">
+      <div className="grid grid-cols-5 mt-6 gap-3 mb-5">
         <div className="col-span-3">
           <DailyExpenseChart data={monthlyExpenses || []} />
         </div>
         <div className="col-span-2 h-full">
           <SpendingByCategory />
-          {/* <div className="border bg-white p-4 rounded-lg">
-          </div> */}
         </div>
       </div>
-      <CategoryBudgetProgress expenses={expenses || []} />
+
+      <CategoryWiseBudget
+        budgetData={budgetTable}
+        monthFilter={date}
+        totalBudgetAmount={totalBudgetAmount}
+        totalRemaining={totalRemaining}
+        totalSpent={totalSpent}
+        showTotal={false}
+        hideMonth
+      />
     </>
   );
 };

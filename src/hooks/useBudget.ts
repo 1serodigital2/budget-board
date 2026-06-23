@@ -12,7 +12,9 @@ import useSubmitMessage from "./useSubmitMessage";
 import { queryClient } from "../services/firebase";
 import { useAuth } from "../context/AuthContext";
 import {
+  BudgetDataResponse,
   BudgetInputType,
+  BudgetTableResponseTypes,
   BudgetTableTypes,
   UpdateBudgetType,
 } from "../types/budget";
@@ -108,60 +110,69 @@ const useBudget = () => {
     budgets,
     expenses,
     categories,
-  }: BudgetTableTypes) => {
-    if (!budgets || !expenses || !categories) return;
+    limit = undefined,
+  }: BudgetTableTypes): BudgetTableResponseTypes | undefined => {
+    if (!budgets || !expenses || !categories) return undefined;
 
     let totalSpent = 0;
     let totalBudgetAmount = 0;
     let totalRemaining = 0;
-    const budgetData = budgets.map((budget) => {
-      const category = categories.find((cat) => cat.id === budget.category);
 
-      const [yearStr, monthStr] = budget.month.split("-");
-      const year = parseInt(yearStr, 10);
-      const month = parseInt(monthStr, 10) - 1;
-      const budgetStartDate = new Date(year, month, 1);
-      const budgetEndDate = new Date(year, month + 1, 1);
+    // Slice before mapping to avoid returning undefined for limit
+    const slicedBudgets = limit ? budgets.slice(0, limit) : budgets;
 
-      const spent = expenses
-        .filter(
-          (expense) =>
-            expense.category === budget.category &&
-            expense.date >= budgetStartDate &&
-            expense.date <= budgetEndDate,
-        )
-        .reduce((total, expense) => total + expense.amount, 0);
+    const budgetData = slicedBudgets
+      .map((budget) => {
+        const category = categories.find((cat) => cat.id === budget.category);
 
-      totalSpent += spent;
+        // Return undefined only for missing category — filtered out below
+        if (!category) return undefined;
 
-      const remaining = budget.amount - spent;
-      totalRemaining += remaining;
+        const [yearStr, monthStr] = budget.month.split("-");
+        const year = parseInt(yearStr, 10);
+        const month = parseInt(monthStr, 10) - 1;
+        const budgetStartDate = new Date(year, month, 1);
+        const budgetEndDate = new Date(year, month + 1, 1);
 
-      const percentage =
-        budget.amount > 0
-          ? Number(((spent / budget.amount) * 100).toFixed(2))
-          : 0;
+        const spent = expenses
+          .filter(
+            (expense) =>
+              expense.category === budget.category &&
+              expense.date >= budgetStartDate &&
+              expense.date <= budgetEndDate,
+          )
+          .reduce((total, expense) => total + expense.amount, 0);
 
-      const formattedMonth = new Date(
-        Number(year),
-        Number(month),
-      ).toLocaleString("en-IN", {
-        month: "long",
-        year: "numeric",
-      });
+        totalSpent += spent;
 
-      totalBudgetAmount += Number(budget.amount);
-      return {
-        categoryName: category?.name ?? "Unknown",
-        categoryId: category?.id,
-        categorySlug: category?.slug,
-        budget: budget.amount || 0,
-        spent: spent || 0,
-        remaining: remaining || 0,
-        percentage: percentage || 0,
-        budgetMonth: formattedMonth || "N/A",
-      };
-    });
+        const remaining = budget.amount - spent;
+        totalRemaining += remaining;
+
+        const percentage =
+          budget.amount > 0
+            ? Number(((spent / budget.amount) * 100).toFixed(2))
+            : 0;
+
+        const formattedMonth = new Date(year, month).toLocaleString("en-IN", {
+          month: "long",
+          year: "numeric",
+        });
+
+        totalBudgetAmount += Number(budget.amount);
+
+        return {
+          categoryName: category.name ?? "Unknown",
+          categoryId: category.id,
+          categorySlug: category.slug,
+          budget: budget.amount || 0,
+          spent: spent || 0,
+          remaining: remaining || 0,
+          percentage: percentage || 0,
+          budgetMonth: formattedMonth || "N/A",
+        } satisfies BudgetDataResponse;
+      })
+      // Type guard to narrow (BudgetDataResponse | undefined)[] → BudgetDataResponse[]
+      .filter((item): item is BudgetDataResponse => item !== undefined);
 
     return {
       totalBudgetAmount,
