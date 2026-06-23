@@ -143,9 +143,12 @@ export default function SpendingByCategory() {
 
       <div className="grid grid-cols-2 gap-y-2 gap-x-4 mt-2">
         {formattedExpense?.map((item, index) => (
-          <div key={item.category} className="flex items-center gap-2 text-sm">
+          <div
+            key={item.category}
+            className="flex items-center gap-2 text-[.8rem] text-gray-600"
+          >
             <span
-              className="w-3 h-3 rounded-full"
+              className="w-2 h-2 rounded-full"
               style={{
                 backgroundColor: item.categoryColor,
               }}

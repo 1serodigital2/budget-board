@@ -43,7 +43,7 @@ export interface SelectType<T> extends BaseFieldProps, HandleInputChangeProps {
 }
 
 export interface MyButtonTypes {
-  btnType: string;
+  btnType: "view" | "edit" | "delete";
   id?: string;
   deleteFn?: (id: string) => void;
   isPending?: boolean;

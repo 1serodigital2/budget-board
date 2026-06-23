@@ -19,8 +19,13 @@ import {
   ExpensesDetailTyps,
   FilterProps,
 } from "../../types/expense";
-import { formatDate, getTimeStampFromMonth, moneyFormat } from "../../utils/helpers";
+import {
+  formatDate,
+  getTimeStampFromMonth,
+  moneyFormat,
+} from "../../utils/helpers";
 import useExpenses from "../../hooks/useExpenses";
+import MyButton from "../form/MyButton";
 
 const ExpenseList = () => {
   const [searchParams] = useSearchParams();
@@ -184,61 +189,52 @@ const ExpenseList = () => {
           {submitMessage && submitMessage.message !== "" && (
             <Alert type={submitMessage.type} message={submitMessage.message} />
           )}
-          <Table
-            columnNames={[
-              "SL No",
-              "Category",
-              "Amount",
-              "Note",
-              "Date",
-              "Action",
-            ]}
-            data={expenses}
-          >
-            {expensedWithCategory?.map((expense, i) => (
-              <tr
-                key={expense.id}
-                className="bg-neutral-primary border-b border-default"
-              >
-                <TableBodyData>{i + 1}</TableBodyData>
-                <TableBodyData item={expense.categoryData?.name} />
-                <TableBodyData>{moneyFormat(expense.amount)}</TableBodyData>
-                <TableBodyData item={expense.note} />
-                <TableBodyData
-                  item={
-                    expense.date?.toDate
-                      ? formatDate(expense.date.toDate())
-                      : expense.createdAt?.toDate
-                        ? formatDate(expense.createdAt.toDate())
-                        : ""
-                  }
-                />
-                <TableBodyData>
-                  <NavLink
-                    to={expense.id}
-                    className="cursor-pointer btn-primary mr-4 text-green-700"
-                  >
-                    View
-                  </NavLink>
-
-                  <NavLink
-                    to={`${expense.id}/edit`}
-                    className="cursor-pointer btn-primary mr-4 text-blue-600"
-                  >
-                    Edit
-                  </NavLink>
-
-                  <button
-                    disabled={isPending}
-                    onClick={() => handleDelete(expense.id)}
-                    className="cursor-pointer text-red-900 disabled:opacity-50"
-                  >
-                    {isPending ? "Deleting..." : "Delete"}
-                  </button>
-                </TableBodyData>
-              </tr>
-            ))}
-          </Table>
+          <div className="bg-white rounded-lg border p-4">
+            <Table
+              columnNames={[
+                "SL No",
+                "Category",
+                "Amount",
+                "Note",
+                "Date",
+                "Action",
+              ]}
+              data={expenses}
+            >
+              {expensedWithCategory?.map((expense, i) => (
+                <tr
+                  key={expense.id}
+                  className={`bg-neutral-primary ${expensedWithCategory.length - 1 !== i ? "border-b border-default" : ""}`}
+                >
+                  <TableBodyData>{i + 1}</TableBodyData>
+                  <TableBodyData item={expense.categoryData?.name} />
+                  <TableBodyData>{moneyFormat(expense.amount)}</TableBodyData>
+                  <TableBodyData item={expense.note} />
+                  <TableBodyData
+                    item={
+                      expense.date?.toDate
+                        ? formatDate(expense.date.toDate())
+                        : expense.createdAt?.toDate
+                          ? formatDate(expense.createdAt.toDate())
+                          : ""
+                    }
+                  />
+                  <TableBodyData>
+                    <div className="flex gap-1 items-center">
+                      <MyButton btnType="view" btnSlug={expense.id} />
+                      <MyButton btnType="edit" btnSlug={`${expense.id}/edit`} />
+                      <MyButton
+                        btnType="delete"
+                        deleteFn={handleDelete}
+                        id={expense.id}
+                        isPending={isPending}
+                      />
+                    </div>
+                  </TableBodyData>
+                </tr>
+              ))}
+            </Table>
+          </div>
           {hasNextPage && (
             <div className="text-center">
               <button
