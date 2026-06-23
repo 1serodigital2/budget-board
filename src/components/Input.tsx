@@ -26,7 +26,7 @@ const Input = ({
         max={
           type === "date" ? new Date().toISOString().split("T")[0] : undefined
         }
-        className={`block mb-2.5 text-sm font-medium text-heading p-3 border rounded-xl ${
+        className={`block mb-2.5 text-sm font-medium text-heading py-2 px-3 border rounded-lg text-[.8rem] ${
           sx ? sx : "text-white"
         }`}
         onChange={(e) =>

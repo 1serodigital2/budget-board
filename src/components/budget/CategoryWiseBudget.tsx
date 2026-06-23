@@ -100,9 +100,17 @@ const CategoryWiseBudget = ({
               {budget.spent > 0 && (
                 <NavLink
                   to={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`}
-                  className="bg-blue-100 rounded px-2 py-[.1rem] cursor-pointer hover:bg-blue-600 transition duration-200 hover:text-white"
+                  className="bg-blue-100 rounded px-2 py-[.1rem] cursor-pointer hover:bg-blue-600 transition duration-200 hover:text-white flex gap-1 items-center text-[.7rem]"
                 >
-                  View
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: ".8rem",
+                    }}
+                  >
+                    visibility
+                  </span>
+                  <span>View</span>
                 </NavLink>
               )}
             </TableBodyData>
@@ -110,13 +118,14 @@ const CategoryWiseBudget = ({
         ))}
         {showTotal && (
           <tr className="bg-neutral-primary border-t border-default font-semibold hover:bg-blue-50 transition duration-200">
-            <TableBodyData colSpan={2}>Total</TableBodyData>
+            <TableBodyData>Total</TableBodyData>
             <TableBodyData>{moneyFormat(totalBudgetAmount)}</TableBodyData>
             <TableBodyData>{moneyFormat(totalSpent)}</TableBodyData>
-            <TableBodyData></TableBodyData>
-            <TableBodyData>{moneyFormat(totalRemaining)}</TableBodyData>
-            <TableBodyData></TableBodyData>
-            <TableBodyData></TableBodyData>
+            <TableBodyData colSpan={5}>
+              <div className={`${totalRemaining < 0 ? "text-red-700" : ""}`}>
+                {moneyFormat(totalRemaining)}
+              </div>{" "}
+            </TableBodyData>
           </tr>
         )}
       </Table>
