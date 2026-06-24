@@ -23,7 +23,7 @@ const BudgetForm = ({
     );
   }
   return (
-    <div className="bg-(--color-primary) p-5 rounded-3xl w-125">
+    <div className="bg-white p-4 border rounded-lg max-w-xl">
       <form onSubmit={handleFormSubmit}>
         <div className="mb-2">
           <Select

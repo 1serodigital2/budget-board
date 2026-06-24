@@ -36,9 +36,9 @@ const ExpenseForm = ({
       )}
       <form
         onSubmit={handleFormSubmit}
-        className="bg-(--color-primary) p-8 rounded-3xl max-w-3xl"
+        className="bg-white border p-4 rounded-lg max-w-xl"
       >
-        <div className="mb-2 5">
+        <div className="mb-1">
           <Input
             type="number"
             name="amount"
@@ -48,7 +48,7 @@ const ExpenseForm = ({
             inputValues={inputValues.amount || ""}
           />
         </div>
-        <div className="flex justify-between gap-5">
+        <div className="flex justify-between gap-5 mb-1">
           <Select
             getOptionValue={(category) => category.id}
             getOptionLabel={(category) => category.name}
@@ -70,7 +70,7 @@ const ExpenseForm = ({
             }
           />
         </div>
-        <div className="mb-2 5">
+        <div className="mb-2">
           <Input
             name="note"
             label="Short note"
