@@ -5,10 +5,10 @@ import { useAuth } from "../context/AuthContext";
 const useEpxenseTrend = () => {
   const { user } = useAuth();
 
-  const useMonthlyExpenseTrend = () => {
+  const useMonthlyExpenseTrend = (month: number) => {
     return useQuery({
-      queryKey: ["monthtlyExpenses"],
-      queryFn: () => getMonthlyExpenses(user!.uid),
+      queryKey: ["monthtlyExpenses", month],
+      queryFn: () => getMonthlyExpenses(user!.uid, month),
     });
   };
 

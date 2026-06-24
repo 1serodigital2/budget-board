@@ -10,7 +10,7 @@ export const setUserIdCookie = (userId: string, daysToLive: number) => {
 export const formatDate = (date: Date) => {
   return date.toLocaleDateString("en-IN").replace(/\//g, "-");
 };
-export const getMonthYear = (date = new Date()) => {
+export const getCurrentMonth = (date = new Date()) => {
   const year = date.getFullYear();
   const month = ("0" + (date.getMonth() + 1)).slice(-2);
 

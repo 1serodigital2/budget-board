@@ -221,8 +221,22 @@ export const getExpensesMonthYear = async ({
 
 export const getMonthlyExpenses = async (
   uid: string,
+  month: number,
 ): Promise<MonthlyExpenseSummaryResponseType[]> => {
-  const expensesSnap = await getDocs(collection(db, `users/${uid}/expenses`));
+  const cutOffDate = new Date();
+  cutOffDate.setMonth(cutOffDate.getMonth() - month);
+
+  const startTimestamp = Timestamp.fromDate(cutOffDate);
+
+  console.log("[getMonthlyExpenses] month", month)
+  console.log("[getMonthlyExpenses] startTimestamp", startTimestamp)
+
+  const expenseQuery = query(
+    collection(db, `users/${uid}/expenses`),
+    where("date", ">=", startTimestamp),
+  );
+
+  const expensesSnap = await getDocs(expenseQuery);
   const budgets = await getBudgets(uid);
 
   const monthlyData: Record<

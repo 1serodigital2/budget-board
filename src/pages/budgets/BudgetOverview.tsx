@@ -7,7 +7,7 @@ import TableBodyData from "../../components/ui/TableBodyData";
 import useBudget from "../../hooks/useBudget";
 import { useCategories } from "../../hooks/useCategories";
 import useExpenses from "../../hooks/useExpenses";
-import { getMonthYear, moneyFormat } from "../../utils/helpers";
+import { getCurrentMonth, moneyFormat } from "../../utils/helpers";
 import Input from "../../components/Input";
 import { HandleInputChangeType } from "../../types/category";
 import Submit from "../../components/form/Submit";
@@ -16,7 +16,7 @@ import { NavLink } from "react-router-dom";
 import CategoryWiseBudget from "../../components/budget/CategoryWiseBudget";
 import MyForm from "../../components/form/Form";
 
-const currentMntYr = getMonthYear();
+const currentMntYr = getCurrentMonth();
 
 const BudgetOverview = () => {
   const [monthFilter, setMonthFilter] = useState(currentMntYr);

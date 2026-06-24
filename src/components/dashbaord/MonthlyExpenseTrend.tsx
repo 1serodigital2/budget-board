@@ -1,7 +1,6 @@
 import {
   Area,
   AreaChart,
-  Line,
   CartesianGrid,
   Legend,
   ResponsiveContainer,
@@ -9,19 +8,34 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { MothlyExpenseDataType } from "../../types/expense";
+import useEpxenseTrend from "../../hooks/useExpenseTrend";
+import { useState } from "react";
 
-export default function MonthlyExpenseTrend({ data }: MothlyExpenseDataType) {
+const MonthlyExpenseTrend = () => {
+  const [filteredMonth, setFilteredMonth] = useState(2);
+
+  const { useMonthlyExpenseTrend } = useEpxenseTrend();
+  const { data } = useMonthlyExpenseTrend(filteredMonth);
+
+  const handleMonthFilter = (month: number) => {
+    setFilteredMonth(month);
+  };
   return (
     <div className="bg-white border rounded-lg p-4">
       <div className="flex justify-between items-center mb-5">
         <h3 className="text-[.9rem] font-medium">Budget vs Expense</h3>
         <div className="flex justify-between items-center gap-3">
-          <button className="bg-gray-200 rounded-lg py-0.5 px-2 text-[.7rem]  cursor-pointer">
-            Last 6 month
+          <button
+            className={`rounded-lg py-0.5 px-2 text-[.7rem] cursor-pointer ${filteredMonth === 1 ? "bg-gray-200" : ""}`}
+            onClick={() => handleMonthFilter(1)}
+          >
+            Last 1 month
           </button>
-          <button className="rounded-lg py-0.5 px-2 text-[.7rem]  cursor-pointer">
-            1 year
+          <button
+            className={`rounded-lg py-0.5 px-2 text-[.7rem] cursor-pointer ${filteredMonth === 2 ? "bg-gray-200" : ""}`}
+            onClick={() => handleMonthFilter(2)}
+          >
+            2 month
           </button>
         </div>
       </div>
@@ -83,4 +97,5 @@ export default function MonthlyExpenseTrend({ data }: MothlyExpenseDataType) {
       </div>
     </div>
   );
-}
+};
+export default MonthlyExpenseTrend;
