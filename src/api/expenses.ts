@@ -25,7 +25,7 @@ import {
   GetExpenseDetailsType,
   MonthlyExpenseSummaryResponseType,
 } from "../types/expense";
-import { getTimeStampFromMonth } from "../utils/helpers";
+import { DateFilter, getMonthRange, getTimeStampFromMonth } from "../utils/helpers";
 
 import { format } from "date-fns";
 import { getBudgets } from "./budget";
@@ -211,7 +211,7 @@ export const getExpensesMonthYear = async ({
       };
     });
 
-    console.log("getExpensesMonthYear", expensesData);
+    // console.log("getExpensesMonthYear", expensesData);
 
     return expensesData;
   } catch (error) {
@@ -221,23 +221,23 @@ export const getExpensesMonthYear = async ({
 
 export const getMonthlyExpenses = async (
   uid: string,
-  month: number,
+  filter: DateFilter,
 ): Promise<MonthlyExpenseSummaryResponseType[]> => {
-  const cutOffDate = new Date();
-  cutOffDate.setMonth(cutOffDate.getMonth() - month);
+  const range = getMonthRange(filter);
 
-  const startTimestamp = Timestamp.fromDate(cutOffDate);
+  const expenseQuery =
+    filter === "all-time"
+      ? query(collection(db, `users/${uid}/expenses`))
+      : query(
+          collection(db, `users/${uid}/expenses`),
+          where("date", ">=", Timestamp.fromDate(range?.startMonth)),
+          where("date", "<", Timestamp.fromDate(range?.endMonth)),
+        );
 
-  console.log("[getMonthlyExpenses] month", month)
-  console.log("[getMonthlyExpenses] startTimestamp", startTimestamp)
-
-  const expenseQuery = query(
-    collection(db, `users/${uid}/expenses`),
-    where("date", ">=", startTimestamp),
-  );
-
-  const expensesSnap = await getDocs(expenseQuery);
-  const budgets = await getBudgets(uid);
+  const [expensesSnap, budgets] = await Promise.all([
+    getDocs(expenseQuery),
+    getBudgets(uid, filter),
+  ]);
 
   const monthlyData: Record<
     string,
@@ -248,7 +248,7 @@ export const getMonthlyExpenses = async (
     }
   > = {};
 
-  // Add budgets
+  // Budgets
   budgets.forEach((budget) => {
     const [year, month] = budget.month.split("-").map(Number);
 
@@ -270,30 +270,37 @@ export const getMonthlyExpenses = async (
     monthlyData[monthKey].budget += Number(budget.amount);
   });
 
-  // Add expenses
+  // Expenses
   expensesSnap.forEach((doc) => {
     const expense = doc.data();
 
     const date = expense.date.toDate();
 
-    const month = date.toLocaleString("en-US", {
+    const monthKey = date.toLocaleString("en-US", {
       month: "short",
       year: "numeric",
     });
 
-    if (!monthlyData[month]) {
-      monthlyData[month] = {
+    if (!monthlyData[monthKey]) {
+      monthlyData[monthKey] = {
         expense: 0,
         budget: 0,
-        sortDate: new Date(date.getFullYear(), date.getMonth(), 1),
+        sortDate: new Date(
+          date.getFullYear(),
+          date.getMonth(),
+          1,
+        ),
       };
     }
 
-    monthlyData[month].expense += Number(expense.amount);
+    monthlyData[monthKey].expense += Number(expense.amount);
   });
 
   return Object.entries(monthlyData)
-    .sort(([, a], [, b]) => a.sortDate.getTime() - b.sortDate.getTime())
+    .sort(
+      ([, a], [, b]) =>
+        a.sortDate.getTime() - b.sortDate.getTime(),
+    )
     .map(([month, data]) => ({
       month,
       expense: data.expense,

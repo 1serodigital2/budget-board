@@ -10,14 +10,15 @@ import {
 } from "recharts";
 import useEpxenseTrend from "../../hooks/useExpenseTrend";
 import { useState } from "react";
+import { DateFilter } from "../../utils/helpers";
 
 const MonthlyExpenseTrend = () => {
-  const [filteredMonth, setFilteredMonth] = useState(2);
+  const [filteredMonth, setFilteredMonth] = useState<DateFilter>("last-1-year");
 
   const { useMonthlyExpenseTrend } = useEpxenseTrend();
   const { data } = useMonthlyExpenseTrend(filteredMonth);
 
-  const handleMonthFilter = (month: number) => {
+  const handleMonthFilter = (month: DateFilter) => {
     setFilteredMonth(month);
   };
   return (
@@ -26,16 +27,16 @@ const MonthlyExpenseTrend = () => {
         <h3 className="text-[.9rem] font-medium">Budget vs Expense</h3>
         <div className="flex justify-between items-center gap-3">
           <button
-            className={`rounded-lg py-0.5 px-2 text-[.7rem] cursor-pointer ${filteredMonth === 1 ? "bg-gray-200" : ""}`}
-            onClick={() => handleMonthFilter(1)}
+            className={`rounded-lg py-0.5 px-2 text-[.7rem] cursor-pointer ${filteredMonth === "last-6-months" ? "bg-gray-200" : ""}`}
+            onClick={() => handleMonthFilter("last-6-months")}
           >
-            Last 1 month
+            Last 6 month
           </button>
           <button
-            className={`rounded-lg py-0.5 px-2 text-[.7rem] cursor-pointer ${filteredMonth === 2 ? "bg-gray-200" : ""}`}
-            onClick={() => handleMonthFilter(2)}
+            className={`rounded-lg py-0.5 px-2 text-[.7rem] cursor-pointer ${filteredMonth === "last-1-year" ? "bg-gray-200" : ""}`}
+            onClick={() => handleMonthFilter("last-1-year")}
           >
-            2 month
+            1 Year
           </button>
         </div>
       </div>

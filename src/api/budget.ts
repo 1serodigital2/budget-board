@@ -19,6 +19,7 @@ import {
   UpdateBudgetType,
 } from "../types/budget";
 import { getCategories } from "./category";
+import { DateFilter, formatMonth, getMonthRange } from "../utils/helpers";
 
 export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
   try {
@@ -56,13 +57,31 @@ export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
   }
 };
 
-export const getBudgets = async (uid: string) => {
+export const getBudgets = async (uid: string, filter?: DateFilter) => {
   try {
     const categories = await getCategories(uid);
 
-    const querySnapshot = await getDocs(collection(db, `users/${uid}/budgets`));
+    let budgetQuery = collection(db, `users/${uid}/budgets`);
 
-    const budgets = querySnapshot.docs.map((doc) => {
+    if (filter && filter !== "all-time") {
+      const range = getMonthRange(filter);
+      console.log("range", range);
+
+      const startMonth = formatMonth(range?.startMonth);
+      const endMonth = formatMonth(
+        new Date(range.end.getFullYear(), range.end.getMonth(), 1),
+      );
+
+      budgetQuery = query(
+        budgetQuery,
+        where("month", ">=", startMonth),
+        where("month", "<=", endMonth),
+      ) as any;
+    }
+
+    const querySnapshot = await getDocs(budgetQuery);
+
+    return querySnapshot.docs.map((doc) => {
       const data = doc.data();
 
       const matchedCategory = categories.find(
@@ -78,11 +97,9 @@ export const getBudgets = async (uid: string) => {
         createdAt: data.createdAt,
       };
     });
-
-    return budgets;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Unable to fetch budgets", error);
-    throw new Error("Unable to fetch budgets " + error);
+    throw error;
   }
 };
 

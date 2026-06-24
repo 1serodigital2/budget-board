@@ -43,3 +43,70 @@ export const capitalizeFirstLetter = (str: string) => {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export type DateFilter =
+  | "current-month"
+  | "last-month"
+  | "last-6-months"
+  | "last-1-year"
+  | "all-time";
+
+export const getMonthRange = (filter: DateFilter) => {
+  const now = new Date();
+
+  switch (filter) {
+    case "current-month": {
+      const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+        2,
+        "0",
+      )}`;
+
+      return { startMonth: month, endMonth: month };
+    }
+
+    case "last-month": {
+      const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+      const month = `${prev.getFullYear()}-${String(
+        prev.getMonth() + 1,
+      ).padStart(2, "0")}`;
+
+      return { startMonth: month, endMonth: month };
+    }
+
+    case "last-6-months": {
+      const start = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+
+      return {
+        startMonth: `${start.getFullYear()}-${String(
+          start.getMonth() + 1,
+        ).padStart(2, "0")}`,
+        endMonth: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+          2,
+          "0",
+        )}`,
+      };
+    }
+
+    case "last-1-year": {
+      const start = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+
+      return {
+        startMonth: `${start.getFullYear()}-${String(
+          start.getMonth() + 1,
+        ).padStart(2, "0")}`,
+        endMonth: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+          2,
+          "0",
+        )}`,
+      };
+    }
+  }
+};
+
+
+export const formatMonth = (date: Date) => {
+  return `${date.getFullYear()}-${String(
+    date.getMonth() + 1,
+  ).padStart(2, "0")}`;
+};

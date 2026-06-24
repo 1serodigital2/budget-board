@@ -8,9 +8,6 @@ export default function SpendingByCategory() {
   const { useGetExpenseMonthYear } = useExpenses();
   const { data: expenseData } = useGetExpenseMonthYear(currentMonth);
 
-  console.log("currentMonth", currentMonth);
-  console.log("Piechart expense data", expenseData);
-
   const { useGetCategories } = useCategories();
   const { data: categories } = useGetCategories();
 
@@ -45,7 +42,7 @@ export default function SpendingByCategory() {
   }, {});
 
   const formattedExpense = Object.values(groupedExpenses ?? []);
-  console.log("formattedExpense", formattedExpense);
+  // console.log("formattedExpense", formattedExpense);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
