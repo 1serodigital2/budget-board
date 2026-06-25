@@ -1,3 +1,4 @@
+import { queryClient } from "../services/supabase";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -9,7 +10,7 @@ import {
   updateBudget,
 } from "../api/budget";
 import useSubmitMessage from "./useSubmitMessage";
-import { queryClient } from "../services/firebase";
+
 import { useAuth } from "../context/AuthContext";
 import {
   BudgetDataResponse,
@@ -20,7 +21,7 @@ import {
 } from "../types/budget";
 
 const initialValues: BudgetInputType = {
-  category: "",
+  category: 0,
   amount: 0,
   month: "",
 };
@@ -49,23 +50,23 @@ const useBudget = () => {
   const getAllBudgets = () => {
     return useQuery({
       queryKey: ["budgets"],
-      queryFn: () => getBudgets(user?.uid!),
-      enabled: !!user?.uid,
+      queryFn: () => getBudgets(user?.id!),
+      enabled: !!user?.id,
     });
   };
 
   const getBudget = (budgetId: string) => {
     return useQuery({
       queryKey: ["budgets", budgetId],
-      queryFn: () => getBudgetById({ uid: user?.uid!, budgetId }),
-      enabled: !!budgetId && !!user?.uid,
+      queryFn: () => getBudgetById({ uid: user?.id!, budgetId: Number(budgetId) }),
+      enabled: !!budgetId && !!user?.id,
     });
   };
 
   const useDeleteBudget = () => {
     return useMutation({
       mutationFn: (budgetId: string) =>
-        deleteBudgetById({ uid: user?.uid!, budgetId }),
+        deleteBudgetById({ uid: user?.id!, budgetId: Number(budgetId) }),
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: ["budgets"],
@@ -81,7 +82,7 @@ const useBudget = () => {
   const useBudgetUpdate = (budgetId: string) => {
     return useMutation({
       mutationFn: (budgetDetail: BudgetInputType) =>
-        updateBudget({ uid: user?.uid!, budgetId, budgetDetail }),
+        updateBudget({ uid: user?.id!, budgetId: Number(budgetId), budgetDetail }),
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: ["budgets", budgetId],
@@ -100,9 +101,9 @@ const useBudget = () => {
       queryFn: () =>
         getBudgetMonthYear({
           monthYear,
-          uid: user!.uid,
+          uid: user!.id,
         }),
-      enabled: !!user?.uid,
+      enabled: !!user?.id,
     });
   };
 

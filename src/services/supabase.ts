@@ -1,0 +1,9 @@
+/// <reference types="vite/client" />
+import { createClient } from "@supabase/supabase-js";
+import { QueryClient } from "@tanstack/react-query";
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
+export const queryClient = new QueryClient();

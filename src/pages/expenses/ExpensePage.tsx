@@ -15,11 +15,11 @@ const ExpensePage = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["expenses", id],
     queryFn: () => {
-      if (!user?.uid || !id) {
+      if (!user?.id || !id) {
         showSubmitMessage("Unauthorized access", "error");
         return;
       }
-      return getExpenseById({ uid: user.uid, id });
+      return getExpenseById({ uid: user.id, id: Number(id) });
     },
   });
 
@@ -30,11 +30,11 @@ const ExpensePage = () => {
   } = useQuery({
     queryKey: ["categories"],
     queryFn: () => {
-      if (!user?.uid) {
+      if (!user?.id) {
         showSubmitMessage("Unauthorized access", "error");
         return;
       }
-      return getCategories(user.uid);
+      return getCategories(user.id);
     },
   });
 
@@ -75,8 +75,8 @@ const ExpensePage = () => {
       <div>Note: {data?.note}</div>
       <div>
         Date:
-        {data?.createdAt?.toDate
-          ? data?.createdAt.toDate().toLocaleDateString()
+        {data?.createdAt
+          ? new Date(data.createdAt).toLocaleDateString()
           : "No date"}
       </div>
     </>

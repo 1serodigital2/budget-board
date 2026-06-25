@@ -5,11 +5,11 @@ import { useAuth } from "../../context/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 
 // types
-import { createExpense, queryClient } from "../../api/expenses";
+import { createExpense } from "../../api/expenses";
+import { queryClient } from "../../services/supabase";
 import ExpenseForm from "../../components/form/Expense";
 import useExpenseForm from "../../hooks/useExpenseForm";
 import H1 from "../../components/ui/Heading";
-import { Timestamp } from "firebase/firestore";
 
 const AddExpense = () => {
   const {
@@ -40,7 +40,7 @@ const AddExpense = () => {
     },
   });
 
-  const handleFormSubmit = (e: React.SubmitEvent) => {
+  const handleFormSubmit = (e: React.SyntheticEvent) => {
     try {
       e.preventDefault();
 
@@ -51,16 +51,17 @@ const AddExpense = () => {
         return;
       }
 
-      if (!user?.uid) {
+      if (!user?.id) {
         return;
       }
 
       const formattedExpenseDetail = {
         ...expenseDetail,
-        date: Timestamp.fromDate(new Date(expenseDetail.date)),
+        date: new Date(expenseDetail.date).toISOString(),
+        category: Number(expenseDetail.category),
       };
 
-      mutate({ expenseDetail: formattedExpenseDetail, uid: user.uid });
+      mutate({ expenseDetail: formattedExpenseDetail, uid: user.id });
     } catch (error) {
       console.error("Unable to add", error);
     }

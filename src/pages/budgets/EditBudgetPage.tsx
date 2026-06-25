@@ -41,7 +41,7 @@ const EditBudgetPage = () => {
     }
   }, [data]);
 
-  const handleFormSubmit = (e: React.SubmitEvent) => {
+  const handleFormSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (inputValue.amount < 0 || !inputValue.category) {
       showSubmitMessage("Please fill up the form properly", "error");

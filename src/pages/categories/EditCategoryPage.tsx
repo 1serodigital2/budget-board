@@ -9,7 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useEffect } from "react";
 import { getCategoryById, updateCategory } from "../../api/category";
 import Alert from "../../components/ui/Alert";
-import { queryClient } from "../../services/firebase";
+import { queryClient } from "../../services/supabase";
 
 const EditCategoryPage = () => {
   const params = useParams();
@@ -18,13 +18,13 @@ const EditCategoryPage = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["categories", params.id],
     queryFn: () => {
-      if (!user?.uid || !params?.id) {
+      if (!user?.id || !params?.id) {
         showSubmitMessage("Unauthorized access", "error");
         return;
       }
-      return getCategoryById({ userId: user?.uid, categoryId: params.id });
+      return getCategoryById({ userId: user?.id, categoryId: Number(params.id) });
     },
-    enabled: !!user?.uid,
+    enabled: !!user?.id,
   });
 
   const { mutate, isPending } = useMutation({
@@ -63,7 +63,7 @@ const EditCategoryPage = () => {
     );
   }
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     try {
       const categoryDetail = getCategoryDetail();
@@ -71,12 +71,12 @@ const EditCategoryPage = () => {
         !categoryDetail.category ||
         !categoryDetail.color ||
         !params.id ||
-        !user?.uid
+        !user?.id
       ) {
         showSubmitMessage("Please fill up the form properly", "error");
         return;
       }
-      mutate({ userId: user?.uid, catId: params.id, categoryDetail });
+      mutate({ userId: user?.id, catId: Number(params.id), categoryDetail });
     } catch (error) {}
   };
   return (

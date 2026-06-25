@@ -28,14 +28,14 @@ const ExpenseFilter = ({
           name="category"
           data={Array.isArray(catData) ? catData : catData ? [catData] : []}
           handleInputChange={handleInputChange}
-          inputValues={filter.category || ""}
+          inputValues={filter.category?.toString() || ""}
         />
         <DateRangePicker
           handleInputChange={handleInputChange}
           inputValues={filter.dateRange}
         />
         <Submit isPending={isPending} />
-        {(filter.category !== "" ||
+        {(filter.category !== 0 ||
           (filter.dateRange?.start instanceof Date &&
             filter.dateRange?.end instanceof Date)) && (
           <Submit type="reset" isPending={isPending} />

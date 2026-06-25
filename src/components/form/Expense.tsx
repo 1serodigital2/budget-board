@@ -21,11 +21,11 @@ const ExpenseForm = ({
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["categories"],
     queryFn: () => {
-      if (!user?.uid) {
+      if (!user?.id) {
         showSubmitMessage("Unauthorized access", "error");
         return;
       }
-      return getCategories(user.uid);
+      return getCategories(user.id);
     },
   });
 
@@ -50,7 +50,7 @@ const ExpenseForm = ({
         </div>
         <div className="flex justify-between gap-5 mb-1">
           <Select
-            getOptionValue={(category) => category.id}
+            getOptionValue={(category) => category.id.toString()}
             getOptionLabel={(category) => category.name}
             name="category"
             data={data || []}

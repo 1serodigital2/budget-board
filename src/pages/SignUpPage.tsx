@@ -31,7 +31,7 @@ const Signup = () => {
   }, [user, navigate]);
   const [loginData, setLoginData] = useState<LoginProps>(initialValues);
 
-  const handleFormSubmit = async (e: React.SubmitEvent) => {
+  const handleFormSubmit = async (e: React.SyntheticEvent) => {
     try {
       e.preventDefault();
       const email = loginData.email || "";

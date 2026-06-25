@@ -9,7 +9,7 @@ const useExpenses = () => {
   const useGetExpenseMonthYear = (monthYear: string) => {
     return useQuery({
       queryKey: ["expenses", monthYear],
-      queryFn: () => getExpensesMonthYear({ uid: user!.uid, monthYear }),
+      queryFn: () => getExpensesMonthYear({ uid: user!.id, monthYear }),
     });
   };
 
@@ -17,28 +17,28 @@ const useExpenses = () => {
     category,
     dateRange,
   }: {
-    category?: string;
+    category?: number;
     dateRange?: DateRange;
   }) => {
     return useInfiniteQuery<ExpensesResponse>({
       queryKey: [
         "expenses",
-        user?.uid,
+        user?.id,
         category,
         dateRange?.start || null,
         dateRange?.end || null,
       ],
       queryFn: ({ pageParam }) =>
         getExpenses(
-          user!.uid,
+          user!.id,
           category,
           dateRange,
-          pageParam as QueryDocumentSnapshot<DocumentData> | null,
+          pageParam as number | undefined,
         ),
       initialPageParam: null,
       getNextPageParam: (lastPage) =>
         lastPage.hasMore ? lastPage.lastVisible : undefined,
-      enabled: !!user?.uid,
+      enabled: !!user?.id,
     });
   };
   return {

@@ -26,9 +26,9 @@ const AddBudgetPage = () => {
     });
   };
 
-  const handleFormSubmit = (e: React.SubmitEvent) => {
+  const handleFormSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (!user?.uid) {
+    if (!user?.id) {
       showSubmitMessage("User id is required", "error");
       return;
     }
@@ -36,7 +36,7 @@ const AddBudgetPage = () => {
       showSubmitMessage("Amount must be greater than 0", "error");
       return;
     }
-    mutate({ budgetDetail: inputValue, uid: user?.uid });
+    mutate({ budgetDetail: inputValue, uid: user.id });
   };
   return (
     <>

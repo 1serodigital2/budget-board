@@ -1,52 +1,44 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  query,
-  serverTimestamp,
-  updateDoc,
-  where,
-} from "firebase/firestore";
+import { supabase } from "../services/supabase";
 import {
   AddCategoryType,
   CategoryProps,
   GetCategoryType,
   UpdateCategoryType,
 } from "../types/category";
-import { db } from "../services/firebase";
 
 export const addCategory = async ({
   userId,
   categoryDetail,
 }: AddCategoryType) => {
   try {
-    const normalizedName = categoryDetail.category.trim().toLowerCase();
+    const normalized_name = categoryDetail.category.trim().toLowerCase();
+    const slug = normalized_name.replace(/\s+/g, "-");
 
-    const categoryRef = collection(db, `users/${userId}/category`);
-    const q = query(categoryRef, where("normalizedName", "==", normalizedName));
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
+    // Check if category exists
+    const { data: existing } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("normalized_name", normalized_name);
+
+    if (existing && existing.length > 0) {
       throw new Error("Category already exists");
     }
 
-    const slug = normalizedName.replace(/\s+/g, "-");
-
-    const docRef = await addDoc(collection(db, `users/${userId}/category`), {
-      ...categoryDetail,
-      normalizedName,
+    const { error } = await supabase.from("categories").insert({
+      user_id: userId,
+      category: categoryDetail.category,
+      color: categoryDetail.color,
+      normalized_name,
       slug,
-      isSystem: false,
-      createdAt: serverTimestamp(),
+      is_system: false,
     });
-    if (!docRef?.id) {
-      throw new Error("Failed to create category");
+
+    if (error) {
+      throw new Error("Failed to create category: " + error.message);
     }
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(error.message || error);
   }
 };
 
@@ -55,24 +47,25 @@ export const getCategories = async (userId: string): Promise<CategoryProps[]> =>
     if (!userId) {
       throw new Error("User id is required");
     }
-    const querySnapshot = await getDocs(
-      collection(db, `users/${userId}/category`),
-    );
+    
+    const { data, error } = await supabase
+      .from("categories")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
-    const categories = querySnapshot.docs.map((doc) => {
-      const data = doc.data();
+    if (error) {
+      throw error;
+    }
 
-      return {
-        id: doc.id,
-        name: data.category,
-        color: data.color,
-        createdAt: data.createdAt,
-        isSystem: data.isSystem || false,
-        slug: data.slug || "",
-      };
-    });
-
-    return categories;
+    return (data || []).map((cat: any) => ({
+      id: cat.id,
+      name: cat.category,
+      color: cat.color,
+      createdAt: cat.created_at,
+      isSystem: cat.is_system || false,
+      slug: cat.slug || "",
+    }));
   } catch (error: any) {
     console.error("Unable to get categories", error);
     throw new Error("Unable to get categories");
@@ -90,20 +83,28 @@ export const getCategoryById = async ({
     if (!categoryId) {
       throw new Error("Missing category id");
     }
-    const docSnap = await getDoc(
-      doc(db, `users/${userId}/category`, categoryId),
-    );
-    if (docSnap.exists()) {
-      const data = docSnap.data();
+    
+    const { data, error } = await supabase
+      .from("categories")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("id", categoryId)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    if (data) {
       return {
-        id: categoryId,
+        id: data.id,
         category: data.category,
         color: data.color,
-        createdAt: data.createdAt,
+        createdAt: data.created_at,
       };
     }
   } catch (error: any) {
-    throw new Error("Failed to fetch category detail " + error);
+    throw new Error("Failed to fetch category detail " + error.message);
   }
 };
 
@@ -113,45 +114,43 @@ export const deleteCategory = async ({
 }: GetCategoryType) => {
   try {
     // Find uncategorized category
-    const categoryRef = collection(db, `users/${userId}/category`);
+    const { data: uncategorized, error: uncatError } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("is_system", true)
+      .eq("slug", "uncategorized")
+      .single();
 
-    const uncategorizedQuery = query(
-      categoryRef,
-      where("isSystem", "==", true),
-      where("slug", "==", "uncategorized"),
-      limit(1),
-    );
-
-    const uncategorizedSnapshot = await getDocs(uncategorizedQuery);
-
-    if (uncategorizedSnapshot.empty) {
+    if (uncatError || !uncategorized) {
       throw new Error("Uncategorized category not found");
     }
 
-    const uncategorizedCategory = uncategorizedSnapshot.docs[0];
-
-    const uncategorizedId = uncategorizedCategory.id;
-
-    // Find expenses using this category
-    const expenseRef = collection(db, `users/${userId}/expenses`);
-
-    const expenseQuery = query(expenseRef, where("category", "==", categoryId));
-
-    const expenseSnapshot = await getDocs(expenseQuery);
+    const uncategorizedId = uncategorized.id;
 
     // Update all matched expenses
-    const updatePromises = expenseSnapshot.docs.map((expenseDoc) =>
-      updateDoc(expenseDoc.ref, {
-        category: uncategorizedId,
-      }),
-    );
+    const { error: updateError } = await supabase
+      .from("expenses")
+      .update({ category: uncategorizedId })
+      .eq("user_id", userId)
+      .eq("category", categoryId);
 
-    await Promise.all(updatePromises);
+    if (updateError) {
+      throw new Error("Failed to reassign expenses: " + updateError.message);
+    }
 
     // Delete category
-    await deleteDoc(doc(db, `users/${userId}/category`, categoryId));
-  } catch (error) {
-    throw new Error("Fatal error while deleting category " + error);
+    const { error: deleteError } = await supabase
+      .from("categories")
+      .delete()
+      .eq("user_id", userId)
+      .eq("id", categoryId);
+
+    if (deleteError) {
+      throw deleteError;
+    }
+  } catch (error: any) {
+    throw new Error("Fatal error while deleting category " + error.message);
   }
 };
 
@@ -161,22 +160,28 @@ export const updateCategory = async ({
   categoryDetail,
 }: UpdateCategoryType) => {
   try {
-    const normalizedName = categoryDetail.category.trim().toLowerCase();
-    const slug = normalizedName.replace(/\s+/g, "-");
+    const normalized_name = categoryDetail.category.trim().toLowerCase();
+    const slug = normalized_name.replace(/\s+/g, "-");
 
-    const eventRef = doc(db, `users/${userId}/category`, catId);
+    const { error } = await supabase
+      .from("categories")
+      .update({
+        category: categoryDetail.category,
+        color: categoryDetail.color,
+        normalized_name,
+        slug,
+      })
+      .eq("user_id", userId)
+      .eq("id", catId);
 
-    await updateDoc(eventRef, {
-      ...categoryDetail,
-      normalizedName,
-      slug,
-      createdAt: serverTimestamp(),
-    });
+    if (error) {
+      throw error;
+    }
 
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("unable to update category", error);
-    throw new Error("Error while updating category");
+    throw new Error("Error while updating category: " + error.message);
   }
 };
 
@@ -184,30 +189,30 @@ export const createDefaultCategories = async (uid: string) => {
   try {
     const defaultCategories = [
       {
+        user_id: uid,
         category: "Uncategorized",
-        normalizedName: "uncategorized",
+        normalized_name: "uncategorized",
         slug: "uncategorized",
-        isSystem: true,
+        is_system: true,
         color: "#6b7280",
-        createdAt: serverTimestamp(),
       },
       {
+        user_id: uid,
         category: "Food",
-        normalizedName: "food",
+        normalized_name: "food",
         slug: "food",
-        isSystem: true,
+        is_system: true,
         color: "#ef4444",
-        createdAt: serverTimestamp(),
       },
     ];
 
-    await Promise.all(
-      defaultCategories.map((category) =>
-        addDoc(collection(db, `users/${uid}/category`), category),
-      ),
-    );
+    const { error } = await supabase.from("categories").insert(defaultCategories);
+    
+    if (error) {
+      throw error;
+    }
   } catch (error: any) {
-    console.error("Unable to create default categories " + error);
+    console.error("Unable to create default categories " + error.message);
   }
 };
 
@@ -219,6 +224,6 @@ export const getCategoryMonthYear = ({
   monthYear: string;
 }) => {
   try {
-    const categoryRef = collection(db, `users/${uid}/category`);
+    // left unimplemented as in original code
   } catch (error) {}
 };

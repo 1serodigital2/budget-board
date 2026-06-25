@@ -1,3 +1,4 @@
+import { queryClient } from "../../services/supabase";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { NavLink } from "react-router-dom";
 
@@ -7,13 +8,13 @@ import { useAuth } from "../../context/AuthContext";
 import TableBodyData from "../ui/TableBodyData";
 import Alert from "../ui/Alert";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
-import { queryClient } from "../../services/firebase";
+
 import MyButton from "../form/MyButton";
 
 const CategoriesList = () => {
   const { user } = useAuth();
   const { showSubmitMessage, submitMessage } = useSubmitMessage();
-  const userId = user?.uid;
+  const userId = user?.id;
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["categories"],
@@ -42,10 +43,10 @@ const CategoriesList = () => {
   const handleDelete = (id: string) => {
     if (confirm("Are you sure to delete this category") === false) return;
     try {
-      if (!user?.uid) {
+      if (!user?.id) {
         throw new Error("User id is missing");
       }
-      mutate({ userId: user?.uid, categoryId: id });
+      mutate({ userId: user?.id!, categoryId: Number(id) });
     } catch (error) {
       showSubmitMessage("Fatal error " + error, "error");
     }
@@ -97,13 +98,13 @@ const CategoriesList = () => {
                 <TableBodyData
                   item={
                     category.createdAt
-                      ? category.createdAt.toDate().toLocaleDateString()
+                      ? new Date(category.createdAt).toLocaleDateString()
                       : "No date"
                   }
                 />
                 <TableBodyData>
                   <div className="flex gap-1 items-center">
-                    <MyButton btnType="view" btnSlug={category.id} />
+                    <MyButton btnType="view" btnSlug={category.id.toString()} />
 
                     {!category.isSystem && (
                       <>
@@ -113,10 +114,10 @@ const CategoriesList = () => {
                         />
                         <MyButton
                           btnType="delete"
-                          btnSlug={category.id}
+                          btnSlug={category.id.toString()}
                           isPending={isPending}
                           deleteFn={handleDelete}
-                          id={category.id}
+                          id={category.id.toString()}
                         />
                       </>
                     )}

@@ -71,7 +71,7 @@ const BudgetOverview = () => {
     });
   };
 
-  const handleFormSubmit = (e: React.SubmitEvent) => {
+  const handleFormSubmit = (e: React.SyntheticEvent) => {
     try {
       e.preventDefault();
       const date = inputValue.budgetMonth.toString();

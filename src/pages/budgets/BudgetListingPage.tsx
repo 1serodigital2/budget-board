@@ -52,10 +52,10 @@ const BudgetListingPage = () => {
                   <TableBodyData>{budget.month}</TableBodyData>
                   <TableBodyData>
                     <div className="flex items-center gap-2">
-                      <MyButton  btnType="edit" id={budget.id} btnSlug={`${budget.id}/edit`} />
+                      <MyButton  btnType="edit" id={budget.id.toString()} btnSlug={`${budget.id}/edit`} />
                       <MyButton
                         btnType="delete"
-                        id={budget.id}
+                        id={budget.id.toString()}
                         deleteFn={deleteBudget}
                         isPending={isPending}
                       />

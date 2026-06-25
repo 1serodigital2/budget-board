@@ -1,36 +1,12 @@
-import { QueryClient } from "@tanstack/react-query";
-import {
-  addDoc,
-  doc,
-  collection,
-  serverTimestamp,
-  getDoc,
-  getDocs,
-  deleteDoc,
-  updateDoc,
-  where,
-  query,
-  Timestamp,
-  QueryDocumentSnapshot,
-  orderBy,
-  limit,
-  startAfter,
-  DocumentData,
-} from "firebase/firestore";
-import { db } from "../services/firebase";
+import { supabase } from "../services/supabase";
 import {
   DateRange,
-  ExpenseFormData,
   ExpenseProps,
   GetExpenseDetailsType,
   MonthlyExpenseSummaryResponseType,
 } from "../types/expense";
 import { DateFilter, getMonthRange, getTimeStampFromMonth } from "../utils/helpers";
-
-import { format } from "date-fns";
 import { getBudgets } from "./budget";
-
-export const queryClient = new QueryClient();
 
 interface CreateExpenseProp {
   uid: string;
@@ -44,118 +20,121 @@ export const createExpense = async ({
     if (!uid) {
       throw new Error("Uid is missing");
     }
-    const docRef = await addDoc(collection(db, `users/${uid}/expenses`), {
-      ...expenseDetail,
-      isSystem: false,
-      createdAt: serverTimestamp(),
+    const { error } = await supabase.from("expenses").insert({
+      user_id: uid,
+      amount: expenseDetail.amount,
+      category: expenseDetail.category,
+      date: expenseDetail.date,
+      note: expenseDetail.note,
+      is_system: false,
     });
-    console.log("doc refid", docRef.id);
+    
+    if (error) throw error;
   } catch (error: any) {
-    throw new Error("Unable to add expense" + error);
+    throw new Error("Unable to add expense: " + error.message);
   }
 };
 
 export const getExpenses = async (
   uid: string,
-  category?: string,
+  category?: number,
   dateRange?: DateRange,
-  lastDoc?: QueryDocumentSnapshot<DocumentData> | null,
-  pageSize = 10,
+  pageOffset: number = 0,
+  pageSize: number = 10,
 ) => {
-  const collectionRef = collection(db, `users/${uid}/expenses`);
-
-  const constraints = [];
+  let query = supabase.from("expenses").select("*").eq("user_id", uid);
 
   if (category) {
-    constraints.push(where("category", "==", category));
+    query = query.eq("category", category);
   }
 
   if (dateRange?.start && !dateRange?.end) {
-    constraints.push(where("date", "==", dateRange.start));
+    query = query.eq("date", dateRange.start.toISOString());
   } else if (dateRange?.start && dateRange?.end) {
-    constraints.push(where("date", ">=", dateRange.start));
-    constraints.push(where("date", "<=", dateRange.end));
+    query = query.gte("date", dateRange.start.toISOString());
+    query = query.lte("date", dateRange.end.toISOString());
   }
 
-  constraints.push(orderBy("date", "desc"));
+  query = query.order("date", { ascending: false });
 
-  if (lastDoc) {
-    constraints.push(startAfter(lastDoc));
+  // PostgREST pagination (inclusive)
+  query = query.range(pageOffset, pageOffset + pageSize - 1);
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw error;
   }
 
-  constraints.push(limit(pageSize));
-
-  const q = query(collectionRef, ...constraints);
-
-  const snapshot = await getDocs(q);
-
-  const expensesData = snapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      amount: data.amount,
-      category: data.category,
-      note: data.note,
-      date: data.date,
-      createdAt: data.createdAt,
-    };
-  });
+  const expensesData = (data || []).map((doc: any) => ({
+    id: doc.id,
+    amount: doc.amount,
+    category: doc.category,
+    note: doc.note,
+    date: doc.date,
+    createdAt: doc.created_at,
+  }));
 
   return {
     expenses: expensesData,
-    lastVisible: snapshot.docs[snapshot.docs.length - 1],
-    hasMore: snapshot.docs.length === pageSize,
+    lastVisible: data && data.length === pageSize ? pageOffset + data.length : null,
+    hasMore: data && data.length === pageSize,
   };
 };
+
 interface deleteExpenseType {
-  id: string;
+  id: number;
   uid: string;
 }
 export const deleteExpense = async ({ id, uid }: deleteExpenseType) => {
-  console.log("deleteExpense request expense id", id);
-  console.log("deleteExpense request user id", uid);
-
   try {
-    const response = await deleteDoc(doc(db, `users/${uid}/expenses`, id));
-    console.log("delete expense resposne", response);
+    const { error } = await supabase
+      .from("expenses")
+      .delete()
+      .eq("user_id", uid)
+      .eq("id", id);
+      
+    if (error) throw error;
   } catch (error: any) {
-    console.error("Unablet to delete expense", error);
-    throw new Error("Unable to delete expense" + error);
+    console.error("Unable to delete expense", error);
+    throw new Error("Unable to delete expense: " + error.message);
   }
 };
 
 interface GetExpenseByIdType {
   uid?: string;
-  id: string;
+  id: number;
 }
 
 export const getExpenseById = async ({ uid, id }: GetExpenseByIdType) => {
-  console.log("getExpense uid", uid);
-  console.log("getExpense id", id);
   try {
-    const docSnap = await getDoc(doc(db, `users/${uid}/expenses`, id));
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      const expenseData = {
+    const { data, error } = await supabase
+      .from("expenses")
+      .select("*")
+      .eq("user_id", uid)
+      .eq("id", id)
+      .single();
+      
+    if (error) throw error;
+
+    if (data) {
+      return {
         id,
         amount: data.amount,
         category: data.category,
         date: data.date || "",
         note: data.note,
-        createdAt: data.createdAt || "",
+        createdAt: data.created_at || "",
       };
-
-      console.log("expenseData", expenseData);
-      return expenseData;
     }
   } catch (error: any) {
     console.error("Unable to get expense detail", error);
-    throw new Error("Unable to get expense detail" + error);
+    throw new Error("Unable to get expense detail: " + error.message);
   }
 };
 
 interface UpdateExpenseData {
-  expId: string;
+  expId: number;
   expenseDetail: ExpenseProps;
   uid: string;
 }
@@ -165,17 +144,22 @@ export const updateExpense = async ({
   expenseDetail,
 }: UpdateExpenseData) => {
   try {
-    const eventRef = doc(db, `users/${uid}/expenses`, expId);
+    const { error } = await supabase
+      .from("expenses")
+      .update({
+        amount: expenseDetail.amount,
+        category: expenseDetail.category,
+        date: expenseDetail.date,
+        note: expenseDetail.note,
+      })
+      .eq("user_id", uid)
+      .eq("id", expId);
 
-    await updateDoc(eventRef, {
-      ...expenseDetail,
-      createdAt: serverTimestamp(),
-    });
-
+    if (error) throw error;
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("unable to update expense", error);
-    throw new Error("Error while updating expense " + error);
+    throw new Error("Error while updating expense " + error.message);
   }
 };
 
@@ -189,33 +173,27 @@ export const getExpensesMonthYear = async ({
   try {
     const { startDate, endDate } = getTimeStampFromMonth(monthYear);
 
-    const expensesRef = collection(db, `users/${uid}/expenses`);
-    const q = query(
-      expensesRef,
-      where("date", ">=", startDate),
-      where("date", "<", endDate),
-    );
+    const { data, error } = await supabase
+      .from("expenses")
+      .select("*")
+      .eq("user_id", uid)
+      .gte("date", startDate.toISOString())
+      .lt("date", endDate.toISOString());
 
-    const expensesSnap = await getDocs(q);
-    if (expensesSnap.docs.length <= 0) {
+    if (error) throw error;
+
+    if (!data || data.length <= 0) {
       return [];
     }
-    const expensesData = expensesSnap.docs.map((doc) => {
-      const data = doc.data();
-
-      return {
-        id: doc.id,
-        amount: data.amount,
-        category: data.category,
-        date: data.date.toDate(),
-      };
-    });
-
-    // console.log("getExpensesMonthYear", expensesData);
-
-    return expensesData;
-  } catch (error) {
-    throw new Error("Unable to get expense for month year " + error);
+    
+    return data.map((doc: any) => ({
+      id: doc.id,
+      amount: doc.amount,
+      category: doc.category,
+      date: new Date(doc.date),
+    }));
+  } catch (error: any) {
+    throw new Error("Unable to get expense for month year " + error.message);
   }
 };
 
@@ -225,19 +203,22 @@ export const getMonthlyExpenses = async (
 ): Promise<MonthlyExpenseSummaryResponseType[]> => {
   const range = getMonthRange(filter);
 
-  const expenseQuery =
-    filter === "all-time"
-      ? query(collection(db, `users/${uid}/expenses`))
-      : query(
-          collection(db, `users/${uid}/expenses`),
-          where("date", ">=", Timestamp.fromDate(range?.startMonth)),
-          where("date", "<", Timestamp.fromDate(range?.endMonth)),
-        );
+  let query = supabase.from("expenses").select("*").eq("user_id", uid);
+  
+  if (filter !== "all-time" && range) {
+    const { startDate } = getTimeStampFromMonth(range.startMonth);
+    const { endDate } = getTimeStampFromMonth(range.endMonth);
+    query = query
+      .gte("date", startDate.toISOString())
+      .lt("date", endDate.toISOString());
+  }
 
-  const [expensesSnap, budgets] = await Promise.all([
-    getDocs(expenseQuery),
-    getBudgets(uid, filter),
-  ]);
+  const expensesRes = await query;
+  const budgets = await getBudgets(uid, filter);
+
+  if (expensesRes.error) {
+    throw expensesRes.error;
+  }
 
   const monthlyData: Record<
     string,
@@ -251,9 +232,7 @@ export const getMonthlyExpenses = async (
   // Budgets
   budgets.forEach((budget) => {
     const [year, month] = budget.month.split("-").map(Number);
-
     const date = new Date(year, month - 1, 1);
-
     const monthKey = date.toLocaleString("en-US", {
       month: "short",
       year: "numeric",
@@ -271,11 +250,8 @@ export const getMonthlyExpenses = async (
   });
 
   // Expenses
-  expensesSnap.forEach((doc) => {
-    const expense = doc.data();
-
-    const date = expense.date.toDate();
-
+  (expensesRes.data || []).forEach((expense: any) => {
+    const date = new Date(expense.date);
     const monthKey = date.toLocaleString("en-US", {
       month: "short",
       year: "numeric",

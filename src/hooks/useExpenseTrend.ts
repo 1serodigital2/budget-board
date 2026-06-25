@@ -9,7 +9,7 @@ const useEpxenseTrend = () => {
   const useMonthlyExpenseTrend = (month: DateFilter) => {
     return useQuery({
       queryKey: ["monthtlyExpenses", month],
-      queryFn: () => getMonthlyExpenses(user!.uid, month),
+      queryFn: () => getMonthlyExpenses(user!.id, month),
     });
   };
 

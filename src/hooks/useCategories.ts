@@ -8,15 +8,15 @@ export const useCategories = () => {
   const useGetCategories = () => {
     return useQuery({
       queryKey: ["categories"],
-      queryFn: () => getCategories(user!.uid),
-      enabled: !!user?.uid,
+      queryFn: () => getCategories(user!.id),
+      enabled: !!user?.id,
     });
   };
 
   const useCategoriesQuery = () => {
     return useQuery({
       queryKey: ["categories"],
-      queryFn: () => getCategories(user!.uid),
+      queryFn: () => getCategories(user!.id),
     });
   };
 

@@ -21,8 +21,8 @@ const CategoryBudgetProgress = ({
     error,
   } = useQuery({
     queryKey: ["categories"],
-    queryFn: () => getCategories(user!.uid),
-    enabled: !!user!.uid,
+    queryFn: () => getCategories(user!.id),
+    enabled: !!user!.id,
   });
 
   const { useGetBudgetMonthYear } = useBudget();

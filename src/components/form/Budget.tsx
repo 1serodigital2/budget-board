@@ -31,7 +31,7 @@ const BudgetForm = ({
             name="category"
             data={data || []}
             getOptionLabel={(category) => category.name}
-            getOptionValue={(category) => category.id}
+            getOptionValue={(category) => category.id.toString()}
             required
             handleInputChange={handleInputChange}
             inputValues={inputValue.category}
