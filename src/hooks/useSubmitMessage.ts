@@ -9,9 +9,9 @@ const useSubmitMessage = () => {
   const showSubmitMessage = (message: string, type?: "success" | "error") => {
     setSubmitMessage({ message, type });
 
-    setTimeout(() => {
-      setSubmitMessage({ message: "" });
-    }, 3000);
+    // setTimeout(() => {
+    //   setSubmitMessage({ message: "" });
+    // }, 3000);
   };
 
   return { showSubmitMessage, submitMessage };

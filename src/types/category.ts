@@ -1,7 +1,7 @@
 import { AlertProps } from "./FormTypes";
 
 export interface CategoryFormType {
-  category: string;
+  name: string;
   color: string;
 }
 

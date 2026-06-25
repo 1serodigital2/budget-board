@@ -11,7 +11,7 @@ export const addCategory = async ({
   categoryDetail,
 }: AddCategoryType) => {
   try {
-    const normalized_name = categoryDetail.category.trim().toLowerCase();
+    const normalized_name = categoryDetail.name.trim().toLowerCase();
     const slug = normalized_name.replace(/\s+/g, "-");
 
     // Check if category exists
@@ -27,7 +27,7 @@ export const addCategory = async ({
 
     const { error } = await supabase.from("categories").insert({
       user_id: userId,
-      category: categoryDetail.category,
+      name: categoryDetail.name,
       color: categoryDetail.color,
       normalized_name,
       slug,
@@ -42,12 +42,14 @@ export const addCategory = async ({
   }
 };
 
-export const getCategories = async (userId: string): Promise<CategoryProps[]> => {
+export const getCategories = async (
+  userId: string,
+): Promise<CategoryProps[]> => {
   try {
     if (!userId) {
       throw new Error("User id is required");
     }
-    
+
     const { data, error } = await supabase
       .from("categories")
       .select("*")
@@ -83,7 +85,7 @@ export const getCategoryById = async ({
     if (!categoryId) {
       throw new Error("Missing category id");
     }
-    
+
     const { data, error } = await supabase
       .from("categories")
       .select("*")
@@ -160,13 +162,13 @@ export const updateCategory = async ({
   categoryDetail,
 }: UpdateCategoryType) => {
   try {
-    const normalized_name = categoryDetail.category.trim().toLowerCase();
+    const normalized_name = categoryDetail.name.trim().toLowerCase();
     const slug = normalized_name.replace(/\s+/g, "-");
 
     const { error } = await supabase
       .from("categories")
       .update({
-        category: categoryDetail.category,
+        category: categoryDetail.name,
         color: categoryDetail.color,
         normalized_name,
         slug,
@@ -206,8 +208,10 @@ export const createDefaultCategories = async (uid: string) => {
       },
     ];
 
-    const { error } = await supabase.from("categories").insert(defaultCategories);
-    
+    const { error } = await supabase
+      .from("categories")
+      .insert(defaultCategories);
+
     if (error) {
       throw error;
     }

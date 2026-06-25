@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CategoryFormType, HandleInputChangeType } from "../types/category";
 
 const defaultValues: CategoryFormType = {
-  category: "",
+  name: "",
   color: "",
 };
 
@@ -26,7 +26,7 @@ const useCategoryForm = (initialValues = defaultValues) => {
   const getCategoryDetail = () => {
     console.log("getCategoryDetail", inputValues);
     return {
-      category: inputValues.category,
+      category: inputValues.name,
       color: inputValues.color,
     };
   };
