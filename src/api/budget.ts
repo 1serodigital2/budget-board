@@ -49,11 +49,19 @@ export const getBudgets = async (uid: string, filter?: DateFilter) => {
   try {
     const categories = await getCategories(uid);
 
-    let query = supabase.from("budgets").select("*").eq("user_id", uid);
+    let query = supabase
+      .from("budgets")
+      .select("*")
+      .eq("user_id", uid)
+      .order("month", { ascending: false });
 
     if (filter && filter !== "all-time") {
       const range = getMonthRange(filter);
-      if (range) { query = query.gte("month", range.startMonth).lte("month", range.endMonth); }
+      if (range) {
+        query = query
+          .gte("month", range.startMonth)
+          .lte("month", range.endMonth);
+      }
     }
 
     const { data, error } = await query;
@@ -116,7 +124,7 @@ export const deleteBudgetById = async ({
       .delete()
       .eq("user_id", uid)
       .eq("id", budgetId);
-      
+
     if (error) throw error;
   } catch (error: any) {
     throw new Error("Fatal error while deleting budget" + error.message);

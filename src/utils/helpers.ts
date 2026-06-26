@@ -110,3 +110,14 @@ export const formatMonth = (date: Date) => {
     date.getMonth() + 1,
   ).padStart(2, "0")}`;
 };
+
+export const formatInDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+// Usage
+// formatDate("2026-06-24T14:03:27.669Z") // → "24-06-2026"

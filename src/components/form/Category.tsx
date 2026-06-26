@@ -21,10 +21,10 @@ const Category = ({
       >
         <div className="mb-2">
           <Input
-            name="category"
+            name="name"
             label="Category"
             handleInputChange={handleInputChange}
-            inputValues={inputValues.category || ""}
+            inputValues={inputValues.name || ""}
           />
         </div>
         <div className="flex justify-between">

@@ -14,6 +14,8 @@ const BudgetForm = ({
   const { useGetCategories } = useCategories();
   const { data, isError, error } = useGetCategories();
 
+  console.log("budget input value", inputValue);
+
   if (isError) {
     return (
       <Alert

@@ -35,7 +35,7 @@ const EditBudgetPage = () => {
       const budgetData = {
         category: data.category,
         amount: data.amount,
-        month: data.month,
+        month: data.month.slice(0, 7),
       };
       setInputValue(budgetData);
     }

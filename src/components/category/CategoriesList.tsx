@@ -10,6 +10,7 @@ import Alert from "../ui/Alert";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
 
 import MyButton from "../form/MyButton";
+import { formatInDate } from "../../utils/helpers";
 
 const CategoriesList = () => {
   const { user } = useAuth();
@@ -98,7 +99,7 @@ const CategoriesList = () => {
                 <TableBodyData
                   item={
                     category.createdAt
-                      ? new Date(category.createdAt).toLocaleDateString()
+                      ? formatInDate(category.createdAt)
                       : "No date"
                   }
                 />

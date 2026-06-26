@@ -43,7 +43,7 @@ const EditCategoryPage = () => {
   useEffect(() => {
     if (data) {
       const catData = {
-        category: data.category,
+        name: data.name,
         color: data.color,
       };
       setInputValues(catData);
@@ -68,7 +68,7 @@ const EditCategoryPage = () => {
     try {
       const categoryDetail = getCategoryDetail();
       if (
-        !categoryDetail.category ||
+        !categoryDetail.name ||
         !categoryDetail.color ||
         !params.id ||
         !user?.id

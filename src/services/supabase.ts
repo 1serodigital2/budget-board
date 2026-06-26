@@ -7,3 +7,8 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 export const queryClient = new QueryClient();
+
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+console.log("session:", session);

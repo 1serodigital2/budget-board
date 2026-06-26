@@ -45,6 +45,8 @@ export const addCategory = async ({
 export const getCategories = async (
   userId: string,
 ): Promise<CategoryProps[]> => {
+  console.log("getCategories triggered", userId);
+  console.log("userId type:", typeof userId, "value:", JSON.stringify(userId));
   try {
     if (!userId) {
       throw new Error("User id is required");
@@ -54,7 +56,9 @@ export const getCategories = async (
       .from("categories")
       .select("*")
       .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+      .order("name", { ascending: true });
+
+      console.log("cat data", data)
 
     if (error) {
       throw error;
@@ -62,7 +66,7 @@ export const getCategories = async (
 
     return (data || []).map((cat: any) => ({
       id: cat.id,
-      name: cat.category,
+      name: cat.name,
       color: cat.color,
       createdAt: cat.created_at,
       isSystem: cat.is_system || false,
@@ -100,7 +104,7 @@ export const getCategoryById = async ({
     if (data) {
       return {
         id: data.id,
-        category: data.category,
+        name: data.name,
         color: data.color,
         createdAt: data.created_at,
       };
@@ -168,7 +172,7 @@ export const updateCategory = async ({
     const { error } = await supabase
       .from("categories")
       .update({
-        category: categoryDetail.name,
+        name: categoryDetail.name,
         color: categoryDetail.color,
         normalized_name,
         slug,

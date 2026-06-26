@@ -37,7 +37,7 @@ const CategoryPage = () => {
   return (
     <>
       <H1>Category detail</H1>
-      <div>Category name: {data.category}</div>
+      <div>Category name: {data.name}</div>
       <div>Color: {data.color}</div>
       <div>
         Creation date:{" "}
