@@ -45,7 +45,7 @@ export const addCategory = async ({
 export const getCategories = async (
   userId: string,
 ): Promise<CategoryProps[]> => {
-  console.log("getCategories triggered", userId);
+  // console.log("getCategories triggered", userId);
   console.log("userId type:", typeof userId, "value:", JSON.stringify(userId));
   try {
     if (!userId) {
@@ -58,7 +58,7 @@ export const getCategories = async (
       .eq("user_id", userId)
       .order("name", { ascending: true });
 
-      console.log("cat data", data)
+    console.log("cat data", data);
 
     if (error) {
       throw error;

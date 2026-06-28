@@ -19,12 +19,16 @@ export const getCurrentMonth = (date = new Date()) => {
 
 export const getTimeStampFromMonth = (monthYear: string) => {
   const [yearStr, monthStr] = monthYear.split("-");
+  console.log();
 
   const year = parseInt(yearStr, 10);
   const month = parseInt(monthStr, 10) - 1;
 
   const startDate = new Date(year, month, 1);
   const endDate = new Date(year, month + 1, 1);
+
+  console.log("[getTimeStampFromMonth] startDate", startDate);
+  console.log("[getTimeStampFromMonth] endDate", endDate);
 
   return {
     startDate,
@@ -104,11 +108,11 @@ export const getMonthRange = (filter: DateFilter) => {
   }
 };
 
-
 export const formatMonth = (date: Date) => {
-  return `${date.getFullYear()}-${String(
-    date.getMonth() + 1,
-  ).padStart(2, "0")}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0",
+  )}`;
 };
 
 export const formatInDate = (dateString: string) => {

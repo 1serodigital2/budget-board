@@ -35,7 +35,9 @@ const BudgetOverview = () => {
     data: expenses,
     isError: expensesIsError,
     error: expensesError,
-  } = useGetExpenseMonthYear(monthFilter);
+  } = useGetExpenseMonthYear(monthFilter + "-01");
+
+  console.log("[BudgetOverview] Debug budgets", budgets);
 
   const {
     budgetData: budgetTable,
@@ -75,6 +77,8 @@ const BudgetOverview = () => {
     try {
       e.preventDefault();
       const date = inputValue.budgetMonth.toString();
+      console.log("[BudgetOverview] handleFormSubmit date", date);
+
       setMonthFilter(date);
     } catch (error) {}
   };

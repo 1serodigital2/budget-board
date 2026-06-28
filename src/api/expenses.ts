@@ -5,7 +5,11 @@ import {
   GetExpenseDetailsType,
   MonthlyExpenseSummaryResponseType,
 } from "../types/expense";
-import { DateFilter, getMonthRange, getTimeStampFromMonth } from "../utils/helpers";
+import {
+  DateFilter,
+  getMonthRange,
+  getTimeStampFromMonth,
+} from "../utils/helpers";
 import { getBudgets } from "./budget";
 
 interface CreateExpenseProp {
@@ -28,7 +32,7 @@ export const createExpense = async ({
       note: expenseDetail.note,
       is_system: false,
     });
-    
+
     if (error) throw error;
   } catch (error: any) {
     throw new Error("Unable to add expense: " + error.message);
@@ -77,7 +81,8 @@ export const getExpenses = async (
 
   return {
     expenses: expensesData,
-    lastVisible: data && data.length === pageSize ? pageOffset + data.length : null,
+    lastVisible:
+      data && data.length === pageSize ? pageOffset + data.length : null,
     hasMore: data && data.length === pageSize,
   };
 };
@@ -93,7 +98,7 @@ export const deleteExpense = async ({ id, uid }: deleteExpenseType) => {
       .delete()
       .eq("user_id", uid)
       .eq("id", id);
-      
+
     if (error) throw error;
   } catch (error: any) {
     console.error("Unable to delete expense", error);
@@ -114,7 +119,7 @@ export const getExpenseById = async ({ uid, id }: GetExpenseByIdType) => {
       .eq("user_id", uid)
       .eq("id", id)
       .single();
-      
+
     if (error) throw error;
 
     if (data) {
@@ -180,12 +185,14 @@ export const getExpensesMonthYear = async ({
       .gte("date", startDate.toISOString())
       .lt("date", endDate.toISOString());
 
+    console.log("[getExpenseMonthYear] ", data);
+
     if (error) throw error;
 
     if (!data || data.length <= 0) {
       return [];
     }
-    
+
     return data.map((doc: any) => ({
       id: doc.id,
       amount: doc.amount,
@@ -204,7 +211,7 @@ export const getMonthlyExpenses = async (
   const range = getMonthRange(filter);
 
   let query = supabase.from("expenses").select("*").eq("user_id", uid);
-  
+
   if (filter !== "all-time" && range) {
     const { startDate } = getTimeStampFromMonth(range.startMonth);
     const { endDate } = getTimeStampFromMonth(range.endMonth);
@@ -261,11 +268,7 @@ export const getMonthlyExpenses = async (
       monthlyData[monthKey] = {
         expense: 0,
         budget: 0,
-        sortDate: new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          1,
-        ),
+        sortDate: new Date(date.getFullYear(), date.getMonth(), 1),
       };
     }
 
@@ -273,10 +276,7 @@ export const getMonthlyExpenses = async (
   });
 
   return Object.entries(monthlyData)
-    .sort(
-      ([, a], [, b]) =>
-        a.sortDate.getTime() - b.sortDate.getTime(),
-    )
+    .sort(([, a], [, b]) => a.sortDate.getTime() - b.sortDate.getTime())
     .map(([month, data]) => ({
       month,
       expense: data.expense,

@@ -58,7 +58,8 @@ const useBudget = () => {
   const getBudget = (budgetId: string) => {
     return useQuery({
       queryKey: ["budgets", budgetId],
-      queryFn: () => getBudgetById({ uid: user?.id!, budgetId: Number(budgetId) }),
+      queryFn: () =>
+        getBudgetById({ uid: user?.id!, budgetId: Number(budgetId) }),
       enabled: !!budgetId && !!user?.id,
     });
   };
@@ -82,7 +83,11 @@ const useBudget = () => {
   const useBudgetUpdate = (budgetId: string) => {
     return useMutation({
       mutationFn: (budgetDetail: BudgetInputType) =>
-        updateBudget({ uid: user?.id!, budgetId: Number(budgetId), budgetDetail }),
+        updateBudget({
+          uid: user?.id!,
+          budgetId: Number(budgetId),
+          budgetDetail,
+        }),
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: ["budgets", budgetId],
@@ -96,11 +101,12 @@ const useBudget = () => {
   };
 
   const useGetBudgetMonthYear = (monthYear: string) => {
+    const month = monthYear + "-01";
     return useQuery({
-      queryKey: ["budgets", monthYear],
+      queryKey: ["budgets", month],
       queryFn: () =>
         getBudgetMonthYear({
-          monthYear,
+          monthYear: month,
           uid: user!.id,
         }),
       enabled: !!user?.id,
@@ -113,6 +119,10 @@ const useBudget = () => {
     categories,
     limit = undefined,
   }: BudgetTableTypes): BudgetTableResponseTypes | undefined => {
+    console.log("[useGetBudgetTable] Debug budgets", budgets);
+    console.log("[useGetBudgetTable] Debug expenses", expenses);
+    console.log("[useGetBudgetTable] Debug categories", categories);
+
     if (!budgets || !expenses || !categories) return undefined;
 
     let totalSpent = 0;

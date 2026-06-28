@@ -22,6 +22,7 @@ export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
       .select("id")
       .eq("user_id", uid)
       .eq("slug", finalDocid)
+      .eq("month", budgetDetail.month + "-01")
       .single();
 
     if (duplicateBudget) {
@@ -33,7 +34,7 @@ export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
       user_id: uid,
       amount: budgetDetail.amount,
       category: budgetDetail.category,
-      month: budgetDetail.month,
+      month: budgetDetail.month + "-01",
       slug: finalDocid,
     });
 
@@ -65,6 +66,8 @@ export const getBudgets = async (uid: string, filter?: DateFilter) => {
     }
 
     const { data, error } = await query;
+
+    console.log("[getBudgets] Debug budgets", data);
 
     if (error) {
       throw error;
@@ -167,7 +170,7 @@ export const updateBudget = async ({
     const isDuplicate = existingBudgets.some(
       (budget) =>
         budget.category === budgetDetail.category &&
-        budget.month === budgetDetail.month,
+        budget.month == budgetDetail.month + "-01",
     );
 
     if (isDuplicate) {
@@ -184,7 +187,7 @@ export const updateBudget = async ({
       .update({
         amount: budgetDetail.amount,
         category: budgetDetail.category,
-        month: budgetDetail.month,
+        month: budgetDetail.month + "-01",
         slug: budgetSlug,
       })
       .eq("user_id", uid)
@@ -212,12 +215,15 @@ export const getBudgetMonthYear = async ({
   uid: string;
 }): Promise<GetBudgetDetailsTypes[]> => {
   try {
+    console.log("[getBudgetMonthYear] budget monthYear", monthYear);
+
     const { data, error } = await supabase
       .from("budgets")
       .select("*")
       .eq("user_id", uid)
       .eq("month", monthYear);
 
+    console.log("[getBudgetMonthYear] budget data", data);
     if (error) throw error;
 
     return (data || []).map((budget: any) => ({

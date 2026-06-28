@@ -34,8 +34,8 @@ const AddExpense = () => {
       });
     },
 
-    onError: () => {
-      console.error("Unable to add expense");
+    onError: (error) => {
+      console.error("Unable to add expense", error);
       showSubmitMessage("Unable to add expense", "error");
     },
   });
