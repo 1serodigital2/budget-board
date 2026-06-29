@@ -7,7 +7,12 @@ import {
   UpdateBudgetType,
 } from "../types/budget";
 import { getCategories } from "./category";
-import { DateFilter, formatMonth, getMonthRange } from "../utils/helpers";
+import {
+  addDateInMonth,
+  DateFilter,
+  formatMonth,
+  getMonthRange,
+} from "../utils/helpers";
 
 export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
   try {
@@ -22,7 +27,7 @@ export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
       .select("id")
       .eq("user_id", uid)
       .eq("slug", finalDocid)
-      .eq("month", budgetDetail.month + "-01")
+      .eq("month", addDateInMonth(budgetDetail.month, "-01"))
       .single();
 
     if (duplicateBudget) {
@@ -48,6 +53,8 @@ export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
 
 export const getBudgets = async (uid: string, filter?: DateFilter) => {
   try {
+    console.log("[getBudgets] filter", filter);
+
     const categories = await getCategories(uid);
 
     let query = supabase
@@ -60,8 +67,8 @@ export const getBudgets = async (uid: string, filter?: DateFilter) => {
       const range = getMonthRange(filter);
       if (range) {
         query = query
-          .gte("month", range.startMonth)
-          .lte("month", range.endMonth);
+          .gte("month", range.startDate)
+          .lte("month", range.endDate);
       }
     }
 

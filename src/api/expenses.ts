@@ -52,11 +52,11 @@ export const getExpenses = async (
     query = query.eq("category", category);
   }
 
-  if (dateRange?.start && !dateRange?.end) {
-    query = query.eq("date", dateRange.start.toISOString());
-  } else if (dateRange?.start && dateRange?.end) {
-    query = query.gte("date", dateRange.start.toISOString());
-    query = query.lte("date", dateRange.end.toISOString());
+  if (dateRange?.startDate && !dateRange?.endDate) {
+    query = query.eq("date", dateRange.startDate.toISOString());
+  } else if (dateRange?.startDate && dateRange?.endDate) {
+    query = query.gte("date", dateRange.startDate.toISOString());
+    query = query.lte("date", dateRange.endDate.toISOString());
   }
 
   query = query.order("date", { ascending: false });
@@ -218,12 +218,19 @@ export const getMonthlyExpenses = async (
   let query = supabase.from("expenses").select("*").eq("user_id", uid);
 
   if (filter !== "all-time" && range) {
-    const { startDate } = getTimeStampFromMonth(range.startMonth);
-    const { endDate } = getTimeStampFromMonth(range.endMonth);
+    const { startDate } = getTimeStampFromMonth(range.startDate);
+    const { endDate } = getTimeStampFromMonth(range.endDate);
+
+    console.log("[getMonthlyExpenses] startDate", startDate);
+    console.log("[getMonthlyExpenses] endDate", endDate);
+
     query = query.gte("date", startDate).lt("date", endDate);
   }
 
   const expensesRes = await query;
+
+  console.log("[getMonthlyExpenses] expensesRes", expensesRes);
+
   const budgets = await getBudgets(uid, filter);
 
   if (expensesRes.error) {

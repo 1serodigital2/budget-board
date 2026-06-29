@@ -36,8 +36,8 @@ const ExpenseFilter = ({
         />
         <Submit isPending={isPending} />
         {(filter.category !== 0 ||
-          (filter.dateRange?.start instanceof Date &&
-            filter.dateRange?.end instanceof Date)) && (
+          (filter.dateRange?.startDate instanceof Date &&
+            filter.dateRange?.endDate instanceof Date)) && (
           <Submit type="reset" isPending={isPending} />
         )}
       </div>

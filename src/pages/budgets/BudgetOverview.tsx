@@ -7,7 +7,11 @@ import TableBodyData from "../../components/ui/TableBodyData";
 import useBudget from "../../hooks/useBudget";
 import { useCategories } from "../../hooks/useCategories";
 import useExpenses from "../../hooks/useExpenses";
-import { getCurrentMonth, moneyFormat } from "../../utils/helpers";
+import {
+  addDateInMonth,
+  getCurrentMonth,
+  moneyFormat,
+} from "../../utils/helpers";
 import Input from "../../components/Input";
 import { HandleInputChangeType } from "../../types/category";
 import Submit from "../../components/form/Submit";
@@ -16,11 +20,15 @@ import { NavLink } from "react-router-dom";
 import CategoryWiseBudget from "../../components/budget/CategoryWiseBudget";
 import MyForm from "../../components/form/Form";
 
-const currentMntYr = getCurrentMonth() + "-01";
+const currentMntYr = getCurrentMonth();
 
 const BudgetOverview = () => {
   const [monthFilter, setMonthFilter] = useState(currentMntYr);
-  const [inputValue, setInputValue] = useState({ budgetMonth: monthFilter });
+  const [inputValue, setInputValue] = useState({
+    budgetMonth: monthFilter.slice(0, 7),
+  });
+  console.log("setInputValue", inputValue);
+
   const { useGetBudgetMonthYear, useGetBudgetTable } = useBudget();
 
   const { showSubmitMessage, submitMessage } = useSubmitMessage();
@@ -76,8 +84,7 @@ const BudgetOverview = () => {
   const handleFormSubmit = (e: React.SyntheticEvent) => {
     try {
       e.preventDefault();
-      const date = inputValue.budgetMonth.toString();
-      console.log("[BudgetOverview] handleFormSubmit date", date);
+      const date = addDateInMonth(inputValue.budgetMonth).toString();
 
       setMonthFilter(date);
     } catch (error) {}

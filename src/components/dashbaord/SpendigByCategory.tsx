@@ -2,9 +2,10 @@ import { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import useExpenses from "../../hooks/useExpenses";
 import { useCategories } from "../../hooks/useCategories";
+import { getCurrentMonth } from "../../utils/helpers";
 
 export default function SpendingByCategory() {
-  const currentMonth = new Date().toISOString().slice(0, 7);
+  const currentMonth = getCurrentMonth();
   const { useGetExpenseMonthYear } = useExpenses();
   const { data: expenseData } = useGetExpenseMonthYear(currentMonth);
 

@@ -13,12 +13,7 @@ import useSubmitMessage from "../../hooks/useSubmitMessage";
 import { HandleInputChangeType } from "../../types/category";
 import { useEffect, useState } from "react";
 import ExpenseFilter from "./ExpenseFilter";
-import {
-  DateRange,
-  ExpenseProps,
-  ExpensesDetailTyps,
-  FilterProps,
-} from "../../types/expense";
+import { DateRange, FilterProps } from "../../types/expense";
 import {
   formatDate,
   getTimeStampFromMonth,
@@ -34,9 +29,9 @@ const ExpenseList = () => {
   const initialDateRange: DateRange = month
     ? (() => {
         const { startDate, endDate } = getTimeStampFromMonth(month);
-        return { start: startDate, end: endDate };
+        return { startDate: new Date(startDate), endDate: new Date(endDate) };
       })()
-    : { start: null, end: null };
+    : { startDate: null, endDate: null };
 
   const initialFilter = {
     category: 0,
@@ -61,7 +56,8 @@ const ExpenseList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useGetExpensesQuery({
-    category: appliedFilter.category === 0 ? undefined : Number(appliedFilter.category),
+    category:
+      appliedFilter.category === 0 ? undefined : Number(appliedFilter.category),
     dateRange: appliedFilter.dateRange,
   });
 
@@ -221,7 +217,10 @@ const ExpenseList = () => {
                   />
                   <TableBodyData>
                     <div className="flex gap-1 items-center">
-                      <MyButton btnType="view" btnSlug={expense.id.toString()} />
+                      <MyButton
+                        btnType="view"
+                        btnSlug={expense.id.toString()}
+                      />
                       <MyButton btnType="edit" btnSlug={`${expense.id}/edit`} />
                       <MyButton
                         btnType="delete"

@@ -11,10 +11,12 @@ export const formatDate = (date: Date) => {
   return date.toLocaleDateString("en-IN").replace(/\//g, "-");
 };
 export const getCurrentMonth = (date = new Date()) => {
+  console.log("[getCurrentMonth] date", date);
+
   const year = date.getFullYear();
   const month = ("0" + (date.getMonth() + 1)).slice(-2);
 
-  return `${year}-${month}`;
+  return `${year}-${month}-01`;
 };
 
 export const getTimeStampFromMonth = (monthDate: string) => {
@@ -54,51 +56,49 @@ export type DateFilter =
 export const getMonthRange = (filter: DateFilter) => {
   const now = new Date();
 
+  const formatMonthDate = (date: Date) => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0",
+    )}-01`;
+  };
+
   switch (filter) {
     case "current-month": {
-      const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-        2,
-        "0",
-      )}`;
+      const date = new Date(now.getFullYear(), now.getMonth(), 1);
 
-      return { startMonth: month, endMonth: month };
+      return {
+        startDate: formatMonthDate(date),
+        endDate: formatMonthDate(date),
+      };
     }
 
     case "last-month": {
-      const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const date = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-      const month = `${prev.getFullYear()}-${String(
-        prev.getMonth() + 1,
-      ).padStart(2, "0")}`;
-
-      return { startMonth: month, endMonth: month };
+      return {
+        startDate: formatMonthDate(date),
+        endDate: formatMonthDate(date),
+      };
     }
 
     case "last-6-months": {
       const start = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+      const end = new Date(now.getFullYear(), now.getMonth(), 1);
 
       return {
-        startMonth: `${start.getFullYear()}-${String(
-          start.getMonth() + 1,
-        ).padStart(2, "0")}`,
-        endMonth: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-          2,
-          "0",
-        )}`,
+        startDate: formatMonthDate(start),
+        endDate: formatMonthDate(end),
       };
     }
 
     case "last-1-year": {
       const start = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth(), 1);
 
       return {
-        startMonth: `${start.getFullYear()}-${String(
-          start.getMonth() + 1,
-        ).padStart(2, "0")}`,
-        endMonth: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-          2,
-          "0",
-        )}`,
+        startDate: formatMonthDate(start),
+        endDate: formatMonthDate(end),
       };
     }
   }
@@ -121,3 +121,13 @@ export const formatInDate = (dateString: string) => {
 
 // Usage
 // formatDate("2026-06-24T14:03:27.669Z") // → "24-06-2026"
+
+export const addDateInMonth = (month: string, date?: string) => {
+  if (!date) {
+    date = "-01";
+  }
+  if (date) {
+    return month + date;
+  }
+  return month;
+};

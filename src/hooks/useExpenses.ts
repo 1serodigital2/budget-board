@@ -25,8 +25,8 @@ const useExpenses = () => {
         "expenses",
         user?.id,
         category,
-        dateRange?.start || null,
-        dateRange?.end || null,
+        dateRange?.startDate || null,
+        dateRange?.endDate || null,
       ],
       queryFn: ({ pageParam }) =>
         getExpenses(
