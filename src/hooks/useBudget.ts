@@ -101,12 +101,11 @@ const useBudget = () => {
   };
 
   const useGetBudgetMonthYear = (monthYear: string) => {
-    const month = monthYear + "-01";
     return useQuery({
-      queryKey: ["budgets", month],
+      queryKey: ["budgets", monthYear],
       queryFn: () =>
         getBudgetMonthYear({
-          monthYear: month,
+          monthYear,
           uid: user!.id,
         }),
       enabled: !!user?.id,

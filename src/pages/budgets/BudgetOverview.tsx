@@ -16,7 +16,7 @@ import { NavLink } from "react-router-dom";
 import CategoryWiseBudget from "../../components/budget/CategoryWiseBudget";
 import MyForm from "../../components/form/Form";
 
-const currentMntYr = getCurrentMonth();
+const currentMntYr = getCurrentMonth() + "-01";
 
 const BudgetOverview = () => {
   const [monthFilter, setMonthFilter] = useState(currentMntYr);
@@ -35,7 +35,7 @@ const BudgetOverview = () => {
     data: expenses,
     isError: expensesIsError,
     error: expensesError,
-  } = useGetExpenseMonthYear(monthFilter + "-01");
+  } = useGetExpenseMonthYear(monthFilter);
 
   console.log("[BudgetOverview] Debug budgets", budgets);
 

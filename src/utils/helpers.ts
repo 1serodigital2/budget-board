@@ -17,18 +17,14 @@ export const getCurrentMonth = (date = new Date()) => {
   return `${year}-${month}`;
 };
 
-export const getTimeStampFromMonth = (monthYear: string) => {
-  const [yearStr, monthStr] = monthYear.split("-");
-  console.log();
+export const getTimeStampFromMonth = (monthDate: string) => {
+  const date = new Date(monthDate);
 
-  const year = parseInt(yearStr, 10);
-  const month = parseInt(monthStr, 10) - 1;
+  const startDate = monthDate;
 
-  const startDate = new Date(year, month, 1);
-  const endDate = new Date(year, month + 1, 1);
-
-  console.log("[getTimeStampFromMonth] startDate", startDate);
-  console.log("[getTimeStampFromMonth] endDate", endDate);
+  const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 1)
+    .toISOString()
+    .split("T")[0];
 
   return {
     startDate,

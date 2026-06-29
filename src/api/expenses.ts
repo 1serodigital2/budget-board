@@ -176,14 +176,19 @@ export const getExpensesMonthYear = async ({
   monthYear: string;
 }): Promise<GetExpenseDetailsType[]> => {
   try {
+    console.log("[getExpensesMonthYear] monthYear", monthYear);
+
     const { startDate, endDate } = getTimeStampFromMonth(monthYear);
+
+    console.log("[getExpensesMonthYear] startDate", startDate);
+    console.log("[getExpensesMonthYear] endDate", endDate);
 
     const { data, error } = await supabase
       .from("expenses")
       .select("*")
       .eq("user_id", uid)
-      .gte("date", startDate.toISOString())
-      .lt("date", endDate.toISOString());
+      .gte("date", startDate)
+      .lt("date", endDate);
 
     console.log("[getExpenseMonthYear] ", data);
 
@@ -215,9 +220,7 @@ export const getMonthlyExpenses = async (
   if (filter !== "all-time" && range) {
     const { startDate } = getTimeStampFromMonth(range.startMonth);
     const { endDate } = getTimeStampFromMonth(range.endMonth);
-    query = query
-      .gte("date", startDate.toISOString())
-      .lt("date", endDate.toISOString());
+    query = query.gte("date", startDate).lt("date", endDate);
   }
 
   const expensesRes = await query;

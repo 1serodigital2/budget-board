@@ -11,7 +11,9 @@ import useEpxenseTrend from "../hooks/useExpenseTrend";
 import { BudgetSummaryCardType } from "../types/dashboard";
 import { getCurrentMonth, moneyFormat } from "../utils/helpers";
 
-const date = getCurrentMonth();
+const date = getCurrentMonth() + "-01";
+
+console.log("[Dashboard] date", date);
 
 const BudgetSummaryCard = ({
   children,
