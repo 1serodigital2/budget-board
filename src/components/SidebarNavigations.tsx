@@ -24,7 +24,6 @@ const SideBarNavigation = ({ sidebarActive }: SidebarNavigationTypes) => {
         duration-200
         ease-in-out
         relative
-        }
       `}
       style={{ ...style }}
     >

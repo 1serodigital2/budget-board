@@ -9,7 +9,7 @@ const Header = ({ handleSidebarToggle }: HeaderTypes) => {
   return (
     <div className="flex border-b h-15 items-center">
       <div
-        className="pl-5 pr-4 border-r flex cursor-pointer"
+        className="pl-2 md:pl-5 pr-2 md:pr-4 border-r flex cursor-pointer"
         onClick={() => handleSidebarToggle()}
       >
         <span
@@ -19,7 +19,7 @@ const Header = ({ handleSidebarToggle }: HeaderTypes) => {
           dock_to_right
         </span>
       </div>
-      <div className="flex justify-between w-full pl-4 pr-5 items-center">
+      <div className="flex justify-between w-full pl-3 md:pl-4 pr-2 md:pr-5 items-center">
         <div>
           <h5 className="font-medium text-[.9rem]">Dashboard</h5>
           <div className="text-[.7rem]">Budget summary & insight</div>
