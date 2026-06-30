@@ -12,3 +12,8 @@ const {
   data: { session },
 } = await supabase.auth.getSession();
 console.log("session:", session);
+
+console.log("MODE:", import.meta.env.MODE);
+console.log("URL:", import.meta.env.VITE_SUPABASE_URL);
+console.log("KEY:", import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
+console.log(import.meta.env);
