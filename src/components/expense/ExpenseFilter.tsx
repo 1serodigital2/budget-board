@@ -1,10 +1,7 @@
 import Select from "../form/Select";
-import Input from "../Input";
 import Submit from "../form/Submit";
 import { ExpenseFilterProps } from "../../types/expense";
 import DateRangePicker from "../form/DatePicket";
-import Datep from "../form/DatePicket";
-import { Timestamp } from "firebase/firestore";
 import MyForm from "../form/Form";
 
 const ExpenseFilter = ({
