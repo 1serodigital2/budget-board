@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import SideBarNavigation from "../components/SidebarNavigations";
 
 const RootLayout = () => {
-  const [sidebarActive, setSidebarActive] = useState(false);
+  const [sidebarActive, setSidebarActive] = useState(true);
 
   const handleSidebarToggle = () => {
     setSidebarActive((prevState) => !prevState);
