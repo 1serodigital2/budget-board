@@ -1,10 +1,17 @@
 import { useAuth } from "../context/AuthContext";
 
-const Header = () => {
+interface HeaderTypes {
+  handleSidebarToggle: () => void;
+}
+
+const Header = ({ handleSidebarToggle }: HeaderTypes) => {
   const { logOut } = useAuth();
   return (
     <div className="flex border-b h-15 items-center">
-      <div className="pl-5 pr-4 border-r flex cursor-pointer">
+      <div
+        className="pl-5 pr-4 border-r flex cursor-pointer"
+        onClick={() => handleSidebarToggle()}
+      >
         <span
           className="material-symbols-outlined"
           style={{ fontVariationSettings: "'wght' 300", fontSize: 23 }}
@@ -17,7 +24,10 @@ const Header = () => {
           <h5 className="font-medium text-[.9rem]">Dashboard</h5>
           <div className="text-[.7rem]">Budget summary & insight</div>
         </div>
-        <button onClick={() => logOut()} className="cursor-pointer flex items-center gap-1">
+        <button
+          onClick={() => logOut()}
+          className="cursor-pointer flex items-center gap-1"
+        >
           <span
             className="material-symbols-outlined"
             style={{ fontVariationSettings: "'wght' 300", fontSize: 20 }}

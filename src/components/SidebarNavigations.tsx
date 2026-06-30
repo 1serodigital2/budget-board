@@ -1,14 +1,32 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
-const SideBarNavigation = () => {
+interface SidebarNavigationTypes {
+  sidebarActive: boolean;
+}
+const SideBarNavigation = ({ sidebarActive }: SidebarNavigationTypes) => {
   const [openMenu, setMenu] = useState<string | null>(null);
 
   const toggleMenu = (menu: string) => {
     setMenu((prevMenu) => (prevMenu === menu ? null : menu));
   };
+
+  const style = {
+    width: sidebarActive ? "360px" : "0px",
+    overflow: sidebarActive ? "unset" : "hidden",
+  };
   return (
-    <div className="bg-(--color-sidebar) w-75">
+    <div
+      className={`
+    bg-(--color-sidebar)
+    overflow-hidden
+    transition-all
+    duration-200
+    ease-in-out
+    }
+  `}
+      style={{ ...style }}
+    >
       <div className="flex gap-3 items-center mb-5 px-5 pt-5 border-b border-b-sidebar-border pb-5">
         <div className="bg-(--color-primary) w-8 h-8 rounded-[10px] flex justify-center items-center shrink-0">
           <span
