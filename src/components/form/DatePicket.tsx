@@ -19,8 +19,8 @@ const DateRangePicker = ({
     <div className="w-64">
       <DatePicker
         selectsRange
-        startDate={inputValues?.startDate || null}
-        endDate={inputValues?.endDate || null}
+        startDate={inputValues?.start || null}
+        endDate={inputValues?.end || null}
         onChange={(dates) => {
           const [start, end] = dates;
           handleInputChange({

@@ -47,8 +47,8 @@ export interface GetExpenseObjType {
 }
 
 export interface DateRange {
-  startDate: Date | null;
-  endDate: Date | null;
+  start: Date | null;
+  end: Date | null;
 }
 
 export interface ExpensesResponse {

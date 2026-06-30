@@ -2,7 +2,6 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getExpenses, getExpensesMonthYear } from "../api/expenses";
 import { useAuth } from "../context/AuthContext";
 import { DateRange, ExpensesResponse } from "../types/expense";
-import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
 const useExpenses = () => {
   const { user } = useAuth();
@@ -25,8 +24,8 @@ const useExpenses = () => {
         "expenses",
         user?.id,
         category,
-        dateRange?.startDate || null,
-        dateRange?.endDate || null,
+        dateRange?.start || null,
+        dateRange?.end || null,
       ],
       queryFn: ({ pageParam }) =>
         getExpenses(

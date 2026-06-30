@@ -52,11 +52,11 @@ export const getExpenses = async (
     query = query.eq("category", category);
   }
 
-  if (dateRange?.startDate && !dateRange?.endDate) {
-    query = query.eq("date", dateRange.startDate.toISOString());
-  } else if (dateRange?.startDate && dateRange?.endDate) {
-    query = query.gte("date", dateRange.startDate.toISOString());
-    query = query.lte("date", dateRange.endDate.toISOString());
+  if (dateRange?.start && !dateRange?.end) {
+    query = query.eq("date", dateRange.start.toISOString());
+  } else if (dateRange?.start && dateRange?.end) {
+    query = query.gte("date", dateRange.start.toISOString());
+    query = query.lte("date", dateRange.end.toISOString());
   }
 
   query = query.order("date", { ascending: false });
@@ -176,21 +176,14 @@ export const getExpensesMonthYear = async ({
   monthYear: string;
 }): Promise<GetExpenseDetailsType[]> => {
   try {
-    console.log("[getExpensesMonthYear] monthYear", monthYear);
-
-    const { startDate, endDate } = getTimeStampFromMonth(monthYear);
-
-    console.log("[getExpensesMonthYear] startDate", startDate);
-    console.log("[getExpensesMonthYear] endDate", endDate);
+    const { start: startDate, end: endDate } = getTimeStampFromMonth(monthYear);
 
     const { data, error } = await supabase
       .from("expenses")
       .select("*")
       .eq("user_id", uid)
       .gte("date", startDate)
-      .lt("date", endDate);
-
-    console.log("[getExpenseMonthYear] ", data);
+      .lte("date", endDate);
 
     if (error) throw error;
 
@@ -218,18 +211,13 @@ export const getMonthlyExpenses = async (
   let query = supabase.from("expenses").select("*").eq("user_id", uid);
 
   if (filter !== "all-time" && range) {
-    const { startDate } = getTimeStampFromMonth(range.startDate);
-    const { endDate } = getTimeStampFromMonth(range.endDate);
-
-    console.log("[getMonthlyExpenses] startDate", startDate);
-    console.log("[getMonthlyExpenses] endDate", endDate);
+    const { start: startDate } = getTimeStampFromMonth(range.startDate);
+    const { end: endDate } = getTimeStampFromMonth(range.endDate);
 
     query = query.gte("date", startDate).lt("date", endDate);
   }
 
   const expensesRes = await query;
-
-  console.log("[getMonthlyExpenses] expensesRes", expensesRes);
 
   const budgets = await getBudgets(uid, filter);
 

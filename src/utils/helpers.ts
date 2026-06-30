@@ -11,8 +11,6 @@ export const formatDate = (date: Date) => {
   return date.toLocaleDateString("en-IN").replace(/\//g, "-");
 };
 export const getCurrentMonth = (date = new Date()) => {
-  console.log("[getCurrentMonth] date", date);
-
   const year = date.getFullYear();
   const month = ("0" + (date.getMonth() + 1)).slice(-2);
 
@@ -29,8 +27,8 @@ export const getTimeStampFromMonth = (monthDate: string) => {
     .split("T")[0];
 
   return {
-    startDate,
-    endDate,
+    start: startDate,
+    end: endDate,
   };
 };
 

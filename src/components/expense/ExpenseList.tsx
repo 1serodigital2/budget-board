@@ -28,10 +28,10 @@ const ExpenseList = () => {
   const category = searchParams.get("category") || "";
   const initialDateRange: DateRange = month
     ? (() => {
-        const { startDate, endDate } = getTimeStampFromMonth(month);
-        return { startDate: new Date(startDate), endDate: new Date(endDate) };
+        const { start, end } = getTimeStampFromMonth(month);
+        return { start: new Date(start), end: new Date(end) };
       })()
-    : { startDate: null, endDate: null };
+    : { start: null, end: null };
 
   const initialFilter = {
     category: 0,
@@ -62,8 +62,6 @@ const ExpenseList = () => {
   });
 
   const expenses = expensesData?.pages.flatMap((page) => page.expenses) ?? [];
-
-  console.log("expense data1", expensesData);
 
   const {
     data: catData,
@@ -152,8 +150,6 @@ const ExpenseList = () => {
       };
     });
   };
-
-  console.log("filter", filter);
 
   const handleFilterSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
