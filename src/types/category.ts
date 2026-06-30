@@ -1,8 +1,7 @@
-import { Timestamp } from "firebase/firestore";
 import { AlertProps } from "./FormTypes";
 
 export interface CategoryFormType {
-  category: string;
+  name: string;
   color: string;
 }
 
@@ -12,7 +11,7 @@ export interface AddCategoryType {
 }
 
 export interface GetCategoryType {
-  categoryId: string;
+  categoryId: number;
   userId: string;
 }
 
@@ -23,27 +22,27 @@ export interface HandleInputChangeType {
 export interface CategoryFormProps {
   isPending: boolean;
   submitMessage: AlertProps;
-  handleSubmit: (e: React.SubmitEvent) => void;
+  handleSubmit: (e: React.SyntheticEvent) => void;
   handleInputChange: ({ name, inputValue }: HandleInputChangeType) => void;
   inputValues: CategoryFormType;
 }
 
 export interface UpdateCategoryType {
   userId: string;
-  catId: string;
+  catId: number;
   categoryDetail: CategoryFormType;
 }
 
 export interface CategoryType {
-  id: string;
+  id: number;
   name: string;
 }
 
 export interface CategoryProps {
-  id: string;
+  id: number;
   name: string;
   color: string;
-  createdAt: Timestamp;
+  createdAt: string;
   isSystem: boolean;
   slug?: string;
 }

@@ -14,6 +14,8 @@ const BudgetForm = ({
   const { useGetCategories } = useCategories();
   const { data, isError, error } = useGetCategories();
 
+  console.log("budget input value", inputValue);
+
   if (isError) {
     return (
       <Alert
@@ -23,7 +25,7 @@ const BudgetForm = ({
     );
   }
   return (
-    <div className="bg-(--color-primary) p-5 rounded-3xl w-125">
+    <div className="bg-white p-4 border rounded-lg max-w-xl">
       <form onSubmit={handleFormSubmit}>
         <div className="mb-2">
           <Select
@@ -31,7 +33,7 @@ const BudgetForm = ({
             name="category"
             data={data || []}
             getOptionLabel={(category) => category.name}
-            getOptionValue={(category) => category.id}
+            getOptionValue={(category) => category.id.toString()}
             required
             handleInputChange={handleInputChange}
             inputValues={inputValue.category}

@@ -35,13 +35,13 @@ const EditBudgetPage = () => {
       const budgetData = {
         category: data.category,
         amount: data.amount,
-        month: data.month,
+        month: data.month.slice(0, 7),
       };
       setInputValue(budgetData);
     }
   }, [data]);
 
-  const handleFormSubmit = (e: React.SubmitEvent) => {
+  const handleFormSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (inputValue.amount < 0 || !inputValue.category) {
       showSubmitMessage("Please fill up the form properly", "error");

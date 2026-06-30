@@ -1,32 +1,27 @@
-import {
-  DocumentData,
-  QueryDocumentSnapshot,
-  Timestamp,
-} from "firebase/firestore";
 import { AlertProps, HandleInputChangeProps } from "./FormTypes";
 
 export interface ExpenseFilterProps extends HandleInputChangeProps {
   catData: object;
-  handleFilterSubmit: (e: React.SubmitEvent) => void;
+  handleFilterSubmit: (e: React.SyntheticEvent) => void;
   handleFilterReset: () => void;
   filter: FilterProps;
   isPending: boolean;
 }
 
 export interface FilterProps {
-  category?: string;
+  category?: number;
   dateRange?: DateRange;
 }
 
 export interface ExpenseFormData {
   amount: number;
-  category: string;
+  category: number | string;
   date: string;
   note?: string;
 }
 
 export interface ExpenseFormProps extends HandleInputChangeProps {
-  handleFormSubmit: (e: React.SubmitEvent) => void;
+  handleFormSubmit: (e: React.SyntheticEvent) => void;
   inputValues: ExpenseFormData;
   isPending: boolean;
   submitMessage: AlertProps;
@@ -34,17 +29,17 @@ export interface ExpenseFormProps extends HandleInputChangeProps {
 
 export interface ExpenseProps {
   amount: number;
-  category: string;
-  date: Timestamp;
+  category: number;
+  date: string | Date;
   note?: string;
-  createdAt?: Timestamp;
+  createdAt?: string;
 }
 
 export interface GetExpenseDetailsType {
-  id: string;
+  id: number;
   amount: number;
-  category: string;
-  date: Date;
+  category: number | string;
+  date: Date | string;
 }
 
 export interface GetExpenseObjType {
@@ -58,12 +53,12 @@ export interface DateRange {
 
 export interface ExpensesResponse {
   expenses: ExpensesDetailTyps[];
-  lastVisible: QueryDocumentSnapshot<DocumentData> | null;
+  lastVisible: number | null;
   hasMore: boolean;
 }
 
 export interface ExpensesDetailTyps extends ExpenseProps {
-  id: string;
+  id: number;
 }
 
 export interface MothlyExpenseData {

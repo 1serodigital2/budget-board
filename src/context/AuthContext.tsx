@@ -5,19 +5,13 @@ import {
   useEffect,
   useState,
 } from "react";
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  User,
-} from "firebase/auth";
-import { auth } from "../services/firebase";
+import { User } from "@supabase/supabase-js";
+import { supabase } from "../services/supabase";
 
 // auth
-import { loginUser, logOutUser } from "../services/auth";
+import { loginUser, logOutUser, createUser as createUserService } from "../services/auth";
 import { LoginProps } from "../types/FormTypes";
 import { createDefaultCategories } from "../api/category";
-
-// import { setUserIdCookie } from "../utils/helpers";
 
 interface AuthContextType {
   user: User | null;
@@ -49,7 +43,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = async ({ email, password }: LoginProps) => {
     try {
       setLoading(true);
-      await loginUser(email, password);
+      const { error } = await loginUser(email, password);
+      if (error) throw error;
     } catch (error: any) {
       console.error("Critical error " + error);
       setAuthError(error.message || "Unable to login");
@@ -58,7 +53,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }, 3000);
     } finally {
       setLoading(false);
-      // setAuthError("");
     }
   };
 
@@ -76,35 +70,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Listen for changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
       setLoading(false);
     });
 
     return () => {
-      unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
 
   const createUser = async ({ email, password }: LoginProps) => {
     try {
       setLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      const user = userCredential.user;
-      if (user.uid) {
-        createDefaultCategories(user.uid);
+      const { data, error } = await createUserService({ email, password });
+      
+      if (error) throw error;
+      
+      const user = data.user;
+      if (user?.id) {
+        await createDefaultCategories(user.id);
       }
-      console.log("User created:", user.uid);
+      console.log("User created:", user?.id);
       setLoading(false);
     } catch (error: any) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.error("Error signing up:", errorCode, errorMessage);
-      setAuthError("Error signing up " + error);
+      console.error("Error signing up:", error.message);
+      setAuthError("Error signing up " + error.message);
       setTimeout(() => {
         setAuthError("");
       }, 5000);

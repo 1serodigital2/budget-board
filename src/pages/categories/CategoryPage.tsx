@@ -13,8 +13,8 @@ const CategoryPage = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["categories", categoryId],
     queryFn: () =>
-      getCategoryById({ userId: user!.uid, categoryId: categoryId! }),
-    enabled: !!user?.uid && !!categoryId,
+      getCategoryById({ userId: user!.id, categoryId: Number(categoryId!) }),
+    enabled: !!user?.id && !!categoryId,
   });
 
   if (isLoading) {
@@ -37,12 +37,12 @@ const CategoryPage = () => {
   return (
     <>
       <H1>Category detail</H1>
-      <div>Category name: {data.category}</div>
+      <div>Category name: {data.name}</div>
       <div>Color: {data.color}</div>
       <div>
         Creation date:{" "}
-        {data.createdAt?.toDate
-          ? data.createdAt.toDate().toLocaleDateString()
+        {data.createdAt
+          ? new Date(data.createdAt).toLocaleDateString()
           : "No date"}
       </div>
     </>

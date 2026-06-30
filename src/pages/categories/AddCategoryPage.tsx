@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import H1 from "../../components/ui/Heading";
 import useCategoryForm from "../../hooks/useCategorForm";
 import { addCategory } from "../../api/category";
-import { queryClient } from "../../services/firebase";
+import { queryClient } from "../../services/supabase";
 import { useAuth } from "../../context/AuthContext";
 import CategoryForm from "../../components/form/Category";
 import useSubmitMessage from "../../hooks/useSubmitMessage";
@@ -27,14 +27,14 @@ const AddCategoryPage = () => {
     },
   });
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    if (!user?.uid) {
+    if (!user?.id) {
       showSubmitMessage("Fatal error " + error);
       return;
     }
-    mutate({ userId: user.uid, categoryDetail: inputValues });
+    mutate({ userId: user.id, categoryDetail: inputValues });
   };
 
   return (

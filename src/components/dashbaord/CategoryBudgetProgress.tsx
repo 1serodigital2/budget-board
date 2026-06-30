@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "../../api/category";
 import { useAuth } from "../../context/AuthContext";
-import { getMonthYear, moneyFormat } from "../../utils/helpers";
+import { getCurrentMonth, moneyFormat } from "../../utils/helpers";
 import useBudgetVsCategory from "../../hooks/useBudgetVsCategory";
 import useBudget from "../../hooks/useBudget";
 import { GetExpenseDetailsType } from "../../types/expense";
@@ -12,7 +12,7 @@ const CategoryBudgetProgress = ({
   expenses: GetExpenseDetailsType[];
 }) => {
   const { user } = useAuth();
-  const month = getMonthYear();
+  const month = getCurrentMonth();
 
   const {
     data: categories,
@@ -21,8 +21,8 @@ const CategoryBudgetProgress = ({
     error,
   } = useQuery({
     queryKey: ["categories"],
-    queryFn: () => getCategories(user!.uid),
-    enabled: !!user!.uid,
+    queryFn: () => getCategories(user!.id),
+    enabled: !!user!.id,
   });
 
   const { useGetBudgetMonthYear } = useBudget();

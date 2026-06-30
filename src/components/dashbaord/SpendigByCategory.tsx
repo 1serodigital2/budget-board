@@ -2,14 +2,12 @@ import { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import useExpenses from "../../hooks/useExpenses";
 import { useCategories } from "../../hooks/useCategories";
+import { getCurrentMonth } from "../../utils/helpers";
 
 export default function SpendingByCategory() {
-  const currentMonth = new Date().toISOString().slice(0, 7);
+  const currentMonth = getCurrentMonth();
   const { useGetExpenseMonthYear } = useExpenses();
   const { data: expenseData } = useGetExpenseMonthYear(currentMonth);
-
-  console.log("currentMonth", currentMonth);
-  console.log("Piechart expense data", expenseData);
 
   const { useGetCategories } = useCategories();
   const { data: categories } = useGetCategories();
@@ -45,7 +43,7 @@ export default function SpendingByCategory() {
   }, {});
 
   const formattedExpense = Object.values(groupedExpenses ?? []);
-  console.log("formattedExpense", formattedExpense);
+  // console.log("formattedExpense", formattedExpense);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 

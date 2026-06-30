@@ -1,6 +1,5 @@
 import CategoryWiseBudget from "../components/budget/CategoryWiseBudget";
-import CategoryBudgetProgress from "../components/dashbaord/CategoryBudgetProgress";
-import DailyExpenseChart from "../components/dashbaord/DailyExpenseChart";
+import MonthlyExpenseTrend from "../components/dashbaord/MonthlyExpenseTrend";
 import SpendingByCategory from "../components/dashbaord/SpendigByCategory";
 import Alert from "../components/ui/Alert";
 import H1 from "../components/ui/Heading";
@@ -10,9 +9,9 @@ import { useCategories } from "../hooks/useCategories";
 import useExpenses from "../hooks/useExpenses";
 import useEpxenseTrend from "../hooks/useExpenseTrend";
 import { BudgetSummaryCardType } from "../types/dashboard";
-import { getMonthYear, moneyFormat } from "../utils/helpers";
+import { getCurrentMonth, moneyFormat } from "../utils/helpers";
 
-const date = getMonthYear();
+const date = getCurrentMonth();
 
 const BudgetSummaryCard = ({
   children,
@@ -47,6 +46,9 @@ const Dashboard = () => {
   const { useGetBudgetMonthYear, useGetBudgetTable } = useBudget();
   const { data: budgets } = useGetBudgetMonthYear(date);
 
+  console.log("[Dashboard] budgets",budgets);
+  
+
   const { useGetExpenseMonthYear } = useExpenses();
   const { data: expenses, isLoading } = useGetExpenseMonthYear(date);
 
@@ -74,11 +76,6 @@ const Dashboard = () => {
     totalBudgetAmount: 0,
     totalRemaining: 0,
   };
-
-  const { useMonthlyExpenseTrend } = useEpxenseTrend();
-  const { data: monthlyExpenses } = useMonthlyExpenseTrend();
-
-  console.log("Monthly expenses", expenses);
 
   if (isLoading) {
     return <Alert message="Loading data" />;
@@ -169,7 +166,7 @@ const Dashboard = () => {
       </div>
       <div className="grid grid-cols-5 mt-6 gap-3 mb-5">
         <div className="col-span-3">
-          <DailyExpenseChart data={monthlyExpenses || []} />
+          <MonthlyExpenseTrend />
         </div>
         <div className="col-span-2 h-full">
           <SpendingByCategory />

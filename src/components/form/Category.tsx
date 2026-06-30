@@ -17,14 +17,14 @@ const Category = ({
       )}
       <form
         onSubmit={handleSubmit}
-        className="bg-(--color-primary) p-8 rounded-3xl max-w-3xl"
+        className="bg-white p-4 border rounded-lg max-w-xl"
       >
         <div className="mb-2">
           <Input
-            name="category"
+            name="name"
             label="Category"
             handleInputChange={handleInputChange}
-            inputValues={inputValues.category || ""}
+            inputValues={inputValues.name || ""}
           />
         </div>
         <div className="flex justify-between">

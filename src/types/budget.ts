@@ -1,10 +1,9 @@
-import { Timestamp } from "firebase/firestore";
 import { HandleInputChangeProps } from "./FormTypes";
 import { GetExpenseDetailsType } from "./expense";
 import { CategoryProps } from "./category";
 
 export interface BudgetInputType {
-  category: string;
+  category: number;
   amount: number;
   month: string;
 }
@@ -15,28 +14,28 @@ export interface BudgetType {
 }
 
 export interface BudgetFormType extends HandleInputChangeProps {
-  handleFormSubmit: (e: React.SubmitEvent) => void;
+  handleFormSubmit: (e: React.SyntheticEvent) => void;
   inputValue: BudgetInputType;
   isPending?: boolean;
 }
 
 export interface GetBudgetByIdType {
   uid: string;
-  budgetId: string;
+  budgetId: number;
 }
 
 export interface UpdateBudgetType {
   uid: string;
-  budgetId: string;
+  budgetId: number;
   budgetDetail: BudgetInputType;
 }
 
 export interface GetBudgetDetailsTypes {
-  id: string;
+  id: number;
   amount: number;
-  category: string;
+  category: number | string;
   month: string;
-  createdAt: Timestamp;
+  createdAt: string;
   slug: string;
 }
 
@@ -54,7 +53,7 @@ export interface BudgetsObjTypes {
 
 export interface BudgetDataResponse {
   categoryName: string;
-  categoryId: string;
+  categoryId: number;
   categorySlug: string | undefined;
   budget: number;
   spent: number;

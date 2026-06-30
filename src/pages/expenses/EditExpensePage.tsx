@@ -8,11 +8,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 // types
 import { getExpenseById, updateExpense } from "../../api/expenses";
-import { queryClient } from "../../services/firebase";
+import { queryClient } from "../../services/supabase";
 import ExpenseForm from "../../components/form/Expense";
 import Alert from "../../components/ui/Alert";
 import useExpenseForm from "../../hooks/useExpenseForm";
-import { Timestamp } from "firebase/firestore";
 
 const EditExpensePage = () => {
   const {
@@ -30,12 +29,12 @@ const EditExpensePage = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["expenses", id],
     queryFn: () => {
-      if (!user?.uid || !id) {
+      if (!user?.id || !id) {
         throw new Error("Missing userid or expenseid");
       }
-      return getExpenseById({ uid: user?.uid, id });
+      return getExpenseById({ uid: user?.id, id: Number(id) });
     },
-    enabled: !!user?.uid && !!id,
+    enabled: !!user?.id && !!id,
   });
 
   useEffect(() => {
@@ -43,7 +42,7 @@ const EditExpensePage = () => {
       const formattedExpense = {
         ...data,
         date: data.date
-          ? data.date?.toDate().toISOString().split("T")[0]
+          ? new Date(data.date).toISOString().split("T")[0]
           : new Date().toISOString().split("T")[0],
       };
       setInputValues(formattedExpense);
@@ -55,7 +54,7 @@ const EditExpensePage = () => {
     onSuccess: () => {
       showSubmitMessage("Expense updated successfully", "success");
       queryClient.invalidateQueries({
-        queryKey: ["users", user?.uid],
+        queryKey: ["users", user?.id],
       });
     },
 
@@ -77,7 +76,7 @@ const EditExpensePage = () => {
     );
   }
 
-  const handleFormSubmit = (e: React.SubmitEvent) => {
+  const handleFormSubmit = (e: React.SyntheticEvent) => {
     try {
       e.preventDefault();
 
@@ -88,19 +87,20 @@ const EditExpensePage = () => {
         return;
       }
 
-      if (!id || !user?.uid) {
+      if (!id || !user?.id) {
         return;
       }
 
       const formattedExpenseDetail = {
         ...expenseDetail,
-        date: Timestamp.fromDate(new Date(expenseDetail.date)),
+        date: new Date(expenseDetail.date).toISOString(),
+        category: Number(expenseDetail.category),
       };
 
       mutate({
-        expId: id,
+        expId: Number(id),
         expenseDetail: formattedExpenseDetail,
-        uid: user.uid,
+        uid: user.id,
       });
     } catch (error) {
       console.error("Unable to add", error);

@@ -3,7 +3,7 @@ import { NavLink, useSearchParams } from "react-router-dom";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteExpense, getExpenses } from "../../api/expenses";
-import { queryClient } from "../../services/firebase";
+import { queryClient } from "../../services/supabase";
 import { useAuth } from "../../context/AuthContext";
 import Alert from "../ui/Alert";
 import Table from "../ui/Table";
@@ -13,12 +13,7 @@ import useSubmitMessage from "../../hooks/useSubmitMessage";
 import { HandleInputChangeType } from "../../types/category";
 import { useEffect, useState } from "react";
 import ExpenseFilter from "./ExpenseFilter";
-import {
-  DateRange,
-  ExpenseProps,
-  ExpensesDetailTyps,
-  FilterProps,
-} from "../../types/expense";
+import { DateRange, FilterProps } from "../../types/expense";
 import {
   formatDate,
   getTimeStampFromMonth,
@@ -33,13 +28,13 @@ const ExpenseList = () => {
   const category = searchParams.get("category") || "";
   const initialDateRange: DateRange = month
     ? (() => {
-        const { startDate, endDate } = getTimeStampFromMonth(month);
-        return { start: startDate, end: endDate };
+        const { start, end } = getTimeStampFromMonth(month);
+        return { start: new Date(start), end: new Date(end) };
       })()
     : { start: null, end: null };
 
   const initialFilter = {
-    category: "",
+    category: 0,
     dateRange: initialDateRange,
   };
   const [filter, setFilter] = useState<FilterProps>(initialFilter);
@@ -48,7 +43,7 @@ const ExpenseList = () => {
 
   const { submitMessage, showSubmitMessage } = useSubmitMessage();
   const { user } = useAuth();
-  const userId = user?.uid!;
+  const userId = user?.id!;
 
   const { useGetExpensesQuery } = useExpenses();
 
@@ -61,13 +56,12 @@ const ExpenseList = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useGetExpensesQuery({
-    category: appliedFilter.category,
+    category:
+      appliedFilter.category === 0 ? undefined : Number(appliedFilter.category),
     dateRange: appliedFilter.dateRange,
   });
 
   const expenses = expensesData?.pages.flatMap((page) => page.expenses) ?? [];
-
-  console.log("expense data1", expensesData);
 
   const {
     data: catData,
@@ -76,11 +70,11 @@ const ExpenseList = () => {
   } = useQuery({
     queryKey: ["categories"],
     queryFn: () => {
-      if (!user?.uid) {
+      if (!user?.id) {
         showSubmitMessage("Unauthorized access", "error");
         return;
       }
-      return getCategories(user?.uid);
+      return getCategories(user?.id);
     },
   });
 
@@ -91,12 +85,12 @@ const ExpenseList = () => {
 
     setFilter((prev) => ({
       ...prev,
-      category: searchCatId ?? "",
+      category: searchCatId ?? 0,
     }));
 
     setAppliedFilter((prev) => ({
       ...prev,
-      category: searchCatId ?? "",
+      category: searchCatId ?? 0,
     }));
   }, [category, catData]);
 
@@ -137,7 +131,7 @@ const ExpenseList = () => {
 
   const handleDelete = (expenseId: string) => {
     if (confirm("Are you sure to delete this event") === true) {
-      mutate({ uid: userId!, id: expenseId });
+      mutate({ uid: userId!, id: Number(expenseId) });
     }
   };
 
@@ -157,9 +151,7 @@ const ExpenseList = () => {
     });
   };
 
-  console.log("filter", filter);
-
-  const handleFilterSubmit = (e: React.SubmitEvent) => {
+  const handleFilterSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!filter.category && !filter.dateRange) {
       showSubmitMessage("Please select category or enter search keyword");
@@ -212,21 +204,24 @@ const ExpenseList = () => {
                   <TableBodyData item={expense.note} />
                   <TableBodyData
                     item={
-                      expense.date?.toDate
-                        ? formatDate(expense.date.toDate())
-                        : expense.createdAt?.toDate
-                          ? formatDate(expense.createdAt.toDate())
+                      expense.date
+                        ? formatDate(new Date(expense.date))
+                        : expense.createdAt
+                          ? formatDate(new Date(expense.createdAt))
                           : ""
                     }
                   />
                   <TableBodyData>
                     <div className="flex gap-1 items-center">
-                      <MyButton btnType="view" btnSlug={expense.id} />
+                      <MyButton
+                        btnType="view"
+                        btnSlug={expense.id.toString()}
+                      />
                       <MyButton btnType="edit" btnSlug={`${expense.id}/edit`} />
                       <MyButton
                         btnType="delete"
                         deleteFn={handleDelete}
-                        id={expense.id}
+                        id={expense.id.toString()}
                         isPending={isPending}
                       />
                     </div>

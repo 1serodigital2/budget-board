@@ -12,11 +12,11 @@ const Select = <T,>({
   inputValues = "",
 }: SelectType<T>) => {
   return (
-    <div className="flex flex-col flex-1  max-w-75">
+    <div className="flex flex-col flex-1">
       {label && (
         <label
           htmlFor={name}
-          className="block mb-2.5 text-md text-white font-medium text-heading"
+          className="block mb-2 text-md text-gray-700 font-medium text-[.8rem]"
         >
           {label}
         </label>
@@ -25,7 +25,7 @@ const Select = <T,>({
       <select
         name={name}
         id=""
-        className={`block text-sm font-medium text-heading py-2 px-3 border rounded-lg ${sx ? sx : ""}`}
+        className={`block text-[.8rem] font-medium text-heading py-2 px-3 border rounded-lg ${sx ? sx : ""}`}
         required={required}
         value={inputValues}
         onChange={(e) =>
