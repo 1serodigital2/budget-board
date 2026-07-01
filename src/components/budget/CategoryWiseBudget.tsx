@@ -66,7 +66,7 @@ const CategoryWiseBudget = ({
             </TableBodyData>
             <TableBodyData>
               <div className="flex gap-[.4rem] items-center">
-                <div className="w-36 rounded h-1.25 bg-gray-100 overflow-hidden">
+                <div className="w-28 md:w-36 rounded h-1.25 bg-gray-100 overflow-hidden">
                   <div
                     className={`${bgColor(budget.percentage)}`}
                     style={{
@@ -83,15 +83,15 @@ const CategoryWiseBudget = ({
             )}
             <TableBodyData>
               {budget.percentage > 100 ? (
-                <div className="bg-red-100 text-red-700 py-[.1rem] px-2 rounded-full max-w-max text-[.7rem]">
+                <div className="bg-red-100 text-red-700 py-[.1rem] px-2 rounded-full max-w-max text-[.6rem] md:text-[.7rem]">
                   Over Budget
                 </div>
               ) : budget.percentage > 80 ? (
-                <div className="bg-yellow-100 text-yellow-800 py-[.1rem] px-2 rounded-full max-w-max text-[.7rem]">
+                <div className="bg-yellow-100 text-yellow-800 py-[.1rem] px-2 rounded-full max-w-max  text-[.6rem] md:text-[.7rem]">
                   Near Budget
                 </div>
               ) : (
-                <div className="bg-green-100 text-green-700 py-[.1rem] px-2 rounded-full max-w-max text-[.7rem]">
+                <div className="bg-green-100 text-green-700 py-[.1rem] px-2 rounded-full max-w-max text-[.6rem] md:text-[.7rem]">
                   On Track
                 </div>
               )}
@@ -99,21 +99,10 @@ const CategoryWiseBudget = ({
 
             <TableBodyData>
               {budget.spent > 0 && (
-                <MyButton btnSlug={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`} btnType="view" />
-                // <NavLink
-                //   to={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`}
-                //   className="bg-blue-100 rounded px-2 py-[.1rem] cursor-pointer hover:bg-blue-600 transition duration-200 hover:text-white flex gap-1 items-center text-[.7rem]"
-                // >
-                //   <span
-                //     className="material-symbols-outlined"
-                //     style={{
-                //       fontSize: ".8rem",
-                //     }}
-                //   >
-                //     visibility
-                //   </span>
-                //   <span>View</span>
-                // </NavLink>
+                <MyButton
+                  btnSlug={`/expenses?month=${monthFilter}&category=${budget.categorySlug}`}
+                  btnType="view"
+                />
               )}
             </TableBodyData>
           </tr>
