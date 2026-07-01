@@ -13,7 +13,7 @@ const RootLayout = () => {
   return (
     <div className="flex max-w-[100vw] overflow-hidden">
       <SideBarNavigation sidebarActive={sidebarActive} />
-      <main className="w-full">
+      <main className="w-full relative">
         <Header handleSidebarToggle={handleSidebarToggle} />
         <div className="px-3 py-5 md:px-6 bg-(--color-background)">
           <Outlet />

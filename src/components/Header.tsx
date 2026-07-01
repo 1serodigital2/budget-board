@@ -7,7 +7,7 @@ interface HeaderTypes {
 const Header = ({ handleSidebarToggle }: HeaderTypes) => {
   const { logOut } = useAuth();
   return (
-    <div className="flex border-b h-15 items-center">
+    <div className="flex border-b h-15 items-center sticky top-0">
       <div
         className="pl-2 md:pl-5 pr-2 md:pr-4 border-r flex cursor-pointer"
         onClick={() => handleSidebarToggle()}

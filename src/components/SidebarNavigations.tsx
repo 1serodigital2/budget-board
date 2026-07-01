@@ -24,10 +24,11 @@ const SideBarNavigation = ({ sidebarActive }: SidebarNavigationTypes) => {
         duration-200
         ease-in-out
         relative
+        min-h-screen 
       `}
       style={{ ...style }}
     >
-      <div className="min-h-screen top-0 sticky">
+      <div className="top-0 sticky">
         <div className="flex gap-3 items-center mb-5 px-5 pt-5 border-b border-b-sidebar-border pb-5">
           <div className="bg-(--color-primary) w-8 h-8 rounded-[10px] flex justify-center items-center shrink-0">
             <span

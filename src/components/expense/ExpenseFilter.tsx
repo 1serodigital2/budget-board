@@ -18,7 +18,7 @@ const ExpenseFilter = ({
       onReset={handleFilterReset}
       // className="mb-3 max-w-3xl"
     >
-      <div className="flex gap-3 items-center">
+      <div className="flex gap-3 items-center flex-wrap md:flex-nowrap">
         <Select
           getOptionValue={(category: any) => category?.id}
           getOptionLabel={(category: any) => category?.name}
