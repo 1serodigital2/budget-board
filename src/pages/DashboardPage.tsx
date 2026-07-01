@@ -106,7 +106,7 @@ const Dashboard = () => {
             className="material-symbols-outlined"
             style={{
               fontVariationSettings: "'wght' 300",
-              fontSize: 20,
+              fontSize: isMobile ? 14 : 20,
               color: "blue",
             }}
           >
@@ -166,7 +166,7 @@ const Dashboard = () => {
           </span>
         </BudgetSummaryCard>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-5 md:mt-6 gap-3 mb-3 mb:mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 mb:mb-5">
         <div className="md:col-span-3">
           <MonthlyExpenseTrend />
         </div>

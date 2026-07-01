@@ -55,12 +55,14 @@ const Login = () => {
   console.log("auth error", authError);
 
   return (
-    <div className="flex min-h-screen items-center justify-center flex-col">
+    <div className="flex min-h-screen items-center justify-center flex-col bg-(--color-background)">
       {submitMessage && submitMessage.message !== "" && (
         <Alert type={submitMessage.type} message={submitMessage.message} />
       )}
       {authError && <Alert type="error" message={authError} />}
-      <h1 className="mb-2 text-center text-2xl md:text-3xl font-bold">Budget Board Login</h1>
+      <h1 className="mb-4 text-center text-2xl md:text-3xl font-semibold">
+        Budget Board Login
+      </h1>
       <LoginSignup
         handleFormSubmit={handleFormSubmit}
         loading={loading}

@@ -28,6 +28,7 @@ const SideBarNavigation = ({ sidebarActive }: SidebarNavigationTypes) => {
         ease-in-out
         relative
         min-h-screen 
+        shrink-0
       `}
       style={{ ...style }}
     >
