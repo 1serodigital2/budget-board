@@ -9,7 +9,11 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "../services/supabase";
 
 // auth
-import { loginUser, logOutUser, createUser as createUserService } from "../services/auth";
+import {
+  loginUser,
+  logOutUser,
+  createUser as createUserService,
+} from "../services/auth";
 import { LoginProps } from "../types/FormTypes";
 import { createDefaultCategories } from "../api/category";
 
@@ -21,6 +25,7 @@ interface AuthContextType {
   authError?: string;
   resetAuthError: () => void;
   createUser: ({ email, password }: LoginProps) => Promise<void>;
+  authSuccess?: string;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -39,6 +44,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string>("");
+  const [authSuccess, setAuthSuccess] = useState<string>("");
 
   const login = async ({ email, password }: LoginProps) => {
     try {
@@ -77,7 +83,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     });
 
     // Listen for changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -91,13 +99,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       setLoading(true);
       const { data, error } = await createUserService({ email, password });
-      
+
       if (error) throw error;
-      
+
       const user = data.user;
+
+      if (user?.confirmation_sent_at && !user?.user_metadata?.email_verified) {
+      }
+      console.log("[createUser] user", user);
+
       if (user?.id) {
         await createDefaultCategories(user.id);
       }
+
+      setAuthSuccess(
+        "Account created successfully! Please check your email and click the verification link before signing in.",
+      );
       console.log("User created:", user?.id);
       setLoading(false);
     } catch (error: any) {
@@ -118,6 +135,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     loading,
     authError,
     resetAuthError,
+    authSuccess,
   };
 
   return (
