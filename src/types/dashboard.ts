@@ -7,4 +7,5 @@ export interface BudgetSummaryCardType {
   title: string;
   footer: string;
   showColor?: boolean;
+  isMobile?: boolean;
 }

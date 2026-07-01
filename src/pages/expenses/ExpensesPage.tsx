@@ -1,9 +1,10 @@
 import ExpenseList from "../../components/expense/ExpenseList";
+import H1 from "../../components/ui/Heading";
 
 const Expenses = () => {
   return (
     <>
-      <h1 className="text-xl font-medium mb-3">All expenses</h1>
+      <H1>All expenses</H1>
       <ExpenseList />
     </>
   );

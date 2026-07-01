@@ -16,7 +16,7 @@ const DateRangePicker = ({
   inputValues,
 }: DateRangePickerProps) => {
   return (
-    <div className="w-64">
+    <div className="w-[100%] max-w-72 w-[70%]">
       <DatePicker
         selectsRange
         startDate={inputValues?.start || null}
@@ -34,7 +34,7 @@ const DateRangePicker = ({
         isClearable
         placeholderText="Select date range"
         dateFormat="dd-MM-yyyy"
-        className="w-64 border rounded-lg text-sm py-2 px-3"
+        className="w-full border rounded-lg text-sm py-2 px-3"
         name="dateRange"
         autoComplete="off"
       />

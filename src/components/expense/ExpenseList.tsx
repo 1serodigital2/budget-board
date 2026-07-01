@@ -28,6 +28,8 @@ const ExpenseList = () => {
   const category = searchParams.get("category") || "";
   const initialDateRange: DateRange = month
     ? (() => {
+        console.log("[Debug] month", month);
+
         const { start, end } = getTimeStampFromMonth(month);
         return { start: new Date(start), end: new Date(end) };
       })()
@@ -160,8 +162,23 @@ const ExpenseList = () => {
   };
 
   const handleFilterReset = () => {
-    setAppliedFilter(initialFilter);
-    setFilter(initialFilter);
+    setAppliedFilter({
+      category: 0,
+      dateRange: {
+        start: null,
+        end: null,
+      },
+    });
+    setFilter({
+      category: 0,
+      dateRange: {
+        start: null,
+        end: null,
+      },
+    });
+
+    console.log("[Debug handleFilterReset] appliedFilter", appliedFilter);
+    console.log("[Debug handleFilterReset] filter", filter);
   };
 
   return (

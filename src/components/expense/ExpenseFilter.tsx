@@ -1,10 +1,7 @@
 import Select from "../form/Select";
-import Input from "../Input";
 import Submit from "../form/Submit";
 import { ExpenseFilterProps } from "../../types/expense";
 import DateRangePicker from "../form/DatePicket";
-import Datep from "../form/DatePicket";
-import { Timestamp } from "firebase/firestore";
 import MyForm from "../form/Form";
 
 const ExpenseFilter = ({
@@ -21,7 +18,7 @@ const ExpenseFilter = ({
       onReset={handleFilterReset}
       // className="mb-3 max-w-3xl"
     >
-      <div className="flex gap-3 items-center">
+      <div className="flex gap-3 items-center flex-wrap md:flex-nowrap">
         <Select
           getOptionValue={(category: any) => category?.id}
           getOptionLabel={(category: any) => category?.name}

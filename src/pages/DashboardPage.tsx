@@ -1,3 +1,4 @@
+import { useState } from "react";
 import CategoryWiseBudget from "../components/budget/CategoryWiseBudget";
 import MonthlyExpenseTrend from "../components/dashbaord/MonthlyExpenseTrend";
 import SpendingByCategory from "../components/dashbaord/SpendigByCategory";
@@ -7,7 +8,6 @@ import useBudget from "../hooks/useBudget";
 import useBudgetSummary from "../hooks/useBudgetSummary";
 import { useCategories } from "../hooks/useCategories";
 import useExpenses from "../hooks/useExpenses";
-import useEpxenseTrend from "../hooks/useExpenseTrend";
 import { BudgetSummaryCardType } from "../types/dashboard";
 import { getCurrentMonth, moneyFormat } from "../utils/helpers";
 
@@ -20,11 +20,12 @@ const BudgetSummaryCard = ({
   title,
   footer,
   showColor,
+  isMobile,
 }: BudgetSummaryCardType) => {
   return (
-    <div className="border px-6 py-9 rounded-lg bg-white">
-      <div className="flex justify-between items-center mb-3 ">
-        <h5 className="text-[.8rem]">{title}</h5>
+    <div className="border px-2 py-3 md:px-6 md:py-9 rounded-lg bg-white">
+      <div className="flex justify-between items-center mb-2 mb:mb-3">
+        <h5 className="text-[.7rem] md:text-[.8rem]">{title}</h5>
         <div
           className={`${iconBg} w-7.5 h-7.5 rounded flex justify-center items-center`}
         >
@@ -32,12 +33,12 @@ const BudgetSummaryCard = ({
         </div>
       </div>
       <div
-        className={`text-2xl font-semibold mb-2 text-gray-700 ${showColor && typeof total === "number" && (total < 0 ? "text-red-800" : "text-green-700")}`}
+        className={`text-[1rem] md:text-2xl font-semibold mb-2 text-gray-700 ${showColor && typeof total === "number" && (total < 0 ? "text-red-800" : "text-green-700")}`}
       >
         {typeof total === "number" && moneyFormat(total)}
         {typeof total === "string" && total}
       </div>
-      <div className="text-[.7rem]">{footer}</div>
+      <div className="text-[.6rem] md:text-[.7rem]">{footer}</div>
     </div>
   );
 };
@@ -45,9 +46,9 @@ const BudgetSummaryCard = ({
 const Dashboard = () => {
   const { useGetBudgetMonthYear, useGetBudgetTable } = useBudget();
   const { data: budgets } = useGetBudgetMonthYear(date);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  console.log("[Dashboard] budgets",budgets);
-  
+  console.log("[Dashboard] budgets", budgets);
 
   const { useGetExpenseMonthYear } = useExpenses();
   const { data: expenses, isLoading } = useGetExpenseMonthYear(date);
@@ -93,18 +94,19 @@ const Dashboard = () => {
       <H1>Budget Summary for {todaysMonth}</H1>
       {/* <div className="text-[.7rem]">An overview of your spending for {todaysMonth}</div> */}
 
-      <div className="grid grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 mb:mb-5">
         <BudgetSummaryCard
           title="Total Budget"
           iconBg="bg-blue-300"
           footer="Allocated this month"
           total={totalBudget}
+          isMobile
         >
           <span
             className="material-symbols-outlined"
             style={{
               fontVariationSettings: "'wght' 300",
-              fontSize: 20,
+              fontSize: isMobile ? 14 : 20,
               color: "blue",
             }}
           >
@@ -164,11 +166,11 @@ const Dashboard = () => {
           </span>
         </BudgetSummaryCard>
       </div>
-      <div className="grid grid-cols-5 mt-6 gap-3 mb-5">
-        <div className="col-span-3">
+      <div className="grid grid-cols-1 md:grid-cols-5 md:mt-6 gap-3 mb-3 mb:mb-5">
+        <div className="md:col-span-3">
           <MonthlyExpenseTrend />
         </div>
-        <div className="col-span-2 h-full">
+        <div className="md:col-span-2 h-full">
           <SpendingByCategory />
         </div>
       </div>
