@@ -106,7 +106,7 @@ const Dashboard = () => {
             className="material-symbols-outlined"
             style={{
               fontVariationSettings: "'wght' 300",
-              fontSize: isMobile ? 14 : 20,
+              fontSize: 20,
               color: "blue",
             }}
           >

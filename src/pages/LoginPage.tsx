@@ -60,7 +60,7 @@ const Login = () => {
         <Alert type={submitMessage.type} message={submitMessage.message} />
       )}
       {authError && <Alert type="error" message={authError} />}
-      <h1 className="mb-2 text-center text-3xl font-bold">Budget Board Login</h1>
+      <h1 className="mb-2 text-center text-2xl md:text-3xl font-bold">Budget Board Login</h1>
       <LoginSignup
         handleFormSubmit={handleFormSubmit}
         loading={loading}

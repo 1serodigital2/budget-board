@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 interface SidebarNavigationTypes {
   sidebarActive: boolean;
 }
 const SideBarNavigation = ({ sidebarActive }: SidebarNavigationTypes) => {
+  const navigate = useNavigate();
+
   const [openMenu, setMenu] = useState<string | null>(null);
 
   const toggleMenu = (menu: string) => {
@@ -12,8 +14,9 @@ const SideBarNavigation = ({ sidebarActive }: SidebarNavigationTypes) => {
   };
 
   const style = {
-    width: sidebarActive ? "360px" : "0px",
+    width: sidebarActive ? "300px" : "0px",
     overflow: sidebarActive ? "unset" : "hidden",
+    maxWidth: "70%",
   };
   return (
     <div
@@ -29,7 +32,10 @@ const SideBarNavigation = ({ sidebarActive }: SidebarNavigationTypes) => {
       style={{ ...style }}
     >
       <div className="top-0 sticky">
-        <div className="flex gap-3 items-center mb-5 px-5 pt-5 border-b border-b-sidebar-border pb-5">
+        <div
+          className="flex gap-3 items-center mb-5 px-5 pt-5 border-b border-b-sidebar-border pb-5 cursor-pointer"
+          onClick={() => navigate("/")}
+        >
           <div className="bg-(--color-primary) w-8 h-8 rounded-[10px] flex justify-center items-center shrink-0">
             <span
               className="material-symbols-rounded"

@@ -13,7 +13,7 @@ const LoginSignup = ({
   const slugEnd = location.pathname.split("/").filter(Boolean).pop();
 
   return (
-    <div className="bg-(--color-primary) p-5 rounded-3xl w-125">
+    <div className="bg-(--color-primary) p-5 rounded-3xl w-[80%] md:w-125">
       <form onSubmit={handleFormSubmit} action="">
         <div className="mb-2.5">
           <Input
