@@ -3,12 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 
-import Input from "../components/Input";
-import {
-  HandleInputChangeProps,
-  LoginProps,
-  LoginTypes,
-} from "../types/FormTypes";
+import { LoginProps } from "../types/FormTypes";
 import LoginSignup from "../components/form/LoginSignup";
 import { HandleInputChangeType } from "../types/category";
 import useSubmitMessage from "../hooks/useSubmitMessage";
