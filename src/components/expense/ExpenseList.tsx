@@ -252,7 +252,7 @@ const ExpenseList = () => {
               <button
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="bg-(--color-primary) py-2 px-4 h-11.5 text-white rounded-xl cursor-pointer mt-3"
+                className="bg-(--color-primary) py-2 px-4 text-white rounded-lg cursor-pointer mt-3 text-[.7rem] md:text-[.8rem]"
               >
                 {isFetchingNextPage ? "Loading..." : "Load more"}
               </button>

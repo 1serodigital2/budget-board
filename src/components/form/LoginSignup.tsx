@@ -13,7 +13,7 @@ const LoginSignup = ({
   const slugEnd = location.pathname.split("/").filter(Boolean).pop();
 
   return (
-    <div className="bg-(--color-primary) p-5 rounded-3xl w-125">
+    <div className="bg-white border p-5 rounded-lg w-[80%] md:w-125">
       <form onSubmit={handleFormSubmit} action="">
         <div className="mb-2.5">
           <Input
@@ -25,6 +25,7 @@ const LoginSignup = ({
         </div>
         <div className="mb-2.5">
           <Input
+            type="password"
             name="password"
             label="Password"
             handleInputChange={handleInputChange}
@@ -32,7 +33,7 @@ const LoginSignup = ({
           />
         </div>
         <button
-          className="bg-[#1e3a8a] p-3 text-white rounded-xl cursor-pointer"
+          className="bg-(--color-primary) px-3 py-2 text-white rounded-lg cursor-pointer w-full"
           disabled={loading === true}
         >
           {loading ? "Submitting" : slugEnd === "login" ? "login" : "signup"}

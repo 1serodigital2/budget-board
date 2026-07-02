@@ -3,12 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 
-import Input from "../components/Input";
-import {
-  HandleInputChangeProps,
-  LoginProps,
-  LoginTypes,
-} from "../types/FormTypes";
+import { LoginProps } from "../types/FormTypes";
 import LoginSignup from "../components/form/LoginSignup";
 import { HandleInputChangeType } from "../types/category";
 import useSubmitMessage from "../hooks/useSubmitMessage";
@@ -21,7 +16,7 @@ const initialValues: LoginProps = {
 
 const Signup = () => {
   const { submitMessage, showSubmitMessage } = useSubmitMessage();
-  const { user, loading, createUser, authError } = useAuth();
+  const { user, loading, createUser, authError, authSuccess } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,11 +58,15 @@ const Signup = () => {
         <Alert type={submitMessage.type} message={submitMessage.message} />
       )}
       {authError && <Alert type="error" message={authError} />}
-      <LoginSignup
-        handleFormSubmit={handleFormSubmit}
-        loading={loading}
-        handleInputChange={handleInputChange}
-      />
+      {authSuccess ? (
+        <Alert message={authSuccess} />
+      ) : (
+        <LoginSignup
+          handleFormSubmit={handleFormSubmit}
+          loading={loading}
+          handleInputChange={handleInputChange}
+        />
+      )}
     </div>
   );
 };
