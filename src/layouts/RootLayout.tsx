@@ -16,6 +16,7 @@ const RootLayout = () => {
       <SideBarNavigation
         sidebarActive={sidebarActive}
         handleSidebarToggle={handleSidebarToggle}
+        isDesktop={isDesktop}
       />
       <main className="w-full relative">
         <Header handleSidebarToggle={handleSidebarToggle} />

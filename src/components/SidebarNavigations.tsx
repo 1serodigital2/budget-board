@@ -4,10 +4,12 @@ import { NavLink, useNavigate } from "react-router-dom";
 interface SidebarNavigationTypes {
   sidebarActive: boolean;
   handleSidebarToggle: () => void;
+  isDesktop: boolean;
 }
 const SideBarNavigation = ({
   sidebarActive,
   handleSidebarToggle,
+  isDesktop,
 }: SidebarNavigationTypes) => {
   const navigate = useNavigate();
 
@@ -15,6 +17,11 @@ const SideBarNavigation = ({
 
   const toggleMenu = (menu: string) => {
     setMenu((prevMenu) => (prevMenu === menu ? null : menu));
+  };
+
+  const sidebarToggler = () => {
+    if (isDesktop) return;
+    handleSidebarToggle();
   };
 
   const style = {
@@ -41,7 +48,7 @@ const SideBarNavigation = ({
           className="flex gap-3 items-center mb-5 px-5 pt-5 border-b border-b-sidebar-border pb-5 cursor-pointer"
           onClick={() => {
             navigate("/");
-            handleSidebarToggle;
+            sidebarToggler;
           }}
         >
           <div className="bg-(--color-primary) w-8 h-8 rounded-[10px] flex justify-center items-center shrink-0">
@@ -68,7 +75,7 @@ const SideBarNavigation = ({
             <NavLink
               to="/"
               className="flex gap-[.3rem] [&.active]:bg-sidebar-accent p-1.5 rounded-[.6rem]"
-              onClick={handleSidebarToggle}
+              onClick={sidebarToggler}
             >
               <span
                 className="material-symbols-rounded"
@@ -101,7 +108,7 @@ const SideBarNavigation = ({
                   end
                   className="flex gap-[.3rem]  [&.active]:bg-sidebar-accent p-1.5 rounded-[.6rem]"
                   to="/expenses/add"
-                  onClick={handleSidebarToggle}
+                  onClick={sidebarToggler}
                 >
                   <span
                     className="material-symbols-rounded"
@@ -120,7 +127,7 @@ const SideBarNavigation = ({
                   end
                   className="flex gap-[.3rem]  [&.active]:bg-sidebar-accent p-1.5 rounded-[.6rem]"
                   to="/expenses"
-                  onClick={handleSidebarToggle}
+                  onClick={sidebarToggler}
                 >
                   <span
                     className="material-symbols-rounded"
@@ -158,7 +165,7 @@ const SideBarNavigation = ({
                   end
                   className="flex gap-[.3rem]  [&.active]:bg-sidebar-accent p-1.5 rounded-[.6rem]"
                   to="/categories/add"
-                  onClick={handleSidebarToggle}
+                  onClick={sidebarToggler}
                 >
                   <span
                     className="material-symbols-rounded"
@@ -177,7 +184,7 @@ const SideBarNavigation = ({
                   end
                   className="flex gap-[.3rem]  [&.active]:bg-sidebar-accent p-1.5 rounded-[.6rem]"
                   to="/categories"
-                  onClick={handleSidebarToggle}
+                  onClick={sidebarToggler}
                 >
                   <span
                     className="material-symbols-rounded"
@@ -216,7 +223,7 @@ const SideBarNavigation = ({
                   end
                   className="flex gap-[.3rem]  [&.active]:bg-sidebar-accent p-1.5 rounded-[.6rem]"
                   to="/budget/add"
-                  onClick={handleSidebarToggle}
+                  onClick={sidebarToggler}
                 >
                   <span
                     className="material-symbols-rounded"
@@ -235,7 +242,7 @@ const SideBarNavigation = ({
                   end
                   className="flex gap-[.3rem]  [&.active]:bg-sidebar-accent p-1.5 rounded-[.6rem]"
                   to="/budget"
-                  onClick={handleSidebarToggle}
+                  onClick={sidebarToggler}
                 >
                   <span
                     className="material-symbols-rounded"
@@ -254,7 +261,7 @@ const SideBarNavigation = ({
                   end
                   className="flex gap-[.3rem]  [&.active]:bg-sidebar-accent p-1.5 rounded-[.6rem]"
                   to="/budget/overview"
-                  onClick={handleSidebarToggle}
+                  onClick={sidebarToggler}
                 >
                   <span
                     className="material-symbols-rounded"
