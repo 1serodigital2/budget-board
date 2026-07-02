@@ -6,7 +6,6 @@ export const createUser = ({ email, password }: LoginProps) => {
 };
 
 export const loginUser = (email: string, password: string) => {
-  console.log("login response");
   return supabase.auth.signInWithPassword({ email, password });
 };
 

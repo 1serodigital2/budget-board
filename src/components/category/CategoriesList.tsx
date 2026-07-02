@@ -66,8 +66,6 @@ const CategoriesList = () => {
     );
   }
 
-  console.log("categories data", data);
-
   return (
     <>
       {submitMessage && submitMessage.message !== "" && (

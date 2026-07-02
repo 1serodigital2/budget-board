@@ -118,9 +118,6 @@ const useBudget = () => {
     categories,
     limit = undefined,
   }: BudgetTableTypes): BudgetTableResponseTypes | undefined => {
-    console.log("[useGetBudgetTable] Debug budgets", budgets);
-    console.log("[useGetBudgetTable] Debug expenses", expenses);
-    console.log("[useGetBudgetTable] Debug categories", categories);
 
     if (!budgets || !expenses || !categories) return undefined;
 

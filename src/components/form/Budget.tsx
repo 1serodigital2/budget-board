@@ -14,8 +14,6 @@ const BudgetForm = ({
   const { useGetCategories } = useCategories();
   const { data, isError, error } = useGetCategories();
 
-  console.log("budget input value", inputValue);
-
   if (isError) {
     return (
       <Alert
@@ -39,7 +37,7 @@ const BudgetForm = ({
             inputValues={inputValue.category}
           />
         </div>
-        <div className="flex gap-4 mb-2">
+        <div className="flex md:gap-4 mb-2 flex-wrap">
           <Input
             type="number"
             label="Amount"

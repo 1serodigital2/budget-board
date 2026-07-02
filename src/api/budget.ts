@@ -53,7 +53,6 @@ export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
 
 export const getBudgets = async (uid: string, filter?: DateFilter) => {
   try {
-    console.log("[getBudgets] filter", filter);
 
     const categories = await getCategories(uid);
 
@@ -74,7 +73,6 @@ export const getBudgets = async (uid: string, filter?: DateFilter) => {
 
     const { data, error } = await query;
 
-    console.log("[getBudgets] Debug budgets", data);
 
     if (error) {
       throw error;
@@ -222,7 +220,6 @@ export const getBudgetMonthYear = async ({
   uid: string;
 }): Promise<GetBudgetDetailsTypes[]> => {
   try {
-    console.log("[getBudgetMonthYear] budget monthYear", monthYear);
 
     const { data, error } = await supabase
       .from("budgets")
@@ -230,7 +227,6 @@ export const getBudgetMonthYear = async ({
       .eq("user_id", uid)
       .eq("month", monthYear);
 
-    console.log("[getBudgetMonthYear] budget data", data);
     if (error) throw error;
 
     return (data || []).map((budget: any) => ({

@@ -28,16 +28,12 @@ const CategoryBudgetProgress = ({
   const { useGetBudgetMonthYear } = useBudget();
   const { data: currentMonthBudgets } = useGetBudgetMonthYear(month);
 
-  console.log("useGetBudgetMonthYear", currentMonthBudgets);
-
   const monthlyCategorySpent = useBudgetVsCategory({
     month,
     budgets: currentMonthBudgets || [],
     expenses,
     categories: categories || [],
   });
-
-  console.log("monthlyCategorySpent", monthlyCategorySpent);
 
   return (
     <div className="grid grid-cols-5 gap-5">

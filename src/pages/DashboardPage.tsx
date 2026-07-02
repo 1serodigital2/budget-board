@@ -48,8 +48,6 @@ const Dashboard = () => {
   const { data: budgets } = useGetBudgetMonthYear(date);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  console.log("[Dashboard] budgets", budgets);
-
   const { useGetExpenseMonthYear } = useExpenses();
   const { data: expenses, isLoading } = useGetExpenseMonthYear(date);
 

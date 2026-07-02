@@ -21,7 +21,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("user data", user);
     if (user) {
       navigate("/");
     }
@@ -51,8 +50,6 @@ const Login = () => {
       };
     });
   };
-
-  console.log("auth error", authError);
 
   return (
     <div className="flex min-h-screen items-center justify-center flex-col bg-(--color-background)">
