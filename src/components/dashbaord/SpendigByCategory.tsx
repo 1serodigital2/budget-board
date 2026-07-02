@@ -43,7 +43,6 @@ export default function SpendingByCategory() {
   }, {});
 
   const formattedExpense = Object.values(groupedExpenses ?? []);
-  // console.log("formattedExpense", formattedExpense);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 

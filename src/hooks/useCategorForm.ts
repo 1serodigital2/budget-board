@@ -24,7 +24,6 @@ const useCategoryForm = (initialValues = defaultValues) => {
   };
 
   const getCategoryDetail = () => {
-    console.log("getCategoryDetail", inputValues);
     return {
       name: inputValues.name,
       color: inputValues.color,

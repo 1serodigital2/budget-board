@@ -27,7 +27,6 @@ const BudgetOverview = () => {
   const [inputValue, setInputValue] = useState({
     budgetMonth: monthFilter.slice(0, 7),
   });
-  console.log("setInputValue", inputValue);
 
   const { useGetBudgetMonthYear, useGetBudgetTable } = useBudget();
 
@@ -44,8 +43,6 @@ const BudgetOverview = () => {
     isError: expensesIsError,
     error: expensesError,
   } = useGetExpenseMonthYear(monthFilter);
-
-  console.log("[BudgetOverview] Debug budgets", budgets);
 
   const {
     budgetData: budgetTable,
