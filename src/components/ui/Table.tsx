@@ -2,19 +2,20 @@ import { TableProps } from "../../types/table";
 
 const Table = ({ columnNames, data = [], children }: TableProps) => {
   return (
-    <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base  rounded">
-      <table className="w-full text-sm text-left rtl:text-right text-body">
-        <thead className="md:text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default rounded">
-          <tr className=" hover:bg-blue-50 transition duration-200">
-            {columnNames.map((column) => (
-              <th className="px-6 py-3 font-medium  text-[.7rem]  md:text-[.8rem] text-gray-800 ">
+    <div className="glass-panel overflow-x-auto">
+      <table className="w-full text-left text-sm text-foreground">
+        <thead className="bg-white/5 border-b border-white/10 text-xs uppercase tracking-wider text-muted-foreground">
+          <tr>
+            {columnNames.map((column, index) => (
+              <th key={index} className="px-6 py-4 font-semibold">
                 {column}
               </th>
             ))}
           </tr>
         </thead>
-
-        <tbody>{children}</tbody>
+        <tbody className="divide-y divide-white/5 [&>tr]:transition-colors [&>tr:hover]:bg-white/5">
+          {children}
+        </tbody>
       </table>
     </div>
   );

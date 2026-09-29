@@ -15,9 +15,9 @@ const Input = ({
     <div className="flex flex-col flex-1">
       <label
         htmlFor={name}
-        className="block mb-2 text-md text-gray-700 font-medium text-[.8rem]"
+        className="block mb-2 text-sm text-foreground/90 font-medium tracking-wide"
       >
-        {label}
+        {label} {required && <span className="text-destructive">*</span>}
       </label>
       <input
         type={type}
@@ -26,8 +26,8 @@ const Input = ({
         max={
           type === "date" ? new Date().toISOString().split("T")[0] : undefined
         }
-        className={`block mb-2.5 text-sm font-medium text-heading py-2 px-3 border rounded-lg text-[.8rem] ${
-          sx ? sx : "text-gray-700"
+        className={`block w-full text-sm font-medium bg-black/20 text-foreground border border-white/10 rounded-xl px-4 py-2.5 transition-all duration-300 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground ${
+          sx ? sx : ""
         }`}
         onChange={(e) =>
           handleInputChange({ name, inputValue: e.target.value })

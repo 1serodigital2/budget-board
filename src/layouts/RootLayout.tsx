@@ -12,23 +12,24 @@ const RootLayout = () => {
   };
 
   return (
-    <div className="flex max-w-[100vw] overflow-hidden">
+    <div className="flex max-w-[100vw] min-h-screen overflow-hidden text-foreground">
       <SideBarNavigation
         sidebarActive={sidebarActive}
         handleSidebarToggle={handleSidebarToggle}
         isDesktop={isDesktop}
       />
-      <main className="w-full relative">
+      <main className="flex-1 relative flex flex-col transition-all duration-300">
         <Header handleSidebarToggle={handleSidebarToggle} />
-        <div className="px-3 py-5 md:px-6 bg-(--color-background)">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6">
           {!isDesktop && (
             <div
-              className={`absolute inset-0 bg-[rgba(0,0,0,0.8)] transition-all duration-200 z-10 ${sidebarActive ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+              className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-300 z-10 ${sidebarActive ? "opacity-100" : "opacity-0 pointer-events-none"}`}
               onClick={() => !isDesktop && setSidebarActive(false)}
             ></div>
           )}
-
-          <Outlet />
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>

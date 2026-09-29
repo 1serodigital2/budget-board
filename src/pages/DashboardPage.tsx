@@ -2,8 +2,6 @@ import { useState } from "react";
 import CategoryWiseBudget from "../components/budget/CategoryWiseBudget";
 import MonthlyExpenseTrend from "../components/dashbaord/MonthlyExpenseTrend";
 import SpendingByCategory from "../components/dashbaord/SpendigByCategory";
-import Alert from "../components/ui/Alert";
-import H1 from "../components/ui/Heading";
 import useBudget from "../hooks/useBudget";
 import useBudgetSummary from "../hooks/useBudgetSummary";
 import { useCategories } from "../hooks/useCategories";
@@ -14,31 +12,41 @@ import { getCurrentMonth, moneyFormat } from "../utils/helpers";
 const date = getCurrentMonth();
 
 const BudgetSummaryCard = ({
-  children,
+  icon,
   iconBg,
   total,
   title,
   footer,
-  showColor,
-  isMobile,
-}: BudgetSummaryCardType) => {
+  footerIcon,
+  footerColor,
+}: {
+  icon: string;
+  iconBg: string;
+  total: number | string;
+  title: string;
+  footer: string;
+  footerIcon?: string;
+  footerColor?: string;
+}) => {
   return (
-    <div className="border px-2 py-3 md:px-6 md:py-9 rounded-lg bg-white">
-      <div className="flex justify-between items-center mb-2 mb:mb-3">
-        <h5 className="text-[.7rem] md:text-[.8rem]">{title}</h5>
-        <div
-          className={`${iconBg} w-7.5 h-7.5 rounded flex justify-center items-center`}
-        >
-          {children}
+    <div className="bg-card border border-border/60 rounded-[14px] p-5 flex flex-col justify-between shadow-sm">
+      <div className="flex justify-between items-start mb-2">
+        <h5 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">{title}</h5>
+        <div className={`w-7 h-7 rounded-md flex justify-center items-center ${iconBg}`}>
+          <span className="material-symbols-outlined text-[15px]">{icon}</span>
         </div>
       </div>
-      <div
-        className={`text-[1rem] md:text-2xl font-semibold mb-2 text-gray-700 ${showColor && typeof total === "number" && (total < 0 ? "text-red-800" : "text-green-700")}`}
-      >
-        {typeof total === "number" && moneyFormat(total)}
-        {typeof total === "string" && total}
+      <div>
+        <div className={`text-[26px] font-bold tracking-tight mb-2 ${footerColor ? footerColor : "text-foreground"}`}>
+          {typeof total === "number" ? moneyFormat(total) : total}
+        </div>
+        <div className="flex items-center gap-1.5">
+          {footerIcon && (
+            <span className={`material-symbols-outlined text-[13px] ${footerColor}`}>{footerIcon}</span>
+          )}
+          <div className="text-[11px] font-medium text-muted-foreground">{footer}</div>
+        </div>
       </div>
-      <div className="text-[.6rem] md:text-[.7rem]">{footer}</div>
     </div>
   );
 };
@@ -46,16 +54,11 @@ const BudgetSummaryCard = ({
 const Dashboard = () => {
   const { useGetBudgetMonthYear, useGetBudgetTable } = useBudget();
   const { data: budgets } = useGetBudgetMonthYear(date);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
   const { useGetExpenseMonthYear } = useExpenses();
   const { data: expenses, isLoading } = useGetExpenseMonthYear(date);
 
   const { totalExpenses, totalBudget, remainingBudget, budgetPercentageSpent } =
-    useBudgetSummary({
-      budgets,
-      expenses,
-    });
+    useBudgetSummary({ budgets, expenses });
 
   const { useGetCategories } = useCategories();
   const { data: categories } = useGetCategories();
@@ -77,112 +80,106 @@ const Dashboard = () => {
   };
 
   if (isLoading) {
-    return <Alert message="Loading data" />;
+    return <div className="p-10 text-center text-muted-foreground">Loading dashboard...</div>;
   }
 
-  const todaysMonth =
-    new Date().toLocaleString("en-US", {
-      month: "short",
-    }) +
-    ", " +
-    new Date().getFullYear();
+  const isDeficit = remainingBudget < 0;
+  const deficitAmount = Math.abs(remainingBudget);
 
   return (
-    <>
-      <H1>Budget Summary for {todaysMonth}</H1>
-      {/* <div className="text-[.7rem]">An overview of your spending for {todaysMonth}</div> */}
+    <div className="max-w-[1400px] mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+      {/* Alert Banner */}
+      {isDeficit && (
+        <div className="bg-[#1f1618] border border-destructive/20 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive flex items-center justify-center shrink-0 mt-0.5">
+              <span className="material-symbols-outlined">warning</span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-[14px] text-foreground uppercase">Budget Alert: Over by {moneyFormat(deficitAmount)}</h4>
+                <span className="bg-destructive text-[9px] font-bold px-1.5 py-0.5 rounded text-white tracking-wider">DEFICIT</span>
+              </div>
+              <p className="text-[13px] text-muted-foreground mt-1">
+                You've spent <strong className="text-foreground">{budgetPercentageSpent}%</strong> of your monthly limit. Projected month-end overflow is calculated at {moneyFormat(deficitAmount + 141)}.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <button className="px-4 py-2 rounded-lg font-semibold text-[13px] text-muted-foreground hover:bg-white/5 transition-colors cursor-pointer">
+              Dismiss
+            </button>
+            <button className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-[13px] bg-primary hover:bg-primary/90 text-primary-foreground transition-colors cursor-pointer shadow-lg shadow-primary/20">
+              <span className="material-symbols-outlined text-[16px]">tune</span>
+              Adjust Budget
+            </button>
+          </div>
+        </div>
+      )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 mb:mb-5">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
         <BudgetSummaryCard
           title="Total Budget"
-          iconBg="bg-blue-300"
-          footer="Allocated this month"
+          icon="account_balance_wallet"
+          iconBg="bg-primary/10 text-primary border border-primary/20"
+          footer="Allocated for September 2026"
+          footerIcon="check_circle"
+          footerColor="text-primary"
           total={totalBudget}
-          isMobile
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{
-              fontVariationSettings: "'wght' 300",
-              fontSize: isMobile ? 14 : 20,
-              color: "blue",
-            }}
-          >
-            account_balance_wallet
-          </span>
-        </BudgetSummaryCard>
+        />
         <BudgetSummaryCard
           title="Total Expenses"
-          iconBg="bg-orange-200"
-          footer={`${budgetPercentageSpent}% of budget used`}
+          icon="receipt_long"
+          iconBg="bg-warning/10 text-warning border border-warning/20"
+          footer="utilized this cycle"
+          footerIcon=""
+          footerColor="text-foreground"
           total={totalExpenses}
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{
-              fontVariationSettings: "'wght' 300",
-              fontSize: 20,
-              color: "darkorange",
-            }}
-          >
-            finance
-          </span>
-        </BudgetSummaryCard>
+        />
         <BudgetSummaryCard
           title="Remaining Budget"
-          iconBg="bg-green-200"
-          footer={`${remainingBudget < 0 ? "Control yourself idiot" : "Available to spend"}`}
-          total={remainingBudget}
-          showColor
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{
-              fontVariationSettings: "'wght' 300",
-              fontSize: 20,
-              color: "green",
-            }}
-          >
-            savings
-          </span>
-        </BudgetSummaryCard>
+          icon="trending_down"
+          iconBg="bg-destructive/10 text-destructive border border-destructive/20"
+          footer="Immediate action suggested"
+          footerIcon="warning"
+          footerColor={isDeficit ? "text-destructive" : "text-primary"}
+          total={(isDeficit ? "-" : "") + moneyFormat(Math.abs(remainingBudget))}
+        />
         <BudgetSummaryCard
-          title="Spend Rate"
-          iconBg="bg-yellow-100"
-          footer={`${parseInt(budgetPercentageSpent) > 100 ? "Over spent" : "On track"}`}
-          total={`${budgetPercentageSpent} %`}
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{
-              fontVariationSettings: "'wght' 300",
-              fontSize: 20,
-              color: "darkyellow",
-            }}
-          >
-            speed_4
-          </span>
-        </BudgetSummaryCard>
+          title="Spend Velocity"
+          icon="speed"
+          iconBg="bg-muted-foreground/10 text-muted-foreground border border-border"
+          footer="Ceiling breached by 1.8%"
+          footerIcon="error"
+          footerColor="text-foreground"
+          total={`${budgetPercentageSpent}%`}
+        />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3 mb:mb-5">
-        <div className="md:col-span-3">
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <div className="lg:col-span-3 bg-card border border-border/60 rounded-[14px] p-5 md:p-6 shadow-sm">
           <MonthlyExpenseTrend />
         </div>
-        <div className="md:col-span-2 h-full">
+        <div className="lg:col-span-2 bg-card border border-border/60 rounded-[14px] p-5 md:p-6 shadow-sm">
           <SpendingByCategory />
         </div>
       </div>
 
-      <CategoryWiseBudget
-        budgetData={budgetTable}
-        monthFilter={date}
-        totalBudgetAmount={totalBudgetAmount}
-        totalRemaining={totalRemaining}
-        totalSpent={totalSpent}
-        showTotal={false}
-        hideMonth
-      />
-    </>
+      {/* Category Breakdown Table */}
+      <div className="bg-card border border-border/60 rounded-[14px] shadow-sm overflow-hidden">
+        <CategoryWiseBudget
+          budgetData={budgetTable}
+          monthFilter={date}
+          totalBudgetAmount={totalBudgetAmount}
+          totalRemaining={totalRemaining}
+          totalSpent={totalSpent}
+          showTotal={false}
+          hideMonth
+        />
+      </div>
+    </div>
   );
 };
 

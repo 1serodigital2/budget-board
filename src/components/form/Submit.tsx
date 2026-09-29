@@ -4,15 +4,19 @@ interface SubmitType {
   label?: string;
 }
 
-const Submit = ({ isPending, type = "submit" }: SubmitType) => {
+const Submit = ({ isPending, type = "submit", label }: SubmitType) => {
   return (
     <button
       type={type}
-      className={`${type == "submit" ? "bg-(--color-primary)" : "bg-(--color-primary)"} py-2 px-3 text-white rounded-lg cursor-pointer text-[.8rem]`}
-      disabled={isPending ? true : false}
+      className={`hover-lift py-2.5 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
+        type === "submit"
+          ? "bg-primary text-primary-foreground hover:bg-primary/90 neon-glow"
+          : "bg-white/10 text-foreground hover:bg-white/20 border border-white/10"
+      } ${isPending ? "opacity-70 cursor-not-allowed hover:translate-y-0" : "cursor-pointer"}`}
+      disabled={isPending}
     >
-      {type === "submit" && (isPending ? "Submitting" : "Submit")}
-      {type === "reset" && "X  Clear"}
+      {type === "submit" && (isPending ? "Submitting..." : label || "Submit")}
+      {type === "reset" && (label || "Clear")}
     </button>
   );
 };
