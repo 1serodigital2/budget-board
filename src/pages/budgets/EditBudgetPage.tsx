@@ -1,92 +1,58 @@
-import { useParams } from "react-router-dom";
-
-import BudgetForm from "../../components/form/Budget";
-import Alert from "../../components/ui/Alert";
-import H1 from "../../components/ui/Heading";
-import useBudget from "../../hooks/useBudget";
-import { useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { HandleInputChangeType } from "../../types/category";
+import { useNavigate, useParams } from "react-router-dom";
+import BudgetForm from "../../components/budgets/BudgetForm";
+import Card from "../../components/ui/Card";
+import PageHeader from "../../components/ui/PageHeader";
+import { PageLoader } from "../../components/ui/Spinner";
+import { ErrorState } from "../../components/ui/States";
+import { useToast } from "../../context/ToastContext";
+import { useBudget, useUpdateBudget } from "../../hooks/useBudgets";
+import { getErrorMessage } from "../../utils/helpers";
 
 const EditBudgetPage = () => {
-  const { user } = useAuth();
-  const params = useParams();
-  const budgetId = params.id;
-  const {
-    inputValue,
-    useBudgetUpdate,
-    submitMessage,
-    getBudget,
-    setInputValue,
-    showSubmitMessage,
-  } = useBudget();
+  const id = Number(useParams().id);
+  const navigate = useNavigate();
+  const toast = useToast();
+  const { data: budget, isPending, isError, error, refetch } = useBudget(id);
+  const updateBudget = useUpdateBudget(id);
 
-  const { data, isLoading, isError, error } = getBudget(budgetId!);
-
-  const {
-    mutate,
-    isPending,
-    isError: updateIsError,
-    error: updateError,
-  } = useBudgetUpdate(params.id!);
-
-  useEffect(() => {
-    if (data) {
-      const budgetData = {
-        category: data.category,
-        amount: data.amount,
-        month: data.month.slice(0, 7),
-      };
-      setInputValue(budgetData);
-    }
-  }, [data]);
-
-  const handleFormSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    if (inputValue.amount < 0 || !inputValue.category) {
-      showSubmitMessage("Please fill up the form properly", "error");
-      return;
-    }
-    mutate(inputValue);
-  };
-
-  const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
-    setInputValue((prevState) => {
-      return {
-        ...prevState,
-        [name]: inputValue,
-      };
-    });
-  };
-
-  if (isLoading) {
-    return <Alert message="Getting budget detail..." />;
+  if (isPending) return <PageLoader label="Loading budget…" />;
+  if (isError) {
+    return (
+      <>
+        <PageHeader back={{ to: "/budgets", label: "Budgets" }} title="Edit budget" />
+        <Card>
+          <ErrorState error={error} onRetry={() => refetch()} />
+        </Card>
+      </>
+    );
   }
+
+  const backTo = `/budgets?month=${budget.month}`;
 
   return (
     <>
-      <H1>Edit Budget</H1>
-      {updateIsError && (
-        <Alert
-          type="error"
-          message={updateError.message || "Failed to update"}
-        />
-      )}
-      {updateIsError && (
-        <Alert
-          type="error"
-          message={updateError.message || "Failed to update"}
-        />
-      )}
-      {submitMessage && submitMessage.message !== "" && (
-        <Alert type={submitMessage.type} message={submitMessage.message} />
-      )}
-
+      <PageHeader
+        back={{ to: backTo, label: "Budgets" }}
+        title="Edit budget"
+        description="Change the limit, category or month."
+      />
       <BudgetForm
-        handleFormSubmit={handleFormSubmit}
-        inputValue={inputValue}
-        handleInputChange={handleInputChange}
-        isPending={isPending}
+        key={budget.id}
+        budgetId={budget.id}
+        initialValues={budget}
+        submitLabel="Save changes"
+        submitting={updateBudget.isPending}
+        cancelTo={backTo}
+        onSubmit={async (input) => {
+          try {
+            await updateBudget.mutateAsync(input);
+          } catch (err) {
+            toast.error(getErrorMessage(err, "Unable to update budget"));
+            throw err;
+          }
+          toast.success("Budget updated");
+          navigate(`/budgets?month=${input.month}`);
+        }}
       />
     </>
   );

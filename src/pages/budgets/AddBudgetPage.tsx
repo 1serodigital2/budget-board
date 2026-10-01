@@ -1,60 +1,45 @@
-import H1 from "../../components/ui/Heading";
-import { HandleInputChangeType } from "../../types/category";
-import useBudget from "../../hooks/useBudget";
-import { useAuth } from "../../context/AuthContext";
-import Alert from "../../components/ui/Alert";
-import BudgetForm from "../../components/form/Budget";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import BudgetForm from "../../components/budgets/BudgetForm";
+import PageHeader from "../../components/ui/PageHeader";
+import { useToast } from "../../context/ToastContext";
+import { useCreateBudget } from "../../hooks/useBudgets";
+import { currentMonthKey, getErrorMessage, isMonthKey } from "../../utils/helpers";
 
 const AddBudgetPage = () => {
-  const { user } = useAuth();
-  const {
-    useAddBudgetForm,
-    submitMessage,
-    setInputValue,
-    inputValue,
-    showSubmitMessage,
-  } = useBudget();
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const toast = useToast();
+  const createBudget = useCreateBudget();
 
-  const { mutate, isPending, isError, error } = useAddBudgetForm();
+  const monthParam = params.get("month")?.slice(0, 7);
+  const month = isMonthKey(monthParam) ? monthParam : currentMonthKey();
+  const categoryId = Number(params.get("category")) || undefined;
 
-  const handleInputChange = ({ name, inputValue }: HandleInputChangeType) => {
-    setInputValue((prevState) => {
-      return {
-        ...prevState,
-        [name]: inputValue,
-      };
-    });
-  };
-
-  const handleFormSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    if (!user?.id) {
-      showSubmitMessage("User id is required", "error");
-      return;
-    }
-    if (inputValue.amount <= 0) {
-      showSubmitMessage("Amount must be greater than 0", "error");
-      return;
-    }
-    mutate({ budgetDetail: inputValue, uid: user.id });
-  };
   return (
     <>
-      <H1>Budget page</H1>
-      {submitMessage && submitMessage.message !== "" && !isError && (
-        <Alert type={submitMessage.type} message={submitMessage.message} />
-      )}
-      {isError && (
-        <Alert type="error" message={error.message || "error adding budget"} />
-      )}
-
+      <PageHeader
+        back={{ to: `/budgets?month=${month}`, label: "Budgets" }}
+        title="New budget"
+        description="Set a monthly spending limit for a category."
+      />
       <BudgetForm
-        handleFormSubmit={handleFormSubmit}
-        inputValue={inputValue}
-        handleInputChange={handleInputChange}
-        isPending={isPending}
+        initialValues={{ month, categoryId }}
+        submitLabel="Create budget"
+        submitting={createBudget.isPending}
+        cancelTo={`/budgets?month=${month}`}
+        onSubmit={async (input) => {
+          try {
+            await createBudget.mutateAsync(input);
+          } catch (error) {
+            toast.error(getErrorMessage(error, "Unable to create budget"));
+            throw error;
+          }
+          toast.success("Budget created");
+          navigate(`/budgets?month=${input.month}`);
+        }}
       />
     </>
   );
 };
+
 export default AddBudgetPage;

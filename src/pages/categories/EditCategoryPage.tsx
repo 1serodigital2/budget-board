@@ -1,93 +1,74 @@
-import { useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
-
-import Category from "../../components/form/Category";
-import H1 from "../../components/ui/Heading";
-import useCategoryForm from "../../hooks/useCategorForm";
-import useSubmitMessage from "../../hooks/useSubmitMessage";
-import { useAuth } from "../../context/AuthContext";
-import { useEffect } from "react";
-import { getCategoryById, updateCategory } from "../../api/category";
-import Alert from "../../components/ui/Alert";
-import { queryClient } from "../../services/supabase";
+import { useNavigate, useParams } from "react-router-dom";
+import CategoryForm from "../../components/categories/CategoryForm";
+import { ButtonLink } from "../../components/ui/Button";
+import Card from "../../components/ui/Card";
+import PageHeader from "../../components/ui/PageHeader";
+import { PageLoader } from "../../components/ui/Spinner";
+import { EmptyState, ErrorState } from "../../components/ui/States";
+import { useToast } from "../../context/ToastContext";
+import { useCategory, useUpdateCategory } from "../../hooks/useCategories";
+import { getErrorMessage } from "../../utils/helpers";
 
 const EditCategoryPage = () => {
-  const params = useParams();
-  const { user } = useAuth();
+  const id = Number(useParams().id);
+  const navigate = useNavigate();
+  const toast = useToast();
+  const { data: category, isPending, isError, error, refetch } = useCategory(id);
+  const updateCategory = useUpdateCategory(id);
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["categories", params.id],
-    queryFn: () => {
-      if (!user?.id || !params?.id) {
-        showSubmitMessage("Unauthorized access", "error");
-        return;
-      }
-      return getCategoryById({ userId: user?.id, categoryId: Number(params.id) });
-    },
-    enabled: !!user?.id,
-  });
+  const back = { to: `/categories/${id}`, label: "Category" };
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: updateCategory,
-    onSuccess: () => {
-      showSubmitMessage("Category updated successfully", "success");
-      queryClient.invalidateQueries({
-        queryKey: ["categories"],
-      });
-    },
-  });
-  const { showSubmitMessage, submitMessage } = useSubmitMessage();
-  const { inputValues, handleInputChange, setInputValues, getCategoryDetail } =
-    useCategoryForm();
-
-  useEffect(() => {
-    if (data) {
-      const catData = {
-        name: data.name,
-        color: data.color,
-      };
-      setInputValues(catData);
-    }
-  }, [data]);
-
-  if (isLoading) {
-    return <Alert message="loading category detail" />;
-  }
-
+  if (isPending) return <PageLoader label="Loading category…" />;
   if (isError) {
     return (
-      <Alert
-        type="error"
-        message={error.message || "Unable to get category detail"}
-      />
+      <>
+        <PageHeader back={{ to: "/categories", label: "Categories" }} title="Edit category" />
+        <Card>
+          <ErrorState error={error} onRetry={() => refetch()} />
+        </Card>
+      </>
     );
   }
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    try {
-      const categoryDetail = getCategoryDetail();
-      if (
-        !categoryDetail.name ||
-        !categoryDetail.color ||
-        !params.id ||
-        !user?.id
-      ) {
-        showSubmitMessage("Please fill up the form properly", "error");
-        return;
-      }
-      mutate({ userId: user?.id, catId: Number(params.id), categoryDetail });
-    } catch (error) {}
-  };
+  if (category.isSystem) {
+    return (
+      <>
+        <PageHeader back={back} title="Edit category" />
+        <Card className="max-w-2xl">
+          <EmptyState
+            icon="lock"
+            title="This category can't be edited"
+            description="Uncategorized is a system category used for expenses whose category was deleted."
+            action={
+              <ButtonLink to="/categories" variant="secondary">
+                Back to categories
+              </ButtonLink>
+            }
+          />
+        </Card>
+      </>
+    );
+  }
+
   return (
     <>
-      <H1>Edit Category</H1>
-      <Category
-        submitMessage={submitMessage}
-        inputValues={inputValues}
-        handleInputChange={handleInputChange}
-        handleSubmit={handleSubmit}
-        isPending={isPending}
+      <PageHeader back={back} title="Edit category" description={category.name} />
+      <CategoryForm
+        key={category.id}
+        initialValues={{ name: category.name }}
+        submitLabel="Save changes"
+        submitting={updateCategory.isPending}
+        cancelTo={back.to}
+        onSubmit={async (input) => {
+          try {
+            await updateCategory.mutateAsync(input);
+          } catch (err) {
+            toast.error(getErrorMessage(err, "Unable to update category"));
+            throw err;
+          }
+          toast.success("Category updated");
+          navigate(back.to);
+        }}
       />
     </>
   );

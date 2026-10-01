@@ -1,84 +1,40 @@
-// react hooks
-import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import ExpenseForm from "../../components/expenses/ExpenseForm";
+import PageHeader from "../../components/ui/PageHeader";
+import { useToast } from "../../context/ToastContext";
+import { useCreateExpense } from "../../hooks/useExpenses";
+import { getErrorMessage } from "../../utils/helpers";
 
-// tanstack
-import { useMutation } from "@tanstack/react-query";
-
-// types
-import { createExpense } from "../../api/expenses";
-import { queryClient } from "../../services/supabase";
-import ExpenseForm from "../../components/form/Expense";
-import useExpenseForm from "../../hooks/useExpenseForm";
-import H1 from "../../components/ui/Heading";
-
-const AddExpense = () => {
-  const {
-    inputValues,
-    handleInputChange,
-    resetForm,
-    showSubmitMessage,
-    submitMessage,
-    getExpenseDetail,
-  } = useExpenseForm();
-
-  const { user } = useAuth();
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: createExpense,
-    onSuccess: () => {
-      showSubmitMessage("Expense added successfully", "success");
-      resetForm();
-      queryClient.invalidateQueries({
-        queryKey: ["users"],
-        refetchType: "none",
-      });
-    },
-
-    onError: (error) => {
-      console.error("Unable to add expense", error);
-      showSubmitMessage("Unable to add expense", "error");
-    },
-  });
-
-  const handleFormSubmit = (e: React.SyntheticEvent) => {
-    try {
-      e.preventDefault();
-
-      const expenseDetail = getExpenseDetail();
-
-      if (expenseDetail.amount <= 0) {
-        showSubmitMessage("Please enter amount");
-        return;
-      }
-
-      if (!user?.id) {
-        return;
-      }
-
-      const formattedExpenseDetail = {
-        ...expenseDetail,
-        date: new Date(expenseDetail.date).toISOString(),
-        category: Number(expenseDetail.category),
-      };
-
-      mutate({ expenseDetail: formattedExpenseDetail, uid: user.id });
-    } catch (error) {
-      console.error("Unable to add", error);
-    }
-  };
+const AddExpensePage = () => {
+  const navigate = useNavigate();
+  const toast = useToast();
+  const createExpense = useCreateExpense();
 
   return (
     <>
-      <H1>Add Expense</H1>
+      <PageHeader
+        back={{ to: "/expenses", label: "Expenses" }}
+        title="Add expense"
+        description="Record money you've spent."
+      />
       <ExpenseForm
-        handleFormSubmit={handleFormSubmit}
-        handleInputChange={handleInputChange}
-        inputValues={inputValues}
-        isPending={isPending}
-        submitMessage={submitMessage}
+        submitLabel="Save expense"
+        submitting={createExpense.isPending}
+        cancelTo="/expenses"
+        allowAddAnother
+        onSubmit={async (input, { addAnother }) => {
+          try {
+            await createExpense.mutateAsync(input);
+          } catch (error) {
+            toast.error(getErrorMessage(error, "Unable to add expense"));
+            throw error;
+          }
+          toast.success("Expense added");
+          if (!addAnother) navigate("/expenses");
+        }}
       />
     </>
   );
 };
 
-export default AddExpense;
+export default AddExpensePage;

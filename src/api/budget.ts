@@ -1,243 +1,144 @@
 import { supabase } from "../services/supabase";
+import type { Budget, BudgetInput } from "../types/budget";
+import { isMonthKey } from "../utils/helpers";
 
-import {
-  BudgetType,
-  GetBudgetByIdType,
-  GetBudgetDetailsTypes,
-  UpdateBudgetType,
-} from "../types/budget";
-import { getCategories } from "./category";
-import {
-  addDateInMonth,
-  DateFilter,
-  formatMonth,
-  getMonthRange,
-} from "../utils/helpers";
+interface BudgetRow {
+  id: number;
+  amount: number | string | null;
+  category: number;
+  month: string;
+  created_at: string | null;
+}
 
-export const createBudget = async ({ budgetDetail, uid }: BudgetType) => {
-  try {
-    const finalDocid = normalizeBudgetSlug(
-      budgetDetail.category.toString(),
-      budgetDetail.month,
-    );
+const COLUMNS = "id, amount, category, month, created_at";
 
-    // check for duplicate budget
-    const { data: duplicateBudget } = await supabase
-      .from("budgets")
-      .select("id")
-      .eq("user_id", uid)
-      .eq("slug", finalDocid)
-      .eq("month", addDateInMonth(budgetDetail.month, "-01"))
-      .single();
+const mapBudget = (row: BudgetRow): Budget => ({
+  id: row.id,
+  amount: Number(row.amount) || 0,
+  categoryId: row.category,
+  month: String(row.month).slice(0, 7),
+  createdAt: row.created_at ?? "",
+});
 
-    if (duplicateBudget) {
-      throw new Error("This budget already exist");
-    }
+const toRow = (input: BudgetInput) => ({
+  amount: Number(input.amount),
+  category: Number(input.categoryId),
+  month: `${input.month}-01`,
+  slug: `${Number(input.categoryId)}_${input.month}`,
+});
 
-    // Add budget
-    const { error } = await supabase.from("budgets").insert({
-      user_id: uid,
-      amount: budgetDetail.amount,
-      category: budgetDetail.category,
-      month: budgetDetail.month + "-01",
-      slug: finalDocid,
-    });
+const validate = (input: BudgetInput) => {
+  if (!input.categoryId) throw new Error("Please choose a category");
+  if (!isMonthKey(input.month)) throw new Error("Please choose a month");
+  if (!(Number(input.amount) > 0)) throw new Error("Amount must be greater than 0");
+};
 
-    if (error) {
-      throw error;
-    }
-  } catch (error: any) {
-    throw new Error("Unable to create budget: " + error.message);
+/** One budget per category per month. */
+const assertNoDuplicate = async (
+  uid: string,
+  input: BudgetInput,
+  excludeId?: number,
+) => {
+  let query = supabase
+    .from("budgets")
+    .select("id")
+    .eq("user_id", uid)
+    .eq("category", Number(input.categoryId))
+    .eq("month", `${input.month}-01`)
+    .limit(1);
+  if (excludeId) query = query.neq("id", excludeId);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  if (data && data.length > 0) {
+    throw new Error("A budget for this category and month already exists");
   }
 };
 
-export const getBudgets = async (uid: string, filter?: DateFilter) => {
-  try {
-
-    const categories = await getCategories(uid);
-
-    let query = supabase
-      .from("budgets")
-      .select("*")
-      .eq("user_id", uid)
-      .order("month", { ascending: false });
-
-    if (filter && filter !== "all-time") {
-      const range = getMonthRange(filter);
-      if (range) {
-        query = query
-          .gte("month", range.startDate)
-          .lte("month", range.endDate);
-      }
-    }
-
-    const { data, error } = await query;
-
-
-    if (error) {
-      throw error;
-    }
-
-    return (data || []).map((budget: any) => {
-      const matchedCategory = categories.find(
-        (category) => category.id === budget.category,
-      );
-
-      return {
-        id: budget.id,
-        slug: budget.slug,
-        amount: budget.amount,
-        category: matchedCategory?.name || "",
-        month: budget.month,
-        createdAt: budget.created_at,
-      };
-    });
-  } catch (error: any) {
-    console.error("Unable to fetch budgets", error);
-    throw error;
-  }
-};
-
-export const getBudgetById = async ({ uid, budgetId }: GetBudgetByIdType) => {
-  try {
-    const { data, error } = await supabase
-      .from("budgets")
-      .select("*")
-      .eq("user_id", uid)
-      .eq("id", budgetId)
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    if (data) {
-      return {
-        id: budgetId,
-        amount: data.amount,
-        category: data.category,
-        month: data.month,
-      };
-    }
-  } catch (error) {}
-};
-
-export const deleteBudgetById = async ({
-  uid,
-  budgetId,
-}: GetBudgetByIdType) => {
-  try {
-    const { error } = await supabase
-      .from("budgets")
-      .delete()
-      .eq("user_id", uid)
-      .eq("id", budgetId);
-
-    if (error) throw error;
-  } catch (error: any) {
-    throw new Error("Fatal error while deleting budget" + error.message);
-  }
-};
-
-export const getBudgetExceptCurrent = async ({
-  uid,
-  budgetId,
-}: GetBudgetByIdType) => {
+export const getBudgetsForMonth = async (
+  uid: string,
+  month: string,
+): Promise<Budget[]> => {
   const { data, error } = await supabase
     .from("budgets")
-    .select("*")
+    .select(COLUMNS)
     .eq("user_id", uid)
-    .neq("id", budgetId);
+    .eq("month", `${month}-01`)
+    .order("amount", { ascending: false });
 
-  if (error) {
-    throw error;
-  }
-
-  return (data || []).map((budget: any) => ({
-    id: budget.id,
-    category: budget.category,
-    month: budget.month,
-    slug: budget.slug,
-  }));
+  if (error) throw new Error(`Unable to load budgets: ${error.message}`);
+  return (data ?? []).map(mapBudget);
 };
 
-export const updateBudget = async ({
-  uid,
-  budgetId,
-  budgetDetail,
-}: UpdateBudgetType) => {
-  try {
-    const existingBudgets = await getBudgetExceptCurrent({
-      uid,
-      budgetId,
-    });
+export const getBudgetById = async (uid: string, id: number) => {
+  const { data, error } = await supabase
+    .from("budgets")
+    .select(COLUMNS)
+    .eq("user_id", uid)
+    .eq("id", id)
+    .maybeSingle();
 
-    const isDuplicate = existingBudgets.some(
-      (budget) =>
-        budget.category === budgetDetail.category &&
-        budget.month == budgetDetail.month + "-01",
-    );
-
-    if (isDuplicate) {
-      throw new Error("Budget already exists for this category and month");
-    }
-
-    const budgetSlug = normalizeBudgetSlug(
-      budgetDetail.category.toString(),
-      budgetDetail.month,
-    );
-
-    const { error } = await supabase
-      .from("budgets")
-      .update({
-        amount: budgetDetail.amount,
-        category: budgetDetail.category,
-        month: budgetDetail.month + "-01",
-        slug: budgetSlug,
-      })
-      .eq("user_id", uid)
-      .eq("id", budgetId);
-
-    if (error) throw error;
-
-    return true;
-  } catch (error: any) {
-    throw error;
-  }
+  if (error) throw new Error(`Unable to load budget: ${error.message}`);
+  if (!data) throw new Error("Budget not found");
+  return mapBudget(data);
 };
 
-const normalizeBudgetSlug = (category: string, month: string) => {
-  const docId = category + "_" + month;
-  const finalDocid = docId.toLowerCase().trim();
-  return finalDocid;
+export const createBudget = async (uid: string, input: BudgetInput) => {
+  validate(input);
+  await assertNoDuplicate(uid, input);
+  const { error } = await supabase
+    .from("budgets")
+    .insert({ ...toRow(input), user_id: uid });
+  if (error) throw new Error(`Unable to create budget: ${error.message}`);
 };
 
-export const getBudgetMonthYear = async ({
-  monthYear,
-  uid,
-}: {
-  monthYear: string;
-  uid: string;
-}): Promise<GetBudgetDetailsTypes[]> => {
-  try {
+export const updateBudget = async (
+  uid: string,
+  id: number,
+  input: BudgetInput,
+) => {
+  validate(input);
+  await assertNoDuplicate(uid, input, id);
+  const { error } = await supabase
+    .from("budgets")
+    .update(toRow(input))
+    .eq("user_id", uid)
+    .eq("id", id);
+  if (error) throw new Error(`Unable to update budget: ${error.message}`);
+};
 
-    const { data, error } = await supabase
-      .from("budgets")
-      .select("*")
-      .eq("user_id", uid)
-      .eq("month", monthYear);
+export const deleteBudget = async (uid: string, id: number) => {
+  const { error } = await supabase
+    .from("budgets")
+    .delete()
+    .eq("user_id", uid)
+    .eq("id", id);
+  if (error) throw new Error(`Unable to delete budget: ${error.message}`);
+};
 
-    if (error) throw error;
-
-    return (data || []).map((budget: any) => ({
-      id: budget.id,
-      amount: budget.amount,
-      category: budget.category,
-      month: budget.month,
-      createdAt: budget.created_at,
-      slug: budget.slug,
+/**
+ * Copies every budget from `fromMonth` into `toMonth`, skipping categories
+ * that already have a budget there. Returns how many were created.
+ */
+export const copyBudgets = async (
+  uid: string,
+  fromMonth: string,
+  toMonth: string,
+) => {
+  const [source, target] = await Promise.all([
+    getBudgetsForMonth(uid, fromMonth),
+    getBudgetsForMonth(uid, toMonth),
+  ]);
+  const taken = new Set(target.map((b) => b.categoryId));
+  const rows = source
+    .filter((b) => !taken.has(b.categoryId))
+    .map((b) => ({
+      ...toRow({ categoryId: b.categoryId, amount: b.amount, month: toMonth }),
+      user_id: uid,
     }));
-  } catch (error: any) {
-    throw new Error("Failed to fetch budget for specific month");
-  }
+
+  if (rows.length === 0) return 0;
+  const { error } = await supabase.from("budgets").insert(rows);
+  if (error) throw new Error(`Unable to copy budgets: ${error.message}`);
+  return rows.length;
 };

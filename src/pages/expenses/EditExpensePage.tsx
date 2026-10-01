@@ -1,121 +1,50 @@
-// react hooks
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-
-// tanstack
-import { useMutation, useQuery } from "@tanstack/react-query";
-
-// types
-import { getExpenseById, updateExpense } from "../../api/expenses";
-import { queryClient } from "../../services/supabase";
-import ExpenseForm from "../../components/form/Expense";
-import Alert from "../../components/ui/Alert";
-import useExpenseForm from "../../hooks/useExpenseForm";
+import { useNavigate, useParams } from "react-router-dom";
+import ExpenseForm from "../../components/expenses/ExpenseForm";
+import PageHeader from "../../components/ui/PageHeader";
+import { PageLoader } from "../../components/ui/Spinner";
+import { ErrorState } from "../../components/ui/States";
+import { useToast } from "../../context/ToastContext";
+import { useExpense, useUpdateExpense } from "../../hooks/useExpenses";
+import { getErrorMessage } from "../../utils/helpers";
 
 const EditExpensePage = () => {
-  const {
-    inputValues,
-    handleInputChange,
-    submitMessage,
-    setInputValues,
-    showSubmitMessage,
-    getExpenseDetail,
-  } = useExpenseForm();
+  const id = Number(useParams().id);
+  const navigate = useNavigate();
+  const toast = useToast();
+  const { data: expense, isPending, isError, error, refetch } = useExpense(id);
+  const updateExpense = useUpdateExpense(id);
 
-  const { user } = useAuth();
-  const { id } = useParams();
+  const back = { to: `/expenses/${id}`, label: "Expense details" };
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["expenses", id],
-    queryFn: () => {
-      if (!user?.id || !id) {
-        throw new Error("Missing userid or expenseid");
-      }
-      return getExpenseById({ uid: user?.id, id: Number(id) });
-    },
-    enabled: !!user?.id && !!id,
-  });
-
-  useEffect(() => {
-    if (data) {
-      const formattedExpense = {
-        ...data,
-        date: data.date
-          ? new Date(data.date).toISOString().split("T")[0]
-          : new Date().toISOString().split("T")[0],
-      };
-      setInputValues(formattedExpense);
-    }
-  }, [data]);
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: updateExpense,
-    onSuccess: () => {
-      showSubmitMessage("Expense updated successfully", "success");
-      queryClient.invalidateQueries({
-        queryKey: ["users", user?.id],
-      });
-    },
-
-    onError: () => {
-      console.error("Unable to update expense");
-      showSubmitMessage("Unable to update expense", "error");
-    },
-  });
-
-  if (isLoading) {
-    return <Alert message="Loading expense" />;
-  }
+  if (isPending) return <PageLoader label="Loading expense…" />;
   if (isError) {
     return (
-      <Alert
-        type="error"
-        message={error.message || "Unable to get expense detail"}
-      />
+      <>
+        <PageHeader back={{ to: "/expenses", label: "Expenses" }} title="Edit expense" />
+        <ErrorState error={error} onRetry={() => refetch()} />
+      </>
     );
   }
 
-  const handleFormSubmit = (e: React.SyntheticEvent) => {
-    try {
-      e.preventDefault();
-
-      const expenseDetail = getExpenseDetail();
-
-      if (expenseDetail.amount <= 0) {
-        console.warn("Please enter amount");
-        return;
-      }
-
-      if (!id || !user?.id) {
-        return;
-      }
-
-      const formattedExpenseDetail = {
-        ...expenseDetail,
-        date: new Date(expenseDetail.date).toISOString(),
-        category: Number(expenseDetail.category),
-      };
-
-      mutate({
-        expId: Number(id),
-        expenseDetail: formattedExpenseDetail,
-        uid: user.id,
-      });
-    } catch (error) {
-      console.error("Unable to add", error);
-    }
-  };
-
   return (
     <>
-      <h1 className="text-2xl font-medium mb-4">Edit Expense</h1>
+      <PageHeader back={back} title="Edit expense" description="Update the details of this expense." />
       <ExpenseForm
-        handleFormSubmit={handleFormSubmit}
-        handleInputChange={handleInputChange}
-        inputValues={inputValues}
-        isPending={isPending}
-        submitMessage={submitMessage}
+        key={expense.id}
+        initialValues={expense}
+        submitLabel="Save changes"
+        submitting={updateExpense.isPending}
+        cancelTo={back.to}
+        onSubmit={async (input) => {
+          try {
+            await updateExpense.mutateAsync(input);
+          } catch (err) {
+            toast.error(getErrorMessage(err, "Unable to update expense"));
+            throw err;
+          }
+          toast.success("Expense updated");
+          navigate(back.to);
+        }}
       />
     </>
   );

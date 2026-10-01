@@ -1,131 +1,138 @@
-export const setUserIdCookie = (userId: string, daysToLive: number) => {
-  const date = new Date();
+/**
+ * Date helpers.
+ *
+ * Expense dates are calendar dates ("YYYY-MM-DD") and budget months are
+ * "YYYY-MM". Everything here works in the user's local time and never goes
+ * through `toISOString()`, which converts to UTC and shifts dates by a day for
+ * users east or west of GMT.
+ */
 
-  date.setTime(date.getTime() + daysToLive * 24 * 60 * 60 * 1000);
-  let expires = "expires=" + date.toUTCString();
+const pad = (n: number) => String(n).padStart(2, "0");
 
-  document.cookie = `userId=${userId}; ${expires}; path=/; SameSite=Lax; Secure`;
+/** Local Date -> "YYYY-MM-DD" */
+export const toDateKey = (date: Date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+export const todayKey = () => toDateKey(new Date());
+
+/** "YYYY-MM-DD" (or an ISO timestamp) -> local Date at midnight */
+export const parseDateKey = (value: string) => {
+  const [y, m, d] = value.slice(0, 10).split("-").map(Number);
+  return new Date(y, (m || 1) - 1, d || 1);
 };
 
-export const formatDate = (date: Date) => {
-  return date.toLocaleDateString("en-IN").replace(/\//g, "-");
-};
-export const getCurrentMonth = (date = new Date()) => {
-  const year = date.getFullYear();
-  const month = ("0" + (date.getMonth() + 1)).slice(-2);
-
-  return `${year}-${month}-01`;
+export const addDays = (dateKey: string, days: number) => {
+  const date = parseDateKey(dateKey);
+  date.setDate(date.getDate() + days);
+  return toDateKey(date);
 };
 
-export const getTimeStampFromMonth = (monthDate: string) => {
-  const date = new Date(monthDate);
+/** Local Date -> "YYYY-MM" */
+export const toMonthKey = (date: Date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
 
-  const startDate = monthDate;
+export const currentMonthKey = () => toMonthKey(new Date());
 
-  const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 1)
-    .toISOString()
-    .split("T")[0];
+export const isMonthKey = (value: string | null | undefined): value is string =>
+  !!value && /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
 
-  return {
-    start: startDate,
-    end: endDate,
-  };
+export const isDateKey = (value: string | null | undefined): value is string =>
+  !!value && /^\d{4}-\d{2}-\d{2}$/.test(value);
+
+export const shiftMonth = (monthKey: string, delta: number) => {
+  const [y, m] = monthKey.split("-").map(Number);
+  return toMonthKey(new Date(y, m - 1 + delta, 1));
 };
 
-export const moneyFormat = (amount: number) => {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-  }).format(amount);
+/** First day of the month and first day of the next month (exclusive end). */
+export const monthBounds = (monthKey: string) => ({
+  start: `${monthKey}-01`,
+  endExclusive: `${shiftMonth(monthKey, 1)}-01`,
+});
+
+export const lastDayOfMonth = (monthKey: string) =>
+  addDays(monthBounds(monthKey).endExclusive, -1);
+
+export const daysInMonth = (monthKey: string) =>
+  Number(lastDayOfMonth(monthKey).slice(8, 10));
+
+export const formatMonth = (
+  monthKey: string,
+  style: "long" | "short" = "long",
+) => {
+  const [y, m] = monthKey.split("-").map(Number);
+  return new Date(y, m - 1, 1).toLocaleDateString("en-IN", {
+    month: style,
+    year: "numeric",
+  });
 };
 
-export const capitalizeFirstLetter = (str: string) => {
-  if (!str) return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
+export const formatDate = (
+  dateKey: string,
+  options: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  },
+) => {
+  if (!dateKey) return "—";
+  return parseDateKey(dateKey).toLocaleDateString("en-IN", options);
 };
 
-export type DateFilter =
-  | "current-month"
-  | "last-month"
-  | "last-6-months"
-  | "last-1-year"
-  | "all-time";
+export const formatDateTime = (iso: string) => {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
 
-export const getMonthRange = (filter: DateFilter) => {
-  const now = new Date();
+/** Money */
+const currency = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 2,
+});
+const currencyWhole = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 0,
+});
+const currencyCompact = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
 
-  const formatMonthDate = (date: Date) => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-      2,
-      "0",
-    )}-01`;
-  };
+export const formatMoney = (
+  amount: number,
+  variant: "default" | "whole" | "compact" = "default",
+) => {
+  const value = Number.isFinite(amount) ? amount : 0;
+  if (variant === "compact") return currencyCompact.format(value);
+  if (variant === "whole") return currencyWhole.format(value);
+  return currency.format(value);
+};
 
-  switch (filter) {
-    case "current-month": {
-      const date = new Date(now.getFullYear(), now.getMonth(), 1);
+export const formatPercent = (value: number) =>
+  `${Number.isFinite(value) ? Math.round(value) : 0}%`;
 
-      return {
-        startDate: formatMonthDate(date),
-        endDate: formatMonthDate(date),
-      };
-    }
+export const normalizeName = (name: string) => name.trim().toLowerCase();
 
-    case "last-month": {
-      const date = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+export const slugify = (name: string) =>
+  normalizeName(name)
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-");
 
-      return {
-        startDate: formatMonthDate(date),
-        endDate: formatMonthDate(date),
-      };
-    }
-
-    case "last-6-months": {
-      const start = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-      const end = new Date(now.getFullYear(), now.getMonth(), 1);
-
-      return {
-        startDate: formatMonthDate(start),
-        endDate: formatMonthDate(end),
-      };
-    }
-
-    case "last-1-year": {
-      const start = new Date(now.getFullYear() - 1, now.getMonth(), 1);
-      const end = new Date(now.getFullYear(), now.getMonth(), 1);
-
-      return {
-        startDate: formatMonthDate(start),
-        endDate: formatMonthDate(end),
-      };
-    }
+export const getErrorMessage = (error: unknown, fallback = "Something went wrong") => {
+  if (error instanceof Error && error.message) return error.message;
+  if (typeof error === "object" && error && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string" && message) return message;
   }
-};
-
-export const formatMonth = (date: Date) => {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-    2,
-    "0",
-  )}`;
-};
-
-export const formatInDate = (dateString: string) => {
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-};
-
-// Usage
-// formatDate("2026-06-24T14:03:27.669Z") // → "24-06-2026"
-
-export const addDateInMonth = (month: string, date?: string) => {
-  if (!date) {
-    date = "-01";
-  }
-  if (date) {
-    return month + date;
-  }
-  return month;
+  return fallback;
 };

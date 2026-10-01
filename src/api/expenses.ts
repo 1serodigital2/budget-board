@@ -1,283 +1,206 @@
 import { supabase } from "../services/supabase";
-import {
-  DateRange,
-  ExpenseProps,
-  GetExpenseDetailsType,
-  MonthlyExpenseSummaryResponseType,
+import type {
+  Expense,
+  ExpenseFilters,
+  ExpenseInput,
+  ExpensePage,
+  MonthlyTrendPoint,
 } from "../types/expense";
 import {
-  DateFilter,
-  getMonthRange,
-  getTimeStampFromMonth,
+  addDays,
+  currentMonthKey,
+  formatMonth,
+  monthBounds,
+  shiftMonth,
 } from "../utils/helpers";
-import { getBudgets } from "./budget";
 
-interface CreateExpenseProp {
-  uid: string;
-  expenseDetail: ExpenseProps;
+interface ExpenseRow {
+  id: number;
+  amount: number | string | null;
+  category: number;
+  note: string | null;
+  date: string | null;
+  created_at: string | null;
 }
-export const createExpense = async ({
-  uid,
-  expenseDetail,
-}: CreateExpenseProp) => {
-  try {
-    if (!uid) {
-      throw new Error("Uid is missing");
-    }
-    const { error } = await supabase.from("expenses").insert({
-      user_id: uid,
-      amount: expenseDetail.amount,
-      category: expenseDetail.category,
-      date: expenseDetail.date,
-      note: expenseDetail.note,
-      is_system: false,
-    });
 
-    if (error) throw error;
-  } catch (error: any) {
-    throw new Error("Unable to add expense: " + error.message);
-  }
+const COLUMNS = "id, amount, category, note, date, created_at";
+export const EXPENSE_PAGE_SIZE = 20;
+
+const mapExpense = (row: ExpenseRow): Expense => ({
+  id: row.id,
+  amount: Number(row.amount) || 0,
+  categoryId: row.category,
+  note: row.note ?? "",
+  // `date` may come back as "YYYY-MM-DD" or a full timestamp; keep the day.
+  date: (row.date || row.created_at || "").slice(0, 10),
+  createdAt: row.created_at ?? "",
+});
+
+const toRow = (input: ExpenseInput) => ({
+  amount: Number(input.amount),
+  category: Number(input.categoryId),
+  date: input.date,
+  note: input.note.trim(),
+});
+
+const validate = (input: ExpenseInput) => {
+  if (!(Number(input.amount) > 0)) throw new Error("Amount must be greater than 0");
+  if (!input.categoryId) throw new Error("Please choose a category");
+  if (!input.date) throw new Error("Please choose a date");
 };
 
 export const getExpenses = async (
   uid: string,
-  category?: number,
-  dateRange?: DateRange,
-  pageOffset: number = 0,
-  pageSize: number = 10,
-) => {
-  let query = supabase.from("expenses").select("*").eq("user_id", uid);
+  filters: ExpenseFilters,
+  offset = 0,
+): Promise<ExpensePage> => {
+  let query = supabase
+    .from("expenses")
+    .select(COLUMNS, { count: "exact" })
+    .eq("user_id", uid);
 
-  if (category) {
-    query = query.eq("category", category);
+  if (filters.categoryId) query = query.eq("category", filters.categoryId);
+  if (filters.search?.trim()) {
+    const term = filters.search.trim().replace(/[\\%_]/g, (c) => `\\${c}`);
+    query = query.ilike("note", `%${term}%`);
   }
+  if (filters.from) query = query.gte("date", filters.from);
+  // `to` is inclusive; compare against the start of the following day so the
+  // whole last day is included whether `date` is a date or a timestamp column.
+  if (filters.to) query = query.lt("date", addDays(filters.to, 1));
 
-  if (dateRange?.start && !dateRange?.end) {
-    query = query.eq("date", dateRange.start.toISOString());
-  } else if (dateRange?.start && dateRange?.end) {
-    query = query.gte("date", dateRange.start.toISOString());
-    query = query.lte("date", dateRange.end.toISOString());
-  }
+  const { data, error, count } = await query
+    .order("date", { ascending: false })
+    .order("id", { ascending: false })
+    .range(offset, offset + EXPENSE_PAGE_SIZE - 1);
 
-  query = query.order("date", { ascending: false });
+  if (error) throw new Error(`Unable to load expenses: ${error.message}`);
 
-  // PostgREST pagination (inclusive)
-  query = query.range(pageOffset, pageOffset + pageSize - 1);
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw error;
-  }
-
-  const expensesData = (data || []).map((doc: any) => ({
-    id: doc.id,
-    amount: doc.amount,
-    category: doc.category,
-    note: doc.note,
-    date: doc.date,
-    createdAt: doc.created_at,
-  }));
+  const expenses = (data ?? []).map(mapExpense);
+  const total = count ?? expenses.length;
+  const loaded = offset + expenses.length;
 
   return {
-    expenses: expensesData,
-    lastVisible:
-      data && data.length === pageSize ? pageOffset + data.length : null,
-    hasMore: data && data.length === pageSize,
+    expenses,
+    total,
+    nextOffset: loaded < total && expenses.length > 0 ? loaded : null,
   };
 };
 
-interface deleteExpenseType {
-  id: number;
-  uid: string;
-}
-export const deleteExpense = async ({ id, uid }: deleteExpenseType) => {
-  try {
-    const { error } = await supabase
-      .from("expenses")
-      .delete()
-      .eq("user_id", uid)
-      .eq("id", id);
-
-    if (error) throw error;
-  } catch (error: any) {
-    console.error("Unable to delete expense", error);
-    throw new Error("Unable to delete expense: " + error.message);
-  }
-};
-
-interface GetExpenseByIdType {
-  uid?: string;
-  id: number;
-}
-
-export const getExpenseById = async ({ uid, id }: GetExpenseByIdType) => {
-  try {
-    const { data, error } = await supabase
-      .from("expenses")
-      .select("*")
-      .eq("user_id", uid)
-      .eq("id", id)
-      .single();
-
-    if (error) throw error;
-
-    if (data) {
-      return {
-        id,
-        amount: data.amount,
-        category: data.category,
-        date: data.date || "",
-        note: data.note,
-        createdAt: data.created_at || "",
-      };
-    }
-  } catch (error: any) {
-    console.error("Unable to get expense detail", error);
-    throw new Error("Unable to get expense detail: " + error.message);
-  }
-};
-
-interface UpdateExpenseData {
-  expId: number;
-  expenseDetail: ExpenseProps;
-  uid: string;
-}
-export const updateExpense = async ({
-  uid,
-  expId,
-  expenseDetail,
-}: UpdateExpenseData) => {
-  try {
-    const { error } = await supabase
-      .from("expenses")
-      .update({
-        amount: expenseDetail.amount,
-        category: expenseDetail.category,
-        date: expenseDetail.date,
-        note: expenseDetail.note,
-      })
-      .eq("user_id", uid)
-      .eq("id", expId);
-
-    if (error) throw error;
-    return true;
-  } catch (error: any) {
-    console.error("unable to update expense", error);
-    throw new Error("Error while updating expense " + error.message);
-  }
-};
-
-export const getExpensesMonthYear = async ({
-  uid,
-  monthYear,
-}: {
-  uid: string;
-  monthYear: string;
-}): Promise<GetExpenseDetailsType[]> => {
-  try {
-    const { start: startDate, end: endDate } = getTimeStampFromMonth(monthYear);
-
-    const { data, error } = await supabase
-      .from("expenses")
-      .select("*")
-      .eq("user_id", uid)
-      .gte("date", startDate)
-      .lte("date", endDate);
-
-    if (error) throw error;
-
-    if (!data || data.length <= 0) {
-      return [];
-    }
-
-    return data.map((doc: any) => ({
-      id: doc.id,
-      amount: doc.amount,
-      category: doc.category,
-      date: new Date(doc.date),
-    }));
-  } catch (error: any) {
-    throw new Error("Unable to get expense for month year " + error.message);
-  }
-};
-
-export const getMonthlyExpenses = async (
+export const getExpensesInRange = async (
   uid: string,
-  filter: DateFilter,
-): Promise<MonthlyExpenseSummaryResponseType[]> => {
-  const range = getMonthRange(filter);
+  start: string,
+  endExclusive: string,
+): Promise<Expense[]> => {
+  const { data, error } = await supabase
+    .from("expenses")
+    .select(COLUMNS)
+    .eq("user_id", uid)
+    .gte("date", start)
+    .lt("date", endExclusive)
+    .order("date", { ascending: false })
+    .order("id", { ascending: false });
 
-  let query = supabase.from("expenses").select("*").eq("user_id", uid);
+  if (error) throw new Error(`Unable to load expenses: ${error.message}`);
+  return (data ?? []).map(mapExpense);
+};
 
-  if (filter !== "all-time" && range) {
-    const { start: startDate } = getTimeStampFromMonth(range.startDate);
-    const { end: endDate } = getTimeStampFromMonth(range.endDate);
+export const getExpenseById = async (uid: string, id: number) => {
+  const { data, error } = await supabase
+    .from("expenses")
+    .select(COLUMNS)
+    .eq("user_id", uid)
+    .eq("id", id)
+    .maybeSingle();
 
-    query = query.gte("date", startDate).lt("date", endDate);
-  }
+  if (error) throw new Error(`Unable to load expense: ${error.message}`);
+  if (!data) throw new Error("Expense not found");
+  return mapExpense(data);
+};
 
-  const expensesRes = await query;
+export const createExpense = async (uid: string, input: ExpenseInput) => {
+  validate(input);
+  const { error } = await supabase
+    .from("expenses")
+    .insert({ ...toRow(input), user_id: uid, is_system: false });
+  if (error) throw new Error(`Unable to add expense: ${error.message}`);
+};
 
-  const budgets = await getBudgets(uid, filter);
+export const updateExpense = async (
+  uid: string,
+  id: number,
+  input: ExpenseInput,
+) => {
+  validate(input);
+  const { error } = await supabase
+    .from("expenses")
+    .update(toRow(input))
+    .eq("user_id", uid)
+    .eq("id", id);
+  if (error) throw new Error(`Unable to update expense: ${error.message}`);
+};
 
-  if (expensesRes.error) {
-    throw expensesRes.error;
-  }
+export const deleteExpense = async (uid: string, id: number) => {
+  const { error } = await supabase
+    .from("expenses")
+    .delete()
+    .eq("user_id", uid)
+    .eq("id", id);
+  if (error) throw new Error(`Unable to delete expense: ${error.message}`);
+};
 
-  const monthlyData: Record<
-    string,
-    {
-      expense: number;
-      budget: number;
-      sortDate: Date;
-    }
-  > = {};
+/**
+ * Spend and total budget for each of the last `months` months, ending with
+ * the current month. Months with no activity are included as zeros so the
+ * chart has no gaps.
+ */
+export const getMonthlyTrend = async (
+  uid: string,
+  months: number,
+): Promise<MonthlyTrendPoint[]> => {
+  const lastMonth = currentMonthKey();
+  const firstMonth = shiftMonth(lastMonth, -(months - 1));
+  const { start } = monthBounds(firstMonth);
+  const { endExclusive } = monthBounds(lastMonth);
 
-  // Budgets
-  budgets.forEach((budget) => {
-    const [year, month] = budget.month.split("-").map(Number);
-    const date = new Date(year, month - 1, 1);
-    const monthKey = date.toLocaleString("en-US", {
-      month: "short",
-      year: "numeric",
-    });
+  const [expensesRes, budgetsRes] = await Promise.all([
+    supabase
+      .from("expenses")
+      .select("amount, date, created_at")
+      .eq("user_id", uid)
+      .gte("date", start)
+      .lt("date", endExclusive),
+    supabase
+      .from("budgets")
+      .select("amount, month")
+      .eq("user_id", uid)
+      .gte("month", start)
+      .lt("month", endExclusive),
+  ]);
 
-    if (!monthlyData[monthKey]) {
-      monthlyData[monthKey] = {
-        expense: 0,
-        budget: 0,
-        sortDate: date,
-      };
-    }
+  if (expensesRes.error) throw new Error(expensesRes.error.message);
+  if (budgetsRes.error) throw new Error(budgetsRes.error.message);
 
-    monthlyData[monthKey].budget += Number(budget.amount);
-  });
-
-  // Expenses
-  (expensesRes.data || []).forEach((expense: any) => {
-    const date = new Date(expense.date);
-    const monthKey = date.toLocaleString("en-US", {
-      month: "short",
-      year: "numeric",
-    });
-
-    if (!monthlyData[monthKey]) {
-      monthlyData[monthKey] = {
-        expense: 0,
-        budget: 0,
-        sortDate: new Date(date.getFullYear(), date.getMonth(), 1),
-      };
-    }
-
-    monthlyData[monthKey].expense += Number(expense.amount);
-  });
-
-  return Object.entries(monthlyData)
-    .sort(([, a], [, b]) => a.sortDate.getTime() - b.sortDate.getTime())
-    .map(([month, data]) => ({
+  const points = new Map<string, MonthlyTrendPoint>();
+  for (let i = 0; i < months; i++) {
+    const month = shiftMonth(firstMonth, i);
+    points.set(month, {
       month,
-      expense: data.expense,
-      budget: data.budget,
-    }));
+      label: formatMonth(month, "short"),
+      expense: 0,
+      budget: 0,
+    });
+  }
+
+  for (const row of expensesRes.data ?? []) {
+    const month = String(row.date || row.created_at || "").slice(0, 7);
+    const point = points.get(month);
+    if (point) point.expense += Number(row.amount) || 0;
+  }
+  for (const row of budgetsRes.data ?? []) {
+    const point = points.get(String(row.month).slice(0, 7));
+    if (point) point.budget += Number(row.amount) || 0;
+  }
+
+  return [...points.values()];
 };

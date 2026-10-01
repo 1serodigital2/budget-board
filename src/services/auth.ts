@@ -1,14 +1,13 @@
 import { supabase } from "./supabase";
-import { LoginProps } from "../types/FormTypes";
 
-export const createUser = ({ email, password }: LoginProps) => {
-  return supabase.auth.signUp({ email, password });
-};
+export const signUpWithEmail = (email: string, password: string) =>
+  supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: window.location.origin },
+  });
 
-export const loginUser = (email: string, password: string) => {
-  return supabase.auth.signInWithPassword({ email, password });
-};
+export const signInWithEmail = (email: string, password: string) =>
+  supabase.auth.signInWithPassword({ email, password });
 
-export const logOutUser = () => {
-  return supabase.auth.signOut();
-};
+export const signOutUser = () => supabase.auth.signOut();

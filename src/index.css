@@ -1,116 +1,171 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --font-heading: 'Inter', sans-serif;
-  --font-sans: 'Inter', sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
   --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  
+  --color-card-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-warning: var(--warning);
-  --color-success: var(--success);
-  
+  --color-subtle: var(--subtle);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
   --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent: var(--sidebar-accent);
-  
-  --radius-sm: 0.25rem;
-  --radius: 0.5rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
 }
 
 :root {
-  /* Match the uploaded design */
-  --background: #14151a; 
-  --foreground: #f3f4f6;
-  
-  --card: #1c1d24;
-  --card-foreground: #f3f4f6;
-  --popover: #1c1d24;
-  --popover-foreground: #f3f4f6;
-  
-  --primary: #10b981; /* Green accent */
+  color-scheme: light;
+  --background: #f6f7f9;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --muted: #f1f3f6;
+  --muted-foreground: #64748b;
+  --subtle: #94a3b8;
+  --border: #e5e8ee;
+  --input: #d9dee6;
+  --ring: #059669;
+
+  --primary: #059669;
   --primary-foreground: #ffffff;
-  
-  --secondary: #2a2c35;
-  --secondary-foreground: #e5e7eb;
-  
-  --muted: #2a2c35;
-  --muted-foreground: #9ca3af;
-  
-  --accent: #2a2c35;
-  --accent-foreground: #f3f4f6;
-  
-  --destructive: #ef4444; /* Red for deficits */
-  --warning: #f59e0b;
-  --success: #10b981;
-  
-  --border: #2a2c35;
-  --input: #2a2c35;
+  --primary-soft: #e7f6f0;
+
+  --destructive: #dc2626;
+  --destructive-soft: #fdecec;
+  --warning: #c2710c;
+  --warning-soft: #fdf3e3;
+  --success: #059669;
+  --success-soft: #e7f6f0;
+  --info: #2563eb;
+  --info-soft: #eaf1fe;
+
+  --sidebar: #ffffff;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.04);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #0b0d12;
+  --foreground: #e7eaf0;
+  --card: #12151c;
+  --muted: #1a1e27;
+  --muted-foreground: #8d96a8;
+  --subtle: #5f687a;
+  --border: #232834;
+  --input: #2c3240;
   --ring: #10b981;
-  
-  --sidebar: #18191f;
-  --sidebar-foreground: #9ca3af;
-  --sidebar-border: #2a2c35;
-  --sidebar-accent: #10b981;
+
+  --primary: #10b981;
+  --primary-foreground: #04120c;
+  --primary-soft: #0f2a21;
+
+  --destructive: #f26464;
+  --destructive-soft: #2c1517;
+  --warning: #f2a93b;
+  --warning-soft: #2c2112;
+  --success: #10b981;
+  --success-soft: #0f2a21;
+  --info: #60a5fa;
+  --info-soft: #14213a;
+
+  --sidebar: #0f1218;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
   }
   body {
-    @apply bg-background text-foreground antialiased min-h-screen;
+    @apply bg-background text-foreground antialiased min-h-screen font-sans;
+    font-feature-settings: "cv11", "ss01";
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="month"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+  .dark input[type="date"]::-webkit-calendar-picker-indicator,
+  .dark input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
   }
 }
 
-/* Recharts overrides */
-.recharts-default-tooltip {
-  @apply !bg-card !border-border !text-foreground rounded-lg shadow-lg;
-}
-.recharts-cartesian-grid-horizontal line, 
-.recharts-cartesian-grid-vertical line {
-  @apply stroke-border;
-}
-.recharts-text {
-  @apply fill-muted-foreground text-xs;
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
 }
 
-/* Custom Scrollbar for a premium feel */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Material Symbols */
+.icon {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  user-select: none;
+  flex-shrink: 0;
+}
+.icon-filled {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+/* Recharts */
+.recharts-surface:focus,
+.recharts-wrapper:focus,
+.recharts-sector:focus {
+  outline: none;
+}
+
+/* Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/30 rounded-full;
-}
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted-foreground/50;
+  background: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
+  border-radius: 999px;
 }

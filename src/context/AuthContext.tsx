@@ -1,152 +1,105 @@
 import {
   createContext,
-  ReactNode,
   useContext,
   useEffect,
+  useMemo,
+  useRef,
   useState,
+  type ReactNode,
 } from "react";
-import { User } from "@supabase/supabase-js";
-import { supabase } from "../services/supabase";
+import type { User } from "@supabase/supabase-js";
 
-// auth
+import { queryClient, supabase } from "../services/supabase";
 import {
-  loginUser,
-  logOutUser,
-  createUser as createUserService,
+  signInWithEmail,
+  signOutUser,
+  signUpWithEmail,
 } from "../services/auth";
-import { LoginProps } from "../types/FormTypes";
-import { createDefaultCategories } from "../api/category";
+
+interface SignUpResult {
+  /** True when the project requires email confirmation before sign-in. */
+  needsConfirmation: boolean;
+}
 
 interface AuthContextType {
   user: User | null;
-  logOut: () => Promise<void>;
-  login: ({ email, password }: LoginProps) => Promise<void>;
-  loading: boolean;
-  authError?: string;
-  resetAuthError: () => void;
-  createUser: ({ email, password }: LoginProps) => Promise<void>;
-  authSuccess?: string;
+  /** True only while the initial session is being restored. */
+  initializing: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<SignUpResult>;
+  signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  logOut: async () => {},
-  login: async () => {},
-  loading: true,
-  resetAuthError: () => {},
-  createUser: async () => {},
-});
+const AuthContext = createContext<AuthContextType | null>(null);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [authError, setAuthError] = useState<string>("");
-  const [authSuccess, setAuthSuccess] = useState<string>("");
-
-  const login = async ({ email, password }: LoginProps) => {
-    try {
-      setLoading(true);
-      const { error } = await loginUser(email, password);
-      if (error) throw error;
-    } catch (error: any) {
-      console.error("Critical error " + error);
-      setAuthError(error.message || "Unable to login");
-      setTimeout(() => {
-        setAuthError("");
-      }, 3000);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const logOut = async () => {
-    try {
-      setLoading(true);
-      await logOutUser();
-    } finally {
-      console.log("user logged out");
-      setLoading(false);
-    }
-  };
-  const resetAuthError = () => {
-    setAuthError("");
-  };
+  const [initializing, setInitializing] = useState(true);
+  const currentUserId = useRef<string | null>(null);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error("Session error:", error);
-      }
-      setUser(session?.user ?? null);
-      setLoading(false);
-    }).catch(err => {
-      console.error("Unexpected session fetch error:", err);
-      setLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        currentUserId.current = session?.user.id ?? null;
+        setUser(session?.user ?? null);
+      })
+      .catch((error) => console.error("Unable to restore session", error))
+      .finally(() => setInitializing(false));
 
-    // Listen for changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+      const next = session?.user ?? null;
+      // Drop cached data when the signed-in account changes.
+      if (currentUserId.current !== (next?.id ?? null)) {
+        currentUserId.current = next?.id ?? null;
+        queryClient.clear();
+      }
+      setUser(next);
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  const createUser = async ({ email, password }: LoginProps) => {
-    try {
-      setLoading(true);
-      const { data, error } = await createUserService({ email, password });
-
-      if (error) throw error;
-
-      const user = data.user;
-
-      if (user?.confirmation_sent_at && !user?.user_metadata?.email_verified) {
-      }
-      console.log("[createUser] user", user);
-
-      if (user?.id) {
-        await createDefaultCategories(user.id);
-      }
-
-      setAuthSuccess(
-        "Account created successfully! Please check your email and click the verification link before signing in.",
-      );
-      console.log("User created:", user?.id);
-      setLoading(false);
-    } catch (error: any) {
-      console.error("Error signing up:", error.message);
-      setAuthError("Error signing up " + error.message);
-      setTimeout(() => {
-        setAuthError("");
-      }, 5000);
-      setLoading(false);
-    }
-  };
-
-  const authValue = {
-    createUser,
-    user,
-    login,
-    logOut,
-    loading,
-    authError,
-    resetAuthError,
-    authSuccess,
-  };
-
-  return (
-    <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
+  const value = useMemo<AuthContextType>(
+    () => ({
+      user,
+      initializing,
+      signIn: async (email, password) => {
+        const { error } = await signInWithEmail(email.trim(), password);
+        if (error) throw error;
+      },
+      signUp: async (email, password) => {
+        const { data, error } = await signUpWithEmail(email.trim(), password);
+        if (error) throw error;
+        // Supabase hides whether an address is registered; an existing
+        // account comes back as a user with no identities.
+        if (data.user && data.user.identities?.length === 0) {
+          throw new Error("An account with this email already exists. Try signing in.");
+        }
+        return { needsConfirmation: !data.session };
+      },
+      signOut: async () => {
+        await signOutUser();
+        queryClient.clear();
+      },
+    }),
+    [user, initializing],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used inside <AuthProvider>");
+  return context;
+};
+
+/** The signed-in user's id. Only use below <ProtectedRoutes>. */
+export const useUserId = () => {
+  const { user } = useAuth();
+  if (!user) throw new Error("useUserId requires a signed-in user");
+  return user.id;
+};

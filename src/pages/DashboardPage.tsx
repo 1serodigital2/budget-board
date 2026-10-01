@@ -1,186 +1,256 @@
-import { useState } from "react";
-import CategoryWiseBudget from "../components/budget/CategoryWiseBudget";
-import MonthlyExpenseTrend from "../components/dashbaord/MonthlyExpenseTrend";
-import SpendingByCategory from "../components/dashbaord/SpendigByCategory";
-import useBudget from "../hooks/useBudget";
-import useBudgetSummary from "../hooks/useBudgetSummary";
+import { useSearchParams } from "react-router-dom";
+import { BudgetLines } from "../components/budgets/BudgetLines";
+import CategoryDonut from "../components/dashboard/CategoryDonut";
+import StatCard from "../components/dashboard/StatCard";
+import TrendChart from "../components/dashboard/TrendChart";
+import ExpenseList from "../components/expenses/ExpenseList";
+import { ButtonLink } from "../components/ui/Button";
+import Card, { CardHeader } from "../components/ui/Card";
+import MonthSwitcher from "../components/ui/MonthSwitcher";
+import PageHeader from "../components/ui/PageHeader";
+import { Alert, EmptyState, Skeleton } from "../components/ui/States";
+import { useAuth } from "../context/AuthContext";
+import { useMonthBudgets } from "../hooks/useBudgets";
 import { useCategories } from "../hooks/useCategories";
-import useExpenses from "../hooks/useExpenses";
-import { BudgetSummaryCardType } from "../types/dashboard";
-import { getCurrentMonth, moneyFormat } from "../utils/helpers";
+import { useMonthExpenses } from "../hooks/useExpenses";
+import { buildBudgetSummary } from "../utils/budgetSummary";
+import {
+  currentMonthKey,
+  daysInMonth,
+  formatMoney,
+  formatMonth,
+  isMonthKey,
+  lastDayOfMonth,
+  shiftMonth,
+} from "../utils/helpers";
 
-const date = getCurrentMonth();
-
-const BudgetSummaryCard = ({
-  icon,
-  iconBg,
-  total,
-  title,
-  footer,
-  footerIcon,
-  footerColor,
-}: {
-  icon: string;
-  iconBg: string;
-  total: number | string;
-  title: string;
-  footer: string;
-  footerIcon?: string;
-  footerColor?: string;
-}) => {
-  return (
-    <div className="bg-card border border-border/60 rounded-[14px] p-5 flex flex-col justify-between shadow-sm">
-      <div className="flex justify-between items-start mb-2">
-        <h5 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">{title}</h5>
-        <div className={`w-7 h-7 rounded-md flex justify-center items-center ${iconBg}`}>
-          <span className="material-symbols-outlined text-[15px]">{icon}</span>
-        </div>
-      </div>
-      <div>
-        <div className={`text-[26px] font-bold tracking-tight mb-2 ${footerColor ? footerColor : "text-foreground"}`}>
-          {typeof total === "number" ? moneyFormat(total) : total}
-        </div>
-        <div className="flex items-center gap-1.5">
-          {footerIcon && (
-            <span className={`material-symbols-outlined text-[13px] ${footerColor}`}>{footerIcon}</span>
-          )}
-          <div className="text-[11px] font-medium text-muted-foreground">{footer}</div>
-        </div>
-      </div>
-    </div>
-  );
+const greeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
 };
 
-const Dashboard = () => {
-  const { useGetBudgetMonthYear, useGetBudgetTable } = useBudget();
-  const { data: budgets } = useGetBudgetMonthYear(date);
-  const { useGetExpenseMonthYear } = useExpenses();
-  const { data: expenses, isLoading } = useGetExpenseMonthYear(date);
+const DashboardPage = () => {
+  const { user } = useAuth();
+  const [params, setParams] = useSearchParams();
+  const thisMonth = currentMonthKey();
+  const monthParam = params.get("month")?.slice(0, 7);
+  const month = isMonthKey(monthParam) && monthParam <= thisMonth ? monthParam : thisMonth;
+  const isCurrent = month === thisMonth;
 
-  const { totalExpenses, totalBudget, remainingBudget, budgetPercentageSpent } =
-    useBudgetSummary({ budgets, expenses });
+  const expensesQuery = useMonthExpenses(month);
+  const previousQuery = useMonthExpenses(shiftMonth(month, -1));
+  const budgetsQuery = useMonthBudgets(month);
+  const { data: categories = [] } = useCategories();
 
-  const { useGetCategories } = useCategories();
-  const { data: categories } = useGetCategories();
+  const loading = expensesQuery.isPending || budgetsQuery.isPending;
+  const expenses = expensesQuery.data ?? [];
+  const summary = buildBudgetSummary(budgetsQuery.data ?? [], expenses, categories);
+  const previousSpent = (previousQuery.data ?? []).reduce((sum, e) => sum + e.amount, 0);
 
-  const {
-    budgetData: budgetTable,
-    totalSpent,
-    totalBudgetAmount,
-    totalRemaining,
-  } = useGetBudgetTable({
-    budgets: budgets || [],
-    expenses: expenses || [],
-    categories: categories || [],
-  }) ?? {
-    budgetData: [],
-    totalSpent: 0,
-    totalBudgetAmount: 0,
-    totalRemaining: 0,
-  };
+  // Time-based figures
+  const totalDays = daysInMonth(month);
+  const elapsedDays = isCurrent ? new Date().getDate() : totalDays;
+  const daysLeft = totalDays - elapsedDays + 1; // including today
+  const dailyAverage = elapsedDays > 0 ? summary.totalSpent / elapsedDays : 0;
+  const projected = dailyAverage * totalDays;
+  const change =
+    previousSpent > 0 ? ((summary.totalSpent - previousSpent) / previousSpent) * 100 : null;
 
-  if (isLoading) {
-    return <div className="p-10 text-center text-muted-foreground">Loading dashboard...</div>;
-  }
+  const overLines = summary.lines.filter((l) => l.status === "over");
+  const hasBudget = summary.totalBudget > 0;
+  const overall = summary.remaining < 0;
+  const name = user?.email?.split("@")[0] ?? "";
 
-  const isDeficit = remainingBudget < 0;
-  const deficitAmount = Math.abs(remainingBudget);
+  const setMonth = (next: string) =>
+    setParams(next === thisMonth ? {} : { month: next }, { replace: true });
 
   return (
-    <div className="max-w-[1400px] mx-auto p-4 md:p-6 lg:p-8 space-y-6">
-      {/* Alert Banner */}
-      {isDeficit && (
-        <div className="bg-[#1f1618] border border-destructive/20 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive flex items-center justify-center shrink-0 mt-0.5">
-              <span className="material-symbols-outlined">warning</span>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-[14px] text-foreground uppercase">Budget Alert: Over by {moneyFormat(deficitAmount)}</h4>
-                <span className="bg-destructive text-[9px] font-bold px-1.5 py-0.5 rounded text-white tracking-wider">DEFICIT</span>
-              </div>
-              <p className="text-[13px] text-muted-foreground mt-1">
-                You've spent <strong className="text-foreground">{budgetPercentageSpent}%</strong> of your monthly limit. Projected month-end overflow is calculated at {moneyFormat(deficitAmount + 141)}.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <button className="px-4 py-2 rounded-lg font-semibold text-[13px] text-muted-foreground hover:bg-white/5 transition-colors cursor-pointer">
-              Dismiss
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-[13px] bg-primary hover:bg-primary/90 text-primary-foreground transition-colors cursor-pointer shadow-lg shadow-primary/20">
-              <span className="material-symbols-outlined text-[16px]">tune</span>
-              Adjust Budget
-            </button>
-          </div>
-        </div>
+    <>
+      <PageHeader
+        title={isCurrent ? `${greeting()}${name ? `, ${name}` : ""}` : formatMonth(month)}
+        description={
+          isCurrent
+            ? `Here's how ${formatMonth(month)} is going.`
+            : "A look back at this month's spending."
+        }
+        actions={<MonthSwitcher value={month} onChange={setMonth} max={thisMonth} className="flex-1 sm:flex-none" />}
+      />
+
+      {!loading && hasBudget && (overall || overLines.length > 0) && (
+        <Alert
+          tone={overall ? "error" : "warning"}
+          className="mb-6"
+          title={
+            overall
+              ? `You're ${formatMoney(-summary.remaining, "whole")} over your ${formatMonth(month)} budget`
+              : `${overLines.length} ${overLines.length === 1 ? "category is" : "categories are"} over budget`
+          }
+          action={
+            <ButtonLink to={`/budgets?month=${month}`} variant="secondary" size="sm">
+              Review budgets
+            </ButtonLink>
+          }
+        >
+          {overLines.length > 0
+            ? `Over budget: ${overLines.map((l) => l.categoryName).join(", ")}.`
+            : "Spending outside your budgeted categories pushed you over."}
+        </Alert>
       )}
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        <BudgetSummaryCard
-          title="Total Budget"
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+        <StatCard
+          loading={loading}
+          label="Spent"
+          icon="payments"
+          value={formatMoney(summary.totalSpent, "whole")}
+          footer={
+            change === null
+              ? `${expenses.length} ${expenses.length === 1 ? "expense" : "expenses"}`
+              : `${change > 0 ? "▲" : "▼"} ${Math.abs(Math.round(change))}% vs ${formatMonth(shiftMonth(month, -1), "short")}`
+          }
+          footerTone={change === null ? "neutral" : change > 0 ? "negative" : "positive"}
+        />
+        <StatCard
+          loading={loading}
+          label="Budget"
+          icon="savings"
+          value={hasBudget ? formatMoney(summary.totalBudget, "whole") : "Not set"}
+          valueTone={hasBudget ? undefined : "neutral"}
+          footer={
+            hasBudget
+              ? `${summary.lines.length} ${summary.lines.length === 1 ? "category" : "categories"} budgeted`
+              : "Set budgets to track your limits"
+          }
+        />
+        <StatCard
+          loading={loading}
+          label={overall ? "Over budget" : "Remaining"}
           icon="account_balance_wallet"
-          iconBg="bg-primary/10 text-primary border border-primary/20"
-          footer="Allocated for September 2026"
-          footerIcon="check_circle"
-          footerColor="text-primary"
-          total={totalBudget}
+          value={hasBudget ? formatMoney(Math.abs(summary.remaining), "whole") : "—"}
+          valueTone={!hasBudget ? "neutral" : overall ? "negative" : "positive"}
+          footer={
+            !hasBudget
+              ? "No budget for this month"
+              : overall
+                ? "Spending has passed the budget"
+                : isCurrent
+                  ? `≈ ${formatMoney(summary.remaining / daysLeft, "whole")}/day for ${daysLeft} ${daysLeft === 1 ? "day" : "days"}`
+                  : "Left unspent"
+          }
+          footerTone={hasBudget && overall ? "negative" : "neutral"}
         />
-        <BudgetSummaryCard
-          title="Total Expenses"
-          icon="receipt_long"
-          iconBg="bg-warning/10 text-warning border border-warning/20"
-          footer="utilized this cycle"
-          footerIcon=""
-          footerColor="text-foreground"
-          total={totalExpenses}
-        />
-        <BudgetSummaryCard
-          title="Remaining Budget"
-          icon="trending_down"
-          iconBg="bg-destructive/10 text-destructive border border-destructive/20"
-          footer="Immediate action suggested"
-          footerIcon="warning"
-          footerColor={isDeficit ? "text-destructive" : "text-primary"}
-          total={(isDeficit ? "-" : "") + moneyFormat(Math.abs(remainingBudget))}
-        />
-        <BudgetSummaryCard
-          title="Spend Velocity"
-          icon="speed"
-          iconBg="bg-muted-foreground/10 text-muted-foreground border border-border"
-          footer="Ceiling breached by 1.8%"
-          footerIcon="error"
-          footerColor="text-foreground"
-          total={`${budgetPercentageSpent}%`}
+        <StatCard
+          loading={loading}
+          label="Daily average"
+          icon="calendar_today"
+          value={formatMoney(dailyAverage, "whole")}
+          footer={
+            isCurrent
+              ? `On pace for ${formatMoney(projected, "whole")} this month`
+              : `Across ${totalDays} days`
+          }
+          footerTone={
+            isCurrent && hasBudget && projected > summary.totalBudget ? "warning" : "neutral"
+          }
         />
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <div className="lg:col-span-3 bg-card border border-border/60 rounded-[14px] p-5 md:p-6 shadow-sm">
-          <MonthlyExpenseTrend />
+      <div className="mt-6 grid gap-6 xl:grid-cols-5">
+        <div className="xl:col-span-3">
+          <TrendChart />
         </div>
-        <div className="lg:col-span-2 bg-card border border-border/60 rounded-[14px] p-5 md:p-6 shadow-sm">
-          <SpendingByCategory />
+        <div className="xl:col-span-2">
+          {loading ? (
+            <Skeleton className="h-full min-h-96 rounded-2xl" />
+          ) : (
+            <CategoryDonut expenses={expenses} categories={categories} month={month} />
+          )}
         </div>
       </div>
 
-      {/* Category Breakdown Table */}
-      <div className="bg-card border border-border/60 rounded-[14px] shadow-sm overflow-hidden">
-        <CategoryWiseBudget
-          budgetData={budgetTable}
-          monthFilter={date}
-          totalBudgetAmount={totalBudgetAmount}
-          totalRemaining={totalRemaining}
-          totalSpent={totalSpent}
-          showTotal={false}
-          hideMonth
-        />
+      <div className="mt-6 grid gap-6 xl:grid-cols-5">
+        <Card className="overflow-hidden xl:col-span-3">
+          <CardHeader
+            className="pb-4"
+            title="Budget health"
+            description="How each category is tracking against its limit"
+            action={
+              <ButtonLink to={`/budgets?month=${month}`} variant="secondary" size="sm">
+                Manage
+              </ButtonLink>
+            }
+          />
+          {loading ? (
+            <div className="space-y-3 p-6 pt-0">
+              <Skeleton className="h-10" />
+              <Skeleton className="h-10" />
+              <Skeleton className="h-10" />
+            </div>
+          ) : summary.lines.length === 0 ? (
+            <EmptyState
+              icon="savings"
+              title="No budgets this month"
+              description="Set a limit per category to see how your spending compares."
+              action={
+                <ButtonLink to={`/budgets?month=${month}`} icon="add" size="sm">
+                  Set up budgets
+                </ButtonLink>
+              }
+            />
+          ) : (
+            <div className="border-t">
+              <BudgetLines lines={summary.lines.slice(0, 6)} month={month} />
+            </div>
+          )}
+        </Card>
+
+        <Card className="overflow-hidden xl:col-span-2">
+          <CardHeader
+            className="pb-4"
+            title="Recent expenses"
+            description={`Latest in ${formatMonth(month)}`}
+            action={
+              expenses.length > 0 && (
+                <ButtonLink
+                  to={`/expenses?from=${month}-01&to=${lastDayOfMonth(month)}`}
+                  variant="secondary"
+                  size="sm"
+                >
+                  View all
+                </ButtonLink>
+              )
+            }
+          />
+          {loading ? (
+            <div className="space-y-3 p-6 pt-0">
+              <Skeleton className="h-10" />
+              <Skeleton className="h-10" />
+              <Skeleton className="h-10" />
+            </div>
+          ) : expenses.length === 0 ? (
+            <EmptyState
+              icon="receipt_long"
+              title="No expenses yet"
+              description={isCurrent ? "Add your first expense for this month." : "Nothing was logged this month."}
+              action={
+                isCurrent && (
+                  <ButtonLink to="/expenses/new" icon="add" size="sm">
+                    Add expense
+                  </ButtonLink>
+                )
+              }
+            />
+          ) : (
+            <div className="border-t">
+              <ExpenseList flat expenses={expenses.slice(0, 6)} categories={categories} />
+            </div>
+          )}
+        </Card>
       </div>
-    </div>
+    </>
   );
 };
 
-export default Dashboard;
+export default DashboardPage;
